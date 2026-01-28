@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('news', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
+            
             $table->string('photo_path');
             $table->string('title');
             $table->text('content');
             $table->date('date');
+
+            $table->index(['date'], 'idx_news_date');
+
             $table->timestamps();
         });
     }

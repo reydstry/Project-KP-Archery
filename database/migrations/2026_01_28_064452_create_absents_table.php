@@ -13,10 +13,27 @@ return new class extends Migration
     {
         Schema::create('absents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('member_id')->constrained('members');
-            $table->foreignId('session_id')->constrained('sessions');
+
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+            
+            $table->foreignId('member_id')
+                ->constrained('members')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+
+            $table->foreignId('training_session_id')
+                ->constrained('training_sessions')
+                ->cascadeOnUpdate()
+                ->restrictOnDelete();
+
             $table->date('date');
+
+            $table->unique(['member_id', 'training_session_id', 'date'], 'unique_absent_per_session_per_day');
+            $table->index(['member_id', 'training_session_id', 'date'], 'idx_absent_member_session_date');
+
             $table->timestamps();
         });
     }
