@@ -29,6 +29,7 @@ return new class extends Migration
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
 
+            $table->enum('status',['hadir', 'tidak hadir']);
             $table->date('date');
 
             $table->unique(['member_id', 'training_session_id', 'date'], 'unique_absent_per_session_per_day');
