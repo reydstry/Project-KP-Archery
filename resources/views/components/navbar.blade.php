@@ -9,11 +9,11 @@
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#beranda" class="nav-link">Beranda</a>
-                <a href="#tentang-kami" class="nav-link">Tentang Kami</a>
-                <a href="#program" class="nav-link">Program</a>
-                <a href="#galeri" class="nav-link">Galeri</a>
-                <a href="#kontak" class="nav-link">Kontak</a>
+                <a href="{{ route('beranda') }}" class="nav-link">Beranda</a>
+                <a href="{{ route('tentang-kami') }}" class="nav-link">Tentang Kami</a>
+                <a href="{{ route('program') }}" class="nav-link">Program</a>
+                <a href="{{ route('galeri') }}" class="nav-link">Galeri</a>
+                <a href="{{ route('kontak') }}" class="nav-link">Kontak</a>
             </div>
 
             <!-- Right Desktop -->
@@ -75,11 +75,11 @@
     </div>
 
     <nav class="flex flex-col gap-6 text-lg font-medium">
-        <a href="#beranda" class="text-gray-700 hover:text-gray-900">Beranda</a>
-        <a href="#tentang-kami" class="text-gray-700 hover:text-gray-900">Tentang Kami</a>
-        <a href="#program" class="text-gray-700 hover:text-gray-900">Program</a>
-        <a href="#galeri" class="text-gray-700 hover:text-gray-900">Galeri</a>
-        <a href="#kontak" class="text-gray-700 hover:text-gray-900">Kontak</a>
+        <a href="{{ route('beranda') }}" class="text-gray-700 hover:text-gray-900">Beranda</a>
+        <a href="{{ route('tentang-kami') }}" class="text-gray-700 hover:text-gray-900">Tentang Kami</a>
+        <a href="{{ route('program') }}" class="text-gray-700 hover:text-gray-900">Program</a>
+        <a href="{{ route('galeri') }}" class="text-gray-700 hover:text-gray-900">Galeri</a>
+        <a href="{{ route('kontak') }}" class="text-gray-700 hover:text-gray-900">Kontak</a>
     </nav>
 
     <div class="mt-10 flex flex-col gap-4">
