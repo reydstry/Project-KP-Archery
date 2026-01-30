@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Enums\UserRoles;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -29,21 +27,34 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'role' => UserRoles::class,
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
-    public const ROLE_ADMIN = 1;
-    public const ROLE_TRAINER = 2;
-
-    public function role(): BelongsTo
+    public function members()
     {
-        return $this->belongsTo(Role::class);
+        return $this->hasMany(Member::class);
     }
 
-    public function absents(): HasMany
+    public function registeredMembers()
     {
-        return $this->hasMany(Absent::class);
+        return $this->hasMany(Member::class, 'registered_by');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRoles::ADMIN;
+    }
+
+    public function isCoach(): bool
+    {
+        return $this->role === UserRoles::COACH;
+    }
+
+    public function isMember(): bool
+    {
+        return $this->role === UserRoles::MEMBER;
     }
 }
