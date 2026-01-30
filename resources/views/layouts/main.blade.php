@@ -24,7 +24,7 @@
 <body class="font-sans antialiased bg-white">
     
     <!-- Navbar -->
-    @include('components.navbar')
+    @include('components.global.navbar')
     
     <!-- Main Content -->
     <main class="min-h-screen">
@@ -32,7 +32,7 @@
     </main>
     
     <!-- Footer -->
-    @include('components.footer')
+    @include('components.global.footer')
     
     <!-- Scripts -->
     <script>

@@ -3,8 +3,8 @@
 @section('title', 'FocusOnex Archery - Temukan Fokus Sejatimu')
 
 @section('content')
-    @include('components.hero')
-    @include('components.program-section')
-    @include('components.partners-section')
-    @include('components.cta-section')
+    @include('components.home.hero')
+    @include('components.home.program-section')
+    @include('components.home.partners-section')
+    @include('components.home.cta-section')
 @endsection
