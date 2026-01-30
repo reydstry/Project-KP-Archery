@@ -13,7 +13,19 @@ return new class extends Migration
     {
         Schema::create('members', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->onDelete('cascade');
+
+            $table->foreignId('parent_member_id')
+                ->nullable()
+                ->constrained('members')
+                ->onDelete('set null');
+            
             $table->string('name');
+            $table->enum('member_type', ['anak', 'dewasa']);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

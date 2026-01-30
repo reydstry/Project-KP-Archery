@@ -6,14 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Member extends Model
 {
-    protected $table = 'members';
-
-    protected $fillable = [
-        'name',
-    ];
-
-    public function absents()
+    public function user()
     {
-        return $this->hasMany(Absent::class);
+        return $this->belongsTo(User::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Member::class, 'parent_member_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Member::class, 'parent_member_id');
+    }
+
+    public function packages()
+    {
+        return $this->hasMany(MemberPackage::class);
     }
 }

@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('news', function (Blueprint $table) {
+        Schema::create('session_times', function (Blueprint $table) {
             $table->id();
-            
-            $table->string('photo_path');
-            $table->string('title');
-            $table->text('content');
-            $table->date('publish_date');
-
-            $table->index(['date'], 'idx_news_date');
-
+            $table->timestamps();
+            $table->string('name');           
+            $table->time('start_time');       
+            $table->time('end_time');         
             $table->timestamps();
         });
     }
@@ -30,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('news');
+        Schema::dropIfExists('session_times');
     }
 };
