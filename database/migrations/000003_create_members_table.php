@@ -15,17 +15,24 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('user_id')
-                ->constrained('users')
-                ->onDelete('cascade');
+                ->constrained()
+                ->cascadeOnDelete();
 
-            $table->foreignId('parent_member_id')
+            $table->foreignId('registered_by')
                 ->nullable()
-                ->constrained('members')
+                ->constrained('users')
                 ->onDelete('set null');
-            
+
             $table->string('name');
-            $table->enum('member_type', ['anak', 'dewasa']);
+            $table->string('phone')->nullable();
+
+            $table->boolean('is_self')->default(true)
+                ->comment('true = member dewasa, false = anak yang didaftarkan ortu');
+
             $table->boolean('is_active')->default(true);
+            
+            $table->index(['name', 'user_id', 'is_active']);
+
             $table->timestamps();
         });
     }

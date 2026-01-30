@@ -18,18 +18,18 @@ return new class extends Migration
                 ->constrained('session_times')
                 ->restrictOnDelete();
 
-            $table->date('session_date');
+            $table->date('date');
 
             $table->foreignId('coach_id')
                 ->constrained('coaches')
                 ->restrictOnDelete();
 
-            $table->integer('quota');
+            $table->integer('max_participants');
             $table->enum('status', ['open', 'closed', 'canceled'])->default('open');
  
             $table->timestamps();
 
-            $table->unique(['session_time_id', 'session_date']);
+            $table->unique(['session_time_id', 'date']);
         });
     }
 

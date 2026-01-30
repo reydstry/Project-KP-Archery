@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\UserRoles;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,7 +10,6 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
@@ -35,18 +33,28 @@ class User extends Authenticatable
         ];
     }
 
-    public function hasRole(UserRoles|string $role): bool
+    public function members()
     {
-        $roleValue = $role instanceof UserRoles ? $role->value : (string) $role;
-
-        $current = $this->role;
-        $currentValue = $current instanceof UserRoles ? $current->value : (string) $current;
-
-        return $currentValue === $roleValue;
+        return $this->hasMany(Member::class);
     }
 
-    public function absents(): HasMany
+    public function registeredMembers()
     {
-        return $this->hasMany(Absent::class);
+        return $this->hasMany(Member::class, 'registered_by');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRoles::ADMIN;
+    }
+
+    public function isCoach(): bool
+    {
+        return $this->role === UserRoles::COACH;
+    }
+
+    public function isMember(): bool
+    {
+        return $this->role === UserRoles::MEMBER;
     }
 }

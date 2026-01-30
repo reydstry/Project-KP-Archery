@@ -11,6 +11,39 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function register(Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required','string','max:255'],
+            'email' => ['required','email','max:255','unique:users,email'],
+            'password' => ['required','string','min:8','confirmed'],
+            'phone' => ['nullable','string','max:20'],
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'phone' => $data['phone'] ?? null,
+            'role' => UserRoles::MEMBER,
+        ]);
+
+        $token = $user->createToken('auth-token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Registrasi Berhasil',
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role?->value,
+                ],
+                'token' => $token,
+                'token_type' => 'Bearer',
+            ],
+        ], 201);
+    }
     public function login(Request $request)
     {
         $data = $request->validate([
@@ -26,17 +59,21 @@ class AuthController extends Controller
             ]);
         }
 
-        $token = $user->createToken('api')->plainTextToken;
+        $user->tokens()->delete();
+
+        $token = $user->createToken('auth-token')->plainTextToken;
 
         return response()->json([
-            'message' => 'logged_in',
-            'token' => $token,
-            'token_type' => 'Bearer',
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role?->value ?? (string) $user->role,
+            'message' => 'Login berhasil',
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role?->value,
+                ],
+                'token' => $token,
+                'token_type' => 'Bearer',
             ],
         ]);
     }
@@ -46,10 +83,16 @@ class AuthController extends Controller
         $user = $request->user();
 
         return response()->json([
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->role?->value ?? (string) $user->role,
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role->value,
+                    'phone' => $user->phone,
+                ],
+                'members' => $user->members, // Member yang dimiliki user ini
+            ],
         ]);
     }
 
@@ -57,6 +100,8 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'logged_out']);
+        return response()->json([
+            'message' => 'Logout berhasil',
+        ]);
     }
 }

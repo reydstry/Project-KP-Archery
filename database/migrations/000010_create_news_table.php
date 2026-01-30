@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('content');
             $table->date('publish_date');
 
-            $table->index(['date'], 'idx_news_date');
+            $table->index(['publish_date'], 'idx_news_date');
 
             $table->timestamps();
         });

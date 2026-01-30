@@ -1,17 +1,42 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Users\MemberController;
+use App\Http\Controllers\Users\AdminController;
+use App\Http\Controllers\Users\CoachController;
+use Illuminate\Support\Facades\Route;
 
-Route::prefix('auth')->group(function () {
-    Route::post('login', [AuthController::class, 'login']);
+// Public routes
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('me', [AuthController::class, 'me']);
-        Route::post('logout', [AuthController::class, 'logout']);
+// Protected routes (perlu login)
+Route::middleware('auth:sanctum')->group(function () {
+    
+    // Auth
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
+
+    // Routes untuk MEMBER (orang tua / member dewasa)
+    Route::middleware('role:member')->prefix('member')->group(function () {
+        Route::get('/dashboard', [MemberController::class, 'dashboard']);
+        Route::post('/register-child', [MemberController::class, 'registerChild']);
+        Route::post('/register-self', [MemberController::class, 'registerSelf']);
+        Route::get('/my-members', [MemberController::class, 'myMembers']);
+        Route::post('/book-session', [MemberController::class, 'bookSession']);
     });
-});
 
-Route::middleware(['auth:sanctum', 'role:admin'])->get('/admin/ping', function () {
-    return response()->json(['ok' => true]);
+    // Routes untuk COACH (pelatih)
+    Route::middleware('role:coach')->prefix('coach')->group(function () {
+        Route::get('/sessions', [CoachController::class, 'sessions']);
+        Route::post('/validate-attendance', [CoachController::class, 'validateAttendance']);
+        Route::post('/book-member', [CoachController::class, 'bookMember']);
+    });
+
+    // Routes untuk ADMIN
+    Route::middleware('role:admin')->prefix('admin')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard']);
+        Route::get('/member-dashboard/{member}', [AdminController::class, 'memberDashboard']);
+        Route::post('/validate-package/{memberPackage}', [AdminController::class, 'validatePackage']);
+    });
 });

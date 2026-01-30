@@ -11,28 +11,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('attendances', function (Blueprint $table) {
+        Schema::create('member_packages', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('member_id')
                 ->constrained('members')
                 ->onDelete('cascade');
 
-            $table->foreignId('training_session_id')
-                ->constrained('training_sessions')
-                ->onDelete('cascade');
-
-            $table->enum('status', ['hadir', 'tidak hadir'])->default('tidak hadir');
-
-            $table->foreignId('validated_by')
-                ->constrained('users')
+            $table->foreignId('package_id')
+                ->constrained('packages')
                 ->restrictOnDelete();
 
-            $table->timestamps('validates_at');
+            $table->integer('total_sessions')->default(0);
+            $table->integer('used_sessions')->default(0);
 
+            $table->date('start_date');
+            $table->date('end_date');
+
+            $table->boolean('is_active')->default(false);
+
+            $table->foreignId('validated_by')
+                ->nullable()
+                ->constrained('users')
+                ->onDelete('set null');
+
+            $table->datetime('validated_at')->nullable();
             $table->timestamps();
-
-            $table->unique(['member_id', 'training_session_id']);
         });
     }
 
@@ -41,6 +45,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('attendances');
+        Schema::dropIfExists('member_packages');
     }
 };

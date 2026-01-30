@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('packages', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('quota_in_month');
-            $table->integer('price');
             $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->decimal('price', 10, 0);
+            $table->integer('duration_days')->default(30); 
+            $table->integer('session_count');
             $table->timestamps();
         });
     }
