@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('news', function (Blueprint $table) {
+        Schema::create('coaches', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('user_id')
+                ->constrained('users')
+                ->onDelete('cascade');
+
+            $table->string('name');
+            $table->string('phone')->nullable();
             
-            $table->string('photo_path');
-            $table->string('title');
-            $table->text('content');
-            $table->date('publish_date');
-
-            $table->index(['date'], 'idx_news_date');
-
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('news');
+        Schema::dropIfExists('coaches');
     }
 };
