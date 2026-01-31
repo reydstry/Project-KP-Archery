@@ -3,200 +3,142 @@
 @section('title', 'Daftar - FocusOneX Archery')
 
 @section('content')
-<section class="relative min-h-screen">
-    <!-- Background Image -->
-    <div class="absolute inset-0">
+<section class="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+
+    <!-- Background -->
+    <div class="absolute inset-0 z-0">
         <img src="{{ asset('asset/img/latarbelakanglogin.jpeg') }}"
-             class="w-full h-full object-cover"
-             alt="Background">
+             alt="Background"
+             class="w-full h-full object-cover blur-sm">
         <div class="absolute inset-0 bg-black/40"></div>
     </div>
 
-    <!-- Content -->
-    <div class="relative flex flex-col items-center justify-center px-6 py-8 mx-auto min-h-screen lg:py-0">
-        
-    <!-- Login Card - Clean & Simple -->
-    <div class="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl px-6 py-8 sm:px-10 sm:py-10">
+    <!-- Register Card -->
+    <div class="relative z-10 w-full max-w-lg sm:max-w-xl lg:max-w-4xl
+                bg-white rounded-2xl shadow-2xl p-8 sm:p-10">
 
         <!-- Logo -->
         <div class="flex justify-center mb-6">
             <img src="{{ asset('asset/img/logofocus.png') }}"
-                 class="h-12 sm:h-14 w-auto"
-                 alt="FocusOneX">
+                 alt="FocusOneX"
+                 class="h-12 w-auto">
         </div>
-        <!-- Register Card -->
-        <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-2xl xl:p-0">
-            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                
-                <!-- Title -->
-                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                    Create an account
-                </h1>
 
-                <!-- Error Messages -->
-                @if ($errors->any())
-                    <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                        @foreach ($errors->all() as $error)
-                            <p>{{ $error }}</p>
-                        @endforeach
-                    </div>
-                @endif
+        <!-- Title -->
+        <h1 class="text-2xl font-bold text-center text-gray-900 mb-6">
+            Create an account
+        </h1>
 
-                <!-- Form -->
-                <form class="space-y-4 md:space-y-6" action="{{ route('register.post') }}" method="POST">
-                    @csrf
-                    
-                    <!-- Row 1: Name & Email -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Name -->
-                        <div>
-                            <label for="name" class="block mb-2 text-sm font-medium text-gray-900">
-                                Nama Lengkap
-                            </label>
-                            <input 
-                                type="text" 
-                                name="name" 
-                                id="name" 
-                                value="{{ old('name') }}"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5" 
-                                placeholder="" 
-                                required
-                            >
-                        </div>
+        <!-- Error Messages -->
+        @if ($errors->any())
+            <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                @foreach ($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
 
-                        <!-- Email -->
-                        <div>
-                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900">
-                                Email
-                            </label>
-                            <input 
-                                type="email" 
-                                name="email" 
-                                id="email" 
-                                value="{{ old('email') }}"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5" 
-                                placeholder="" 
-                                required
-                            >
-                        </div>
-                    </div>
-                    <!-- Row 2: Phone & Birth Date -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Phone -->
-                        <div>
-                            <label for="phone" class="block mb-2 text-sm font-medium text-gray-900">
-                                Nomor Telepon
-                            </label>
-                            <input 
-                                type="tel" 
-                                name="phone" 
-                                id="phone" 
-                                value="{{ old('phone') }}"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5" 
-                                placeholder="" 
-                                required
-                            >
-                        </div>
+        <!-- Form -->
+        <form action="{{ route('register.post') }}" method="POST" class="mt-8 space-y-6">
+            @csrf
 
-                        <!-- Birth Date -->
-                        <div>
-                            <label for="birth_date" class="block mb-2 text-sm font-medium text-gray-900">
-                                Tanggal Lahir
-                            </label>
-                            <input 
-                                type="date" 
-                                name="birth_date" 
-                                id="birth_date" 
-                                value="{{ old('birth_date') }}"
-                                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5"
-                            >
-                        </div>
-                    </div>
+            <!-- Row 1 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
+                        Nama Lengkap
+                    </label>
+                    <input type="text" name="name" value="{{ old('name') }}" required
+                           class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                  focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+                </div>
 
-                    <!-- Address -->
-                    <div>
-                        <label for="address" class="block mb-2 text-sm font-medium text-gray-900">
-                            Alamat
-                        </label>
-                        <textarea 
-                            name="address" 
-                            id="address" 
-                            rows="3"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5" 
-                            placeholder="" 
-                            required
-                        >{{ old('address') }}</textarea>
-                    </div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
+                        Email
+                    </label>
+                    <input type="email" name="email" value="{{ old('email') }}" required
+                           class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                  focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
 
-                    <!-- Row 3: Password & Confirm -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Password -->
-                        <div>
-                            <label for="password" class="block mb-2 text-sm font-medium text-gray-900">
-                                Password
-                            </label>
-                            <input 
-                                type="password" 
-                                name="password" 
-                                id="password" 
-                                placeholder="" 
-                                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5" 
-                                required
-                            >
-                        </div>
+            <!-- Row 2 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
+                        Nomor Telepon
+                    </label>
+                    <input type="tel" name="phone" value="{{ old('phone') }}" required
+                           class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                  focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+                </div>
 
-                        <!-- Confirm Password -->
-                        <div>
-                            <label for="password_confirmation" class="block mb-2 text-sm font-medium text-gray-900">
-                                Konfirmasi Password
-                            </label>
-                            <input 
-                                type="password" 
-                                name="password_confirmation" 
-                                id="password_confirmation" 
-                                placeholder="" 
-                                class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5" 
-                                required
-                            >
-                        </div>
-                    </div>
-                    <!-- Terms Checkbox -->
-                    <div class="flex items-start">
-                        <div class="flex items-center h-5">
-                            <input 
-                                id="terms" 
-                                name="terms"
-                                type="checkbox" 
-                                class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300"
-                                required
-                            >
-                        </div>
-                        <div class="ml-3 text-sm">
-                            <label for="terms" class="font-light text-gray-500">
-                                I accept the 
-                            </label>
-                        </div>
-                    </div>
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
+                        Tanggal Lahir
+                    </label>
+                    <input type="date" name="birth_date" value="{{ old('birth_date') }}"
+                           class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                  focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
 
-                    <!-- Submit Button -->
+            <!-- Address -->
+            <div>
+                <label class="block mb-2 text-sm font-medium text-gray-700">
+                    Alamat
+                </label>
+                <textarea name="address" rows="3" required
+                          class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                 focus:border-blue-500 focus:ring-2 focus:ring-blue-500">{{ old('address') }}</textarea>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
+                        Password
+                    </label>
+                    <input type="password" name="password" required
+                           class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                  focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
+                        Konfirmasi Password
+                    </label>
+                    <input type="password" name="password_confirmation" required
+                           class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                  focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <!-- Terms -->
+            <label class="flex items-center gap-2 pt-2 text-sm text-gray-600">
+                <input type="checkbox" required
+                       class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                I accept the terms & conditions
+            </label>
+
+            <!-- Button -->
             <button type="submit"
-                    class="w-full py-3 text-white font-semibold text-sm
-                           bg-blue-600 rounded-lg hover:bg-blue-700
-                           focus:ring-4 focus:ring-blue-300 focus:outline-none
-                           transition-colors duration-200">
+                    class="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white
+                           transition hover:bg-blue-700 focus:ring-4 focus:ring-blue-300">
                 Create an account
             </button>
+        </form>
 
-                    <!-- Login Link -->
-                    <p class="text-sm font-light text-gray-500">
-                        Already have an account? 
-                        <a href="{{ route('login') }}" class="font-medium text-blue-600 hover:underline">
-                            Login here
-                        </a>
-                    </p>
-                </form>
-            </div>
-        </div>
+        <!-- Login Link -->
+        <p class="mt-6 text-center text-sm text-gray-700">
+            Already have an account?
+            <a href="{{ route('login') }}"
+               class="font-semibold text-blue-600 hover:text-blue-700">
+                Login here
+            </a>
+        </p>
+
     </div>
 </section>
 @endsection
