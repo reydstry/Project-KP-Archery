@@ -33,16 +33,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function members()
-    {
-        return $this->hasMany(Member::class);
-    }
-
-    public function registeredMembers()
-    {
-        return $this->hasMany(Member::class, 'registered_by');
-    }
-
     public function isAdmin(): bool
     {
         return $this->role === UserRoles::ADMIN;
