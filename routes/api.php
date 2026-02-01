@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CoachController;
+use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -44,5 +45,9 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Master Coaches
         Route::apiResource('coaches', CoachController::class);
+        
+        // Master Members
+        Route::apiResource('members', MemberController::class);
+        Route::post('members/{id}/restore', [MemberController::class, 'restore']);
     });
 });
