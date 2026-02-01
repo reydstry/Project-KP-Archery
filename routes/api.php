@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Coach\AttendanceController;
 use App\Http\Controllers\Coach\TrainingSessionController;
+use App\Http\Controllers\Member\DashboardController;
 use App\Http\Controllers\Member\RegistrationController;
 use App\Http\Controllers\Member\SessionBookingController;
 use Illuminate\Support\Facades\Route;
@@ -29,9 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Routes untuk MEMBER (orang tua / member dewasa)
     Route::middleware('role:member')->prefix('member')->group(function () {
-        Route::get('/dashboard', function () {
-            return response()->json(['message' => 'Member dashboard']);
-        });
+        Route::get('/dashboard', [DashboardController::class, 'index']);
         
         // Member Registration
         Route::post('/register-self', [RegistrationController::class, 'registerSelf']);

@@ -390,7 +390,7 @@ class AttendanceTest extends TestCase
         $this->assertNotNull($attendance->validated_at);
     }
 
-    /** @test */
+    
     public function marking_attendance_as_present_deducts_quota()
     {
         $coach = Coach::factory()->create();
@@ -423,7 +423,7 @@ class AttendanceTest extends TestCase
         $this->assertEquals(1, $memberPackage->used_sessions);
     }
 
-    /** @test */
+    
     public function marking_attendance_as_absent_does_not_deduct_quota()
     {
         $coach = Coach::factory()->create();
@@ -455,7 +455,7 @@ class AttendanceTest extends TestCase
         $this->assertEquals(0, $memberPackage->used_sessions);
     }
 
-    /** @test */
+    
     public function cannot_mark_attendance_as_present_when_no_remaining_quota()
     {
         $coach = Coach::factory()->create();
@@ -489,7 +489,7 @@ class AttendanceTest extends TestCase
         ]);
     }
 
-    /** @test */
+    
     public function updating_attendance_from_absent_to_present_deducts_quota()
     {
         $coach = Coach::factory()->create();
@@ -530,7 +530,7 @@ class AttendanceTest extends TestCase
         $this->assertEquals(1, $memberPackage->used_sessions);
     }
 
-    /** @test */
+    
     public function updating_attendance_from_present_to_absent_refunds_quota()
     {
         $coach = Coach::factory()->create();
@@ -571,7 +571,7 @@ class AttendanceTest extends TestCase
         $this->assertEquals(0, $memberPackage->used_sessions);
     }
 
-    /** @test */
+    
     public function cannot_update_attendance_to_present_when_no_remaining_quota()
     {
         $coach = Coach::factory()->create();

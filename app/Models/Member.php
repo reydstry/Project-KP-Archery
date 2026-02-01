@@ -59,4 +59,20 @@ class Member extends Model
     {
         return $this->belongsTo(User::class, 'registered_by');
     }
+
+    /**
+     * Get member packages
+     */
+    public function memberPackages()
+    {
+        return $this->hasMany(MemberPackage::class);
+    }
+
+    /**
+     * Get achievements
+     */
+    public function achievements()
+    {
+        return $this->hasMany(Achievement::class);
+    }
 }

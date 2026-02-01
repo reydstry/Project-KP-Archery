@@ -17,6 +17,13 @@ class MemberRoleTest extends TestCase
     public function test_member_can_access_member_route(): void
     {
         $user = User::factory()->create(['role' => UserRoles::MEMBER]);
+        
+        // Create member profile for dashboard access
+        \App\Models\Member::factory()->create([
+            'user_id' => $user->id,
+            'is_self' => true,
+        ]);
+        
         $token = $user->createToken('test-token')->plainTextToken;
 
         $response = $this->withHeaders([

@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('achievements', function (Blueprint $table) {
             $table->id();
-
-            // $table->string('photo_path');
             $table->foreignId('member_id')
                 ->constrained('members')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
             
-            $table->string('achievement');
+            $table->string('title');
+            $table->text('description')->nullable();
             $table->date('date');
+            $table->string('photo_path')->nullable();
 
             $table->index(['member_id', 'date'], 'idx_achievement_member');
             
