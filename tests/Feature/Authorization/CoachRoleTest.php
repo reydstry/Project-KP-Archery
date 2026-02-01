@@ -21,7 +21,7 @@ class CoachRoleTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->getJson('/api/coach/sessions');
+        ])->getJson('/api/coach/dashboard');
 
         $response->assertStatus(200);
     }
@@ -36,7 +36,7 @@ class CoachRoleTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->getJson('/api/coach/sessions');
+        ])->getJson('/api/coach/dashboard');
 
         $response->assertStatus(403);
     }
@@ -51,7 +51,7 @@ class CoachRoleTest extends TestCase
 
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
-        ])->getJson('/api/coach/sessions');
+        ])->getJson('/api/coach/dashboard');
 
         $response->assertStatus(403);
     }
@@ -61,7 +61,7 @@ class CoachRoleTest extends TestCase
      */
     public function test_unauthenticated_user_cannot_access_coach_route(): void
     {
-        $response = $this->getJson('/api/coach/sessions');
+        $response = $this->getJson('/api/coach/dashboard');
 
         $response->assertStatus(401);
     }

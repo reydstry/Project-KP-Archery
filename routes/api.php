@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Coach\TrainingSessionController;
 use App\Http\Controllers\Member\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,9 +39,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Routes untuk COACH (pelatih)
     Route::middleware('role:coach')->prefix('coach')->group(function () {
-        Route::get('/sessions', function () {
-            return response()->json(['message' => 'Coach sessions']);
+        Route::get('/dashboard', function () {
+            return response()->json(['message' => 'Coach dashboard']);
         });
+        
+        // Training Sessions
+        Route::get('training-sessions', [TrainingSessionController::class, 'index']);
+        Route::post('training-sessions', [TrainingSessionController::class, 'store']);
+        Route::get('training-sessions/{trainingSession}', [TrainingSessionController::class, 'show']);
+        Route::patch('training-sessions/{trainingSession}/quota', [TrainingSessionController::class, 'updateQuota']);
+        Route::post('training-sessions/{trainingSession}/open', [TrainingSessionController::class, 'open']);
+        Route::post('training-sessions/{trainingSession}/close', [TrainingSessionController::class, 'close']);
+        Route::post('training-sessions/{trainingSession}/cancel', [TrainingSessionController::class, 'cancel']);
     });
 
     // Routes untuk ADMIN
