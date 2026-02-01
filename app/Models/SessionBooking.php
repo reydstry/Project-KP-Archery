@@ -49,6 +49,14 @@ class SessionBooking extends Model
     }
 
     /**
+     * Get the attendance record
+     */
+    public function attendance()
+    {
+        return $this->hasOne(Attendance::class);
+    }
+
+    /**
      * Check if booking is confirmed
      */
     public function isConfirmed(): bool

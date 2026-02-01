@@ -47,4 +47,20 @@ class User extends Authenticatable
     {
         return $this->role === UserRoles::MEMBER;
     }
+
+    /**
+     * Get coach profile
+     */
+    public function coach()
+    {
+        return $this->hasOne(Coach::class);
+    }
+
+    /**
+     * Get member profile
+     */
+    public function member()
+    {
+        return $this->hasOne(Member::class);
+    }
 }

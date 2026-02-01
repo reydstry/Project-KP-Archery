@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Coach\AttendanceController;
 use App\Http\Controllers\Coach\TrainingSessionController;
 use App\Http\Controllers\Member\RegistrationController;
 use App\Http\Controllers\Member\SessionBookingController;
@@ -58,6 +59,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('training-sessions/{trainingSession}/open', [TrainingSessionController::class, 'open']);
         Route::post('training-sessions/{trainingSession}/close', [TrainingSessionController::class, 'close']);
         Route::post('training-sessions/{trainingSession}/cancel', [TrainingSessionController::class, 'cancel']);
+        
+        // Attendance
+        Route::get('training-sessions/{trainingSession}/bookings', [AttendanceController::class, 'getSessionBookings']);
+        Route::post('bookings/{sessionBooking}/attendance', [AttendanceController::class, 'validateAttendance']);
+        Route::patch('bookings/{sessionBooking}/attendance', [AttendanceController::class, 'update']);
     });
 
     // Routes untuk ADMIN

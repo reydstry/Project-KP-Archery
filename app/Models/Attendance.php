@@ -10,41 +10,65 @@ class Attendance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'training_session_id',
-        'member_package_id',
+        'session_booking_id',
         'status',
-        'checked_in_at',
-        'checked_in_by',
+        'validated_by',
+        'validated_at',
+        'notes',
     ];
 
     protected function casts(): array
     {
         return [
-            'checked_in_at' => 'datetime',
+            'validated_at' => 'datetime',
         ];
     }
 
     /**
-     * Get the training session
+     * Get the session booking
      */
-    public function trainingSession()
+    public function sessionBooking()
     {
-        return $this->belongsTo(TrainingSession::class);
+        return $this->belongsTo(SessionBooking::class);
     }
 
     /**
-     * Get the member package
+     * Get the validator (coach who validated)
      */
-    public function memberPackage()
+    public function validator()
     {
-        return $this->belongsTo(MemberPackage::class);
+        return $this->belongsTo(User::class, 'validated_by');
     }
 
     /**
-     * Get the checker (who checked in)
+     * Check if member was present
      */
-    public function checkedInBy()
+    public function isPresent(): bool
     {
-        return $this->belongsTo(User::class, 'checked_in_by');
+        return $this->status === 'present';
+    }
+
+    /**
+     * Check if member was absent
+     */
+    public function isAbsent(): bool
+    {
+        return $this->status === 'absent';
+    }
+
+    /**
+     * Scope for present attendances
+     */
+    public function scopePresent($query)
+    {
+        return $query->where('status', 'present');
+    }
+
+    /**
+     * Scope for absent attendances
+     */
+    public function scopeAbsent($query)
+    {
+        return $query->where('status', 'absent');
     }
 }

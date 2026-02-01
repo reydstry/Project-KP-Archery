@@ -10,13 +10,15 @@ return new class extends Migration
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('member_id')->constrained()->onDelete('cascade');
-            $table->foreignId('session_time_id')->constrained()->onDelete('cascade');
-            $table->date('date');
-            $table->enum('status', ['present', 'absent', 'late'])->default('present');
-            $table->foreignId('validated_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('session_booking_id')->constrained()->onDelete('cascade');
+            $table->enum('status', ['present', 'absent'])->default('present');
+            $table->foreignId('validated_by')->constrained('users')->onDelete('cascade');
+            $table->timestamp('validated_at');
             $table->text('notes')->nullable();
             $table->timestamps();
+            
+            // One attendance per booking
+            $table->unique('session_booking_id');
         });
     }
 
