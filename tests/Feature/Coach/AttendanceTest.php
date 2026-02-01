@@ -389,4 +389,226 @@ class AttendanceTest extends TestCase
         $this->assertEquals($coach->user_id, $attendance->validated_by);
         $this->assertNotNull($attendance->validated_at);
     }
+
+    /** @test */
+    public function marking_attendance_as_present_deducts_quota()
+    {
+        $coach = Coach::factory()->create();
+        $sessionTime = SessionTime::factory()->create();
+        $trainingSession = TrainingSession::factory()->create([
+            'coach_id' => $coach->id,
+            'session_time_id' => $sessionTime->id,
+        ]);
+        
+        $memberPackage = MemberPackage::factory()->create([
+            'total_sessions' => 10,
+            'used_sessions' => 0,
+        ]);
+        
+        $booking = SessionBooking::factory()->create([
+            'training_session_id' => $trainingSession->id,
+            'member_package_id' => $memberPackage->id,
+            'status' => 'confirmed',
+        ]);
+
+        $response = $this->actingAs($coach->user)
+            ->postJson("/api/coach/bookings/{$booking->id}/attendance", [
+                'status' => 'present',
+            ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('remaining_sessions', 9);
+
+        $memberPackage->refresh();
+        $this->assertEquals(1, $memberPackage->used_sessions);
+    }
+
+    /** @test */
+    public function marking_attendance_as_absent_does_not_deduct_quota()
+    {
+        $coach = Coach::factory()->create();
+        $sessionTime = SessionTime::factory()->create();
+        $trainingSession = TrainingSession::factory()->create([
+            'coach_id' => $coach->id,
+            'session_time_id' => $sessionTime->id,
+        ]);
+        
+        $memberPackage = MemberPackage::factory()->create([
+            'total_sessions' => 10,
+            'used_sessions' => 0,
+        ]);
+        
+        $booking = SessionBooking::factory()->create([
+            'training_session_id' => $trainingSession->id,
+            'member_package_id' => $memberPackage->id,
+            'status' => 'confirmed',
+        ]);
+
+        $response = $this->actingAs($coach->user)
+            ->postJson("/api/coach/bookings/{$booking->id}/attendance", [
+                'status' => 'absent',
+            ]);
+
+        $response->assertStatus(201);
+
+        $memberPackage->refresh();
+        $this->assertEquals(0, $memberPackage->used_sessions);
+    }
+
+    /** @test */
+    public function cannot_mark_attendance_as_present_when_no_remaining_quota()
+    {
+        $coach = Coach::factory()->create();
+        $sessionTime = SessionTime::factory()->create();
+        $trainingSession = TrainingSession::factory()->create([
+            'coach_id' => $coach->id,
+            'session_time_id' => $sessionTime->id,
+        ]);
+        
+        $memberPackage = MemberPackage::factory()->create([
+            'total_sessions' => 10,
+            'used_sessions' => 10, // No remaining quota
+        ]);
+        
+        $booking = SessionBooking::factory()->create([
+            'training_session_id' => $trainingSession->id,
+            'member_package_id' => $memberPackage->id,
+            'status' => 'confirmed',
+        ]);
+
+        $response = $this->actingAs($coach->user)
+            ->postJson("/api/coach/bookings/{$booking->id}/attendance", [
+                'status' => 'present',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJson(['message' => 'Member has no remaining sessions in package']);
+
+        $this->assertDatabaseMissing('attendances', [
+            'session_booking_id' => $booking->id,
+        ]);
+    }
+
+    /** @test */
+    public function updating_attendance_from_absent_to_present_deducts_quota()
+    {
+        $coach = Coach::factory()->create();
+        $sessionTime = SessionTime::factory()->create();
+        $trainingSession = TrainingSession::factory()->create([
+            'coach_id' => $coach->id,
+            'session_time_id' => $sessionTime->id,
+        ]);
+        
+        $memberPackage = MemberPackage::factory()->create([
+            'total_sessions' => 10,
+            'used_sessions' => 0,
+        ]);
+        
+        $booking = SessionBooking::factory()->create([
+            'training_session_id' => $trainingSession->id,
+            'member_package_id' => $memberPackage->id,
+            'status' => 'confirmed',
+        ]);
+
+        // Mark as absent first
+        $attendance = Attendance::factory()->create([
+            'session_booking_id' => $booking->id,
+            'status' => 'absent',
+            'validated_by' => $coach->user_id,
+        ]);
+
+        // Update to present
+        $response = $this->actingAs($coach->user)
+            ->patchJson("/api/coach/bookings/{$booking->id}/attendance", [
+                'status' => 'present',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('remaining_sessions', 9);
+
+        $memberPackage->refresh();
+        $this->assertEquals(1, $memberPackage->used_sessions);
+    }
+
+    /** @test */
+    public function updating_attendance_from_present_to_absent_refunds_quota()
+    {
+        $coach = Coach::factory()->create();
+        $sessionTime = SessionTime::factory()->create();
+        $trainingSession = TrainingSession::factory()->create([
+            'coach_id' => $coach->id,
+            'session_time_id' => $sessionTime->id,
+        ]);
+        
+        $memberPackage = MemberPackage::factory()->create([
+            'total_sessions' => 10,
+            'used_sessions' => 1,
+        ]);
+        
+        $booking = SessionBooking::factory()->create([
+            'training_session_id' => $trainingSession->id,
+            'member_package_id' => $memberPackage->id,
+            'status' => 'confirmed',
+        ]);
+
+        // Mark as present first
+        $attendance = Attendance::factory()->create([
+            'session_booking_id' => $booking->id,
+            'status' => 'present',
+            'validated_by' => $coach->user_id,
+        ]);
+
+        // Update to absent
+        $response = $this->actingAs($coach->user)
+            ->patchJson("/api/coach/bookings/{$booking->id}/attendance", [
+                'status' => 'absent',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('remaining_sessions', 10);
+
+        $memberPackage->refresh();
+        $this->assertEquals(0, $memberPackage->used_sessions);
+    }
+
+    /** @test */
+    public function cannot_update_attendance_to_present_when_no_remaining_quota()
+    {
+        $coach = Coach::factory()->create();
+        $sessionTime = SessionTime::factory()->create();
+        $trainingSession = TrainingSession::factory()->create([
+            'coach_id' => $coach->id,
+            'session_time_id' => $sessionTime->id,
+        ]);
+        
+        $memberPackage = MemberPackage::factory()->create([
+            'total_sessions' => 10,
+            'used_sessions' => 10, // No remaining quota
+        ]);
+        
+        $booking = SessionBooking::factory()->create([
+            'training_session_id' => $trainingSession->id,
+            'member_package_id' => $memberPackage->id,
+            'status' => 'confirmed',
+        ]);
+
+        // Mark as absent first
+        $attendance = Attendance::factory()->create([
+            'session_booking_id' => $booking->id,
+            'status' => 'absent',
+            'validated_by' => $coach->user_id,
+        ]);
+
+        // Try to update to present
+        $response = $this->actingAs($coach->user)
+            ->patchJson("/api/coach/bookings/{$booking->id}/attendance", [
+                'status' => 'present',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJson(['message' => 'Member has no remaining sessions in package']);
+
+        $attendance->refresh();
+        $this->assertEquals('absent', $attendance->status);
+    }
 }

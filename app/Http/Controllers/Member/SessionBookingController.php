@@ -145,7 +145,7 @@ class SessionBookingController extends Controller
 
         DB::beginTransaction();
         try {
-            // Create booking
+            // Create booking (quota will be deducted when attendance is marked as present)
             $booking = SessionBooking::create([
                 'member_package_id' => $memberPackage->id,
                 'training_session_id' => $trainingSession->id,
@@ -154,15 +154,12 @@ class SessionBookingController extends Controller
                 'notes' => $validated['notes'] ?? null,
             ]);
 
-            // Increment used_sessions
-            $memberPackage->increment('used_sessions');
-
             DB::commit();
 
             return response()->json([
                 'message' => 'Session booked successfully',
                 'data' => $booking->load(['memberPackage.member', 'trainingSession.sessionTime', 'trainingSession.coach']),
-                'remaining_sessions' => $memberPackage->fresh()->total_sessions - $memberPackage->fresh()->used_sessions,
+                'remaining_sessions' => $memberPackage->total_sessions - $memberPackage->used_sessions,
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -227,8 +224,7 @@ class SessionBookingController extends Controller
             // Cancel booking
             $sessionBooking->cancel();
 
-            // Decrement used_sessions (refund the session)
-            $sessionBooking->memberPackage->decrement('used_sessions');
+            // No quota refund needed since quota is only deducted when attendance is marked as present
 
             DB::commit();
 

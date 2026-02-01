@@ -80,7 +80,7 @@ class SessionBookingTest extends TestCase
                 'message' => 'Session booked successfully',
             ])
             ->assertJsonPath('data.status', 'confirmed')
-            ->assertJsonPath('remaining_sessions', 9);
+            ->assertJsonPath('remaining_sessions', 10); // Quota not deducted until attendance marked as present
 
         $this->assertDatabaseHas('session_bookings', [
             'member_package_id' => $this->memberPackage->id,
@@ -88,9 +88,9 @@ class SessionBookingTest extends TestCase
             'status' => 'confirmed',
         ]);
 
-        // Verify used_sessions incremented
+        // Verify used_sessions not incremented (only deducted when attendance marked as present)
         $this->memberPackage->refresh();
-        $this->assertEquals(1, $this->memberPackage->used_sessions);
+        $this->assertEquals(0, $this->memberPackage->used_sessions);
     }
 
     public function test_member_cannot_book_without_active_package()
@@ -317,9 +317,9 @@ class SessionBookingTest extends TestCase
             'status' => 'cancelled',
         ]);
 
-        // Verify used_sessions decremented (refunded)
+        // Verify used_sessions remains unchanged (quota wasn't deducted on booking)
         $this->memberPackage->refresh();
-        $this->assertEquals(0, $this->memberPackage->used_sessions);
+        $this->assertEquals(1, $this->memberPackage->used_sessions);
     }
 
     public function test_member_cannot_cancel_already_cancelled_booking()

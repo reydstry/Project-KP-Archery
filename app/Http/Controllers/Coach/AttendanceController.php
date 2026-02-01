@@ -96,26 +96,59 @@ class AttendanceController extends Controller
             ], 422);
         }
 
-        // Create attendance record
-        $attendance = Attendance::create([
-            'session_booking_id' => $sessionBooking->id,
-            'status' => $validated['status'],
-            'validated_by' => auth()->id(),
-            'validated_at' => now(),
-            'notes' => $validated['notes'] ?? null,
-        ]);
+        // Get member package
+        $memberPackage = $sessionBooking->memberPackage;
 
-        return response()->json([
-            'message' => 'Attendance validated successfully',
-            'attendance' => [
-                'id' => $attendance->id,
-                'booking_id' => $sessionBooking->id,
-                'member_name' => $sessionBooking->memberPackage->member->name,
-                'status' => $attendance->status,
-                'validated_at' => $attendance->validated_at,
-                'notes' => $attendance->notes,
-            ]
-        ], 201);
+        // If marking as present, check and deduct quota
+        if ($validated['status'] === 'present') {
+            // Check remaining quota
+            $remainingSessions = $memberPackage->total_sessions - $memberPackage->used_sessions;
+            if ($remainingSessions <= 0) {
+                return response()->json([
+                    'message' => 'Member has no remaining sessions in package',
+                    'total_sessions' => $memberPackage->total_sessions,
+                    'used_sessions' => $memberPackage->used_sessions,
+                ], 422);
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+            // Create attendance record
+            $attendance = Attendance::create([
+                'session_booking_id' => $sessionBooking->id,
+                'status' => $validated['status'],
+                'validated_by' => auth()->id(),
+                'validated_at' => now(),
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
+            // Deduct quota only if present
+            if ($validated['status'] === 'present') {
+                $memberPackage->increment('used_sessions');
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Attendance validated successfully',
+                'attendance' => [
+                    'id' => $attendance->id,
+                    'booking_id' => $sessionBooking->id,
+                    'member_name' => $sessionBooking->memberPackage->member->name,
+                    'status' => $attendance->status,
+                    'validated_at' => $attendance->validated_at,
+                    'notes' => $attendance->notes,
+                ],
+                'remaining_sessions' => $memberPackage->fresh()->total_sessions - $memberPackage->fresh()->used_sessions,
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to validate attendance',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -149,23 +182,60 @@ class AttendanceController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        // Update attendance
-        $attendance->update([
-            'status' => $validated['status'],
-            'notes' => $validated['notes'] ?? $attendance->notes,
-            'validated_at' => now(),
-        ]);
+        $memberPackage = $sessionBooking->memberPackage;
+        $oldStatus = $attendance->status;
+        $newStatus = $validated['status'];
 
-        return response()->json([
-            'message' => 'Attendance updated successfully',
-            'attendance' => [
-                'id' => $attendance->id,
-                'booking_id' => $sessionBooking->id,
-                'member_name' => $sessionBooking->memberPackage->member->name,
-                'status' => $attendance->status,
-                'validated_at' => $attendance->validated_at,
-                'notes' => $attendance->notes,
-            ]
-        ]);
+        // Check quota if changing from absent to present
+        if ($oldStatus === 'absent' && $newStatus === 'present') {
+            $remainingSessions = $memberPackage->total_sessions - $memberPackage->used_sessions;
+            if ($remainingSessions <= 0) {
+                return response()->json([
+                    'message' => 'Member has no remaining sessions in package',
+                    'total_sessions' => $memberPackage->total_sessions,
+                    'used_sessions' => $memberPackage->used_sessions,
+                ], 422);
+            }
+        }
+
+        DB::beginTransaction();
+        try {
+            // Update attendance
+            $attendance->update([
+                'status' => $newStatus,
+                'notes' => $validated['notes'] ?? $attendance->notes,
+                'validated_at' => now(),
+            ]);
+
+            // Handle quota changes
+            if ($oldStatus === 'absent' && $newStatus === 'present') {
+                // Changed from absent to present: deduct quota
+                $memberPackage->increment('used_sessions');
+            } elseif ($oldStatus === 'present' && $newStatus === 'absent') {
+                // Changed from present to absent: refund quota
+                $memberPackage->decrement('used_sessions');
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Attendance updated successfully',
+                'attendance' => [
+                    'id' => $attendance->id,
+                    'booking_id' => $sessionBooking->id,
+                    'member_name' => $sessionBooking->memberPackage->member->name,
+                    'status' => $attendance->status,
+                    'validated_at' => $attendance->validated_at,
+                    'notes' => $attendance->notes,
+                ],
+                'remaining_sessions' => $memberPackage->fresh()->total_sessions - $memberPackage->fresh()->used_sessions,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to update attendance',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
