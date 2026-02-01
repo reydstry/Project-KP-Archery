@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Coach\TrainingSessionController;
 use App\Http\Controllers\Member\RegistrationController;
+use App\Http\Controllers\Member\SessionBookingController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes - Authentication
@@ -35,6 +36,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/register-self', [RegistrationController::class, 'registerSelf']);
         Route::post('/register-child', [RegistrationController::class, 'registerChild']);
         Route::get('/my-members', [RegistrationController::class, 'myMembers']);
+        
+        // Session Bookings
+        Route::get('bookings', [SessionBookingController::class, 'index']);
+        Route::post('bookings', [SessionBookingController::class, 'store']);
+        Route::get('bookings/{sessionBooking}', [SessionBookingController::class, 'show']);
+        Route::post('bookings/{sessionBooking}/cancel', [SessionBookingController::class, 'cancel']);
     });
 
     // Routes untuk COACH (pelatih)

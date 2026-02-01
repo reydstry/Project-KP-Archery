@@ -10,13 +10,15 @@ return new class extends Migration
     {
         Schema::create('session_bookings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('member_id')->constrained()->onDelete('cascade');
-            $table->foreignId('session_time_id')->constrained()->onDelete('cascade');
-            $table->date('booked_date');
+            $table->foreignId('member_package_id')->constrained()->onDelete('cascade');
+            $table->foreignId('training_session_id')->constrained()->onDelete('cascade');
             $table->foreignId('booked_by')->constrained('users')->onDelete('cascade');
-            $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed'])->default('pending');
+            $table->enum('status', ['confirmed', 'cancelled'])->default('confirmed');
             $table->text('notes')->nullable();
             $table->timestamps();
+            
+            // Prevent duplicate bookings
+            $table->unique(['member_package_id', 'training_session_id']);
         });
     }
 
