@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
@@ -36,5 +37,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard', function () {
             return response()->json(['message' => 'Admin dashboard']);
         });
+        
+        // Master Packages
+        Route::apiResource('packages', PackageController::class);
     });
 });
