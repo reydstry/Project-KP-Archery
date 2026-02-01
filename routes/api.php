@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\MemberController;
+use App\Http\Controllers\Admin\MemberPackageController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -57,6 +58,12 @@ Route::middleware('auth:sanctum')->group(function () {
         // Master Members
         Route::apiResource('members', MemberController::class);
         Route::post('members/{id}/restore', [MemberController::class, 'restore']);
+        
+        // Member Packages
+        Route::get('member-packages', [MemberPackageController::class, 'index']);
+        Route::post('members/{member}/assign-package', [MemberPackageController::class, 'assignPackage']);
+        Route::get('member-packages/{memberPackage}', [MemberPackageController::class, 'show']);
+        Route::get('members/{member}/packages', [MemberPackageController::class, 'getMemberPackages']);
         
         // Pending Members
         Route::get('pending-members', [RegistrationController::class, 'pendingMembers']);

@@ -23,7 +23,7 @@ class MemberFactory extends Factory
             'name' => $this->faker->name(),
             'phone' => $this->faker->phoneNumber(),
             'is_self' => true,
-            'status' => StatusMember::STATUS_ACTIVE,
+            'status' => StatusMember::STATUS_ACTIVE->value,
             'is_active' => true,
         ];
     }
@@ -49,7 +49,7 @@ class MemberFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'is_active' => false,
-                'status' => StatusMember::STATUS_INACTIVE,
+                'status' => StatusMember::STATUS_INACTIVE->value,
             ];
         });
     }
@@ -61,7 +61,7 @@ class MemberFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'status' => StatusMember::STATUS_PENDING,
+                'status' => StatusMember::STATUS_PENDING->value,
             ];
         });
     }
