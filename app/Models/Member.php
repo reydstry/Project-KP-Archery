@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StatusMember;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,6 +16,7 @@ class Member extends Model
         'name',
         'phone',
         'is_self',
+        'status',
         'is_active',
     ];
 
@@ -24,6 +26,22 @@ class Member extends Model
             'is_self' => 'boolean',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Scope for pending members
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', StatusMember::STATUS_PENDING);
+    }
+
+    /**
+     * Scope for active members
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', StatusMember::STATUS_ACTIVE);
     }
 
     /**

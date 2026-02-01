@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Member\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes - Authentication
@@ -27,6 +28,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/dashboard', function () {
             return response()->json(['message' => 'Member dashboard']);
         });
+        
+        // Member Registration
+        Route::post('/register-self', [RegistrationController::class, 'registerSelf']);
+        Route::post('/register-child', [RegistrationController::class, 'registerChild']);
+        Route::get('/my-members', [RegistrationController::class, 'myMembers']);
     });
 
     // Routes untuk COACH (pelatih)
@@ -51,5 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // Master Members
         Route::apiResource('members', MemberController::class);
         Route::post('members/{id}/restore', [MemberController::class, 'restore']);
+        
+        // Pending Members
+        Route::get('pending-members', [RegistrationController::class, 'pendingMembers']);
     });
 });

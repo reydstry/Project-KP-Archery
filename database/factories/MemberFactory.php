@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\UserRoles;
+use App\Enums\StatusMember;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,6 +23,7 @@ class MemberFactory extends Factory
             'name' => $this->faker->name(),
             'phone' => $this->faker->phoneNumber(),
             'is_self' => true,
+            'status' => StatusMember::STATUS_ACTIVE,
             'is_active' => true,
         ];
     }
@@ -47,6 +49,19 @@ class MemberFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'is_active' => false,
+                'status' => StatusMember::STATUS_INACTIVE,
+            ];
+        });
+    }
+
+    /**
+     * Indicate that this is a pending member
+     */
+    public function pending()
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => StatusMember::STATUS_PENDING,
             ];
         });
     }

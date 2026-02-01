@@ -29,9 +29,12 @@ return new class extends Migration
             $table->boolean('is_self')->default(true)
                 ->comment('true = member dewasa, false = anak yang didaftarkan ortu');
 
+            $table->string('status')->default('pending')
+                ->comment('pending, active, inactive');
+
             $table->boolean('is_active')->default(true);
             
-            $table->index(['name', 'user_id', 'is_active']);
+            $table->index(['name', 'user_id', 'is_active', 'status']);
 
             $table->timestamps();
         });
