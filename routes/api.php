@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -40,5 +41,8 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Master Packages
         Route::apiResource('packages', PackageController::class);
+        
+        // Master Coaches
+        Route::apiResource('coaches', CoachController::class);
     });
 });
