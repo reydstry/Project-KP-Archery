@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\MemberPackageController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\Admin\AchievementController as AdminAchievementController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Member\DashboardController;
 use App\Http\Controllers\Member\RegistrationController;
 use App\Http\Controllers\Member\SessionBookingController;
 use App\Http\Controllers\PublicSite\NewsController as PublicNewsController;
+use App\Http\Controllers\PublicSite\AchievementController as PublicAchievementController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes - Authentication
@@ -25,6 +27,10 @@ Route::post('/login', LoginController::class);
 // Public routes - News (for company profile)
 Route::get('/news', [PublicNewsController::class, 'index']);
 Route::get('/news/{news}', [PublicNewsController::class, 'show']);
+
+// Public routes - Achievements (for company profile)
+Route::get('/achievements', [PublicAchievementController::class, 'index']);
+Route::get('/achievements/{achievement}', [PublicAchievementController::class, 'show']);
 
 // Protected routes (perlu login)
 Route::middleware('auth:sanctum')->group(function () {
@@ -82,6 +88,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // News
         Route::apiResource('news', AdminNewsController::class);
+
+        // Achievements
+        Route::apiResource('achievements', AdminAchievementController::class);
         
         // Master Coaches
         Route::apiResource('coaches', CoachController::class);

@@ -102,12 +102,14 @@ class DashboardController extends Controller
 
         // Get achievements
         $achievements = $member->achievements()
+            ->where('type', 'member')
             ->orderBy('date', 'desc')
             ->limit(10)
             ->get()
             ->map(function ($achievement) {
                 return [
                     'id' => $achievement->id,
+                    'type' => $achievement->type,
                     'title' => $achievement->title,
                     'description' => $achievement->description,
                     'date' => $achievement->date,

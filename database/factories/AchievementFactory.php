@@ -13,6 +13,7 @@ class AchievementFactory extends Factory
     public function definition(): array
     {
         return [
+            'type' => 'member',
             'member_id' => Member::factory(),
             'title' => fake()->randomElement([
                 'Juara 1 Kejuaraan Nasional',
@@ -25,5 +26,13 @@ class AchievementFactory extends Factory
             'date' => fake()->dateTimeBetween('-6 months', 'now'),
             'photo_path' => null,
         ];
+    }
+
+    public function clubAchievement(): static
+    {
+        return $this->state(fn () => [
+            'type' => 'club',
+            'member_id' => null,
+        ]);
     }
 }

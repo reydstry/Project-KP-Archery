@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('achievements', function (Blueprint $table) {
             $table->id();
+            $table->enum('type', ['member', 'club'])->default('member');
             $table->foreignId('member_id')
+                ->nullable()
                 ->constrained('members')
                 ->cascadeOnUpdate()
-                ->restrictOnDelete();
+                ->nullOnDelete();
             
             $table->string('title');
             $table->text('description')->nullable();
@@ -24,6 +26,7 @@ return new class extends Migration
             $table->string('photo_path')->nullable();
 
             $table->index(['member_id', 'date'], 'idx_achievement_member');
+            $table->index(['type', 'date'], 'idx_achievement_type_date');
             
             $table->timestamps();
         });

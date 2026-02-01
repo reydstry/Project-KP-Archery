@@ -10,6 +10,7 @@ class Achievement extends Model
     use HasFactory;
 
     protected $fillable = [
+        'type',
         'member_id',
         'title',
         'description',
@@ -30,6 +31,16 @@ class Achievement extends Model
     public function member()
     {
         return $this->belongsTo(Member::class);
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->whereDate('date', '<=', now()->toDateString());
+    }
+
+    public function scopeType($query, string $type)
+    {
+        return $query->where('type', $type);
     }
 
     /**

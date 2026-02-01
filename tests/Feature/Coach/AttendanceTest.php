@@ -23,7 +23,7 @@ class AttendanceTest extends TestCase
         parent::setUp();
     }
 
-    public function coach_can_get_session_bookings_with_attendance_status()
+    public function test_coach_can_get_session_bookings_with_attendance_status()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -81,7 +81,7 @@ class AttendanceTest extends TestCase
             ]);
     }
 
-    public function coach_cannot_view_other_coach_session_bookings()
+    public function test_coach_cannot_view_other_coach_session_bookings()
     {
         $coach1 = Coach::factory()->create();
         $coach2 = Coach::factory()->create();
@@ -98,7 +98,7 @@ class AttendanceTest extends TestCase
             ->assertJson(['message' => 'You can only view your own training sessions']);
     }
 
-    public function coach_can_validate_attendance_as_present()
+    public function test_coach_can_validate_attendance_as_present()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -134,7 +134,7 @@ class AttendanceTest extends TestCase
         ]);
     }
 
-    public function coach_can_validate_attendance_as_absent()
+    public function test_coach_can_validate_attendance_as_absent()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -167,7 +167,7 @@ class AttendanceTest extends TestCase
         ]);
     }
 
-    public function coach_cannot_validate_other_coach_session_attendance()
+    public function test_coach_cannot_validate_other_coach_session_attendance()
     {
         $coach1 = Coach::factory()->create();
         $coach2 = Coach::factory()->create();
@@ -189,7 +189,7 @@ class AttendanceTest extends TestCase
             ->assertJson(['message' => 'You can only validate attendance for your own training sessions']);
     }
 
-    public function coach_cannot_validate_cancelled_booking()
+    public function test_coach_cannot_validate_cancelled_booking()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -211,7 +211,7 @@ class AttendanceTest extends TestCase
             ->assertJson(['message' => 'Can only validate attendance for confirmed bookings']);
     }
 
-    public function coach_cannot_validate_attendance_twice()
+    public function test_coach_cannot_validate_attendance_twice()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -240,7 +240,7 @@ class AttendanceTest extends TestCase
             ->assertJson(['message' => 'Attendance already validated for this booking']);
     }
 
-    public function coach_can_update_attendance_status()
+    public function test_coach_can_update_attendance_status()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -279,7 +279,7 @@ class AttendanceTest extends TestCase
         ]);
     }
 
-    public function coach_cannot_update_non_existent_attendance()
+    public function test_coach_cannot_update_non_existent_attendance()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -301,7 +301,7 @@ class AttendanceTest extends TestCase
             ->assertJson(['message' => 'Attendance not found for this booking']);
     }
 
-    public function validate_attendance_requires_valid_status()
+    public function test_validate_attendance_requires_valid_status()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -323,7 +323,7 @@ class AttendanceTest extends TestCase
             ->assertJsonValidationErrors(['status']);
     }
 
-    public function member_cannot_validate_attendance()
+    public function test_member_cannot_validate_attendance()
     {
         $member = Member::factory()->create();
         $coach = Coach::factory()->create();
@@ -344,7 +344,7 @@ class AttendanceTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function admin_cannot_validate_attendance()
+    public function test_admin_cannot_validate_attendance()
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $coach = Coach::factory()->create();
@@ -365,7 +365,7 @@ class AttendanceTest extends TestCase
         $response->assertStatus(403);
     }
 
-    public function attendance_records_validator_and_timestamp()
+    public function test_attendance_records_validator_and_timestamp()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -391,7 +391,7 @@ class AttendanceTest extends TestCase
     }
 
     
-    public function marking_attendance_as_present_deducts_quota()
+    public function test_marking_attendance_as_present_deducts_quota()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -424,7 +424,7 @@ class AttendanceTest extends TestCase
     }
 
     
-    public function marking_attendance_as_absent_does_not_deduct_quota()
+    public function test_marking_attendance_as_absent_does_not_deduct_quota()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -456,7 +456,7 @@ class AttendanceTest extends TestCase
     }
 
     
-    public function cannot_mark_attendance_as_present_when_no_remaining_quota()
+    public function test_cannot_mark_attendance_as_present_when_no_remaining_quota()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -490,7 +490,7 @@ class AttendanceTest extends TestCase
     }
 
     
-    public function updating_attendance_from_absent_to_present_deducts_quota()
+    public function test_updating_attendance_from_absent_to_present_deducts_quota()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -531,7 +531,7 @@ class AttendanceTest extends TestCase
     }
 
     
-    public function updating_attendance_from_present_to_absent_refunds_quota()
+    public function test_updating_attendance_from_present_to_absent_refunds_quota()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
@@ -572,7 +572,7 @@ class AttendanceTest extends TestCase
     }
 
     
-    public function cannot_update_attendance_to_present_when_no_remaining_quota()
+    public function test_cannot_update_attendance_to_present_when_no_remaining_quota()
     {
         $coach = Coach::factory()->create();
         $sessionTime = SessionTime::factory()->create();
