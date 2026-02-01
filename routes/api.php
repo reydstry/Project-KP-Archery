@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
@@ -19,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth
     Route::post('/logout', LogoutController::class);
     Route::get('/me', ProfileController::class);
+    Route::post('/change-password', ChangePasswordController::class);
 
     // Routes untuk MEMBER (orang tua / member dewasa)
     Route::middleware('role:member')->prefix('member')->group(function () {
