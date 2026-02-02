@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRoles;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -10,20 +11,22 @@ class UserSeeder extends Seeder
 {
   public function run():void
   {
-      $adminRole = 'admin';
+    User::create([
+        'name' => 'Admin Club Panahan',
+        'email' => 'admin@panahan.com',
+        'password' => Hash::make('password'),
+        'role' => UserRoles::ADMIN,
+        'phone' => '081234567890',
+    ]);
 
-      User::query()->firstOrCreate(
-        ['email' => 'admin@club.test'],
-        [
-          'name' => 'Admin',
-          'role' => $adminRole,
-          'email_verified_at' => now(),
-          'password' => Hash::make('password'),
-        ]
-      );
+    User::create([
+        'name' => 'Coach Budi',
+        'email' => 'coach@panahan.com',
+        'password' => Hash::make('password'),
+        'role' => UserRoles::COACH,
+        'phone' => '081234567891',
+    ]);
 
-      if (method_exists(User::class, 'factory')) {
-          User::factory()->count(10)->create();
-      }
+    $this->command->info('✅ Users berhasil dibuat!');
   }
 }

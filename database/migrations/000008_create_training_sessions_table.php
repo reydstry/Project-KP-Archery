@@ -13,12 +13,23 @@ return new class extends Migration
     {
         Schema::create('training_sessions', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
 
-            $table->time('start_time');
-            $table->time('end_time');
+            $table->foreignId('session_time_id')
+                ->constrained('session_times')
+                ->restrictOnDelete();
+
+            $table->date('date');
+
+            $table->foreignId('coach_id')
+                ->constrained('coaches')
+                ->restrictOnDelete();
+
+            $table->integer('max_participants');
+            $table->enum('status', ['open', 'closed', 'canceled'])->default('open');
  
             $table->timestamps();
+
+            $table->unique(['session_time_id', 'date']);
         });
     }
 
