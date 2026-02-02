@@ -100,8 +100,6 @@
                     :image="asset('asset/img/latarbelakanglogin.jpeg')"
                     title="Tim FocusOneX Raih Juara 1 Kompetisi Regional 2026"
                     date="20 Januari 2026"
-                    category="Kemenangan"
-                    categoryColor="blue"
                     excerpt="Tim panahan FocusOneX berhasil meraih juara pertama dalam kompetisi regional yang diselenggarakan di Balikpapan. Prestasi membanggakan ini..."
                     alt="Juara 1 Kompetisi Regional" />
 
@@ -110,8 +108,6 @@
                     :image="asset('asset/img/latarbelakanglogin.jpeg')"
                     title="Atlet FocusOneX Terpilih sebagai Atlet Terbaik 2026"
                     date="15 Januari 2026"
-                    category="Prestasi"
-                    categoryColor="green"
                     excerpt="Salah satu atlet FocusOneX berhasil mendapat penghargaan sebagai atlet terbaik dalam ajang kompetisi nasional tahun ini..."
                     alt="Atlet Terbaik" />
 
