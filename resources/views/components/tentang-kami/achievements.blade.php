@@ -26,7 +26,7 @@
                 ],
                 [
                     'name' => 'Yanto',
-                    'photo' => 'member-3.jpg',
+                    'photo' => 'test.png',
                     'awards' => [
                         ['medal' => '🥇', 'title' => 'Juara 1 Kejuaraan Nasional 2024'],
                         ['medal' => '🥈', 'title' => 'Juara 2 Turnamen Internal']
@@ -39,7 +39,7 @@
             @foreach($achievements as $achievement)
             <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div class="flex items-center mb-5">
-                    <img src="{{ asset('asset/img/' . $achievement['photo']) }}" alt="{{ $achievement['name'] }}" 
+                    <img src="{{ asset('asset/img/achievements/' . $achievement['photo']) }}" alt="{{ $achievement['name'] }}" 
                          class="w-14 h-14 rounded-full object-cover mr-3">
                     <div>
                         <h4 class="font-bold text-gray-900">{{ $achievement['name'] }}</h4>
