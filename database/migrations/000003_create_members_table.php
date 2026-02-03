@@ -30,6 +30,9 @@ return new class extends Migration
                 ->comment('true = member dewasa, false = anak yang didaftarkan ortu');
 
             $table->boolean('is_active')->default(true);
+
+            $table->string('status')->default('pending')
+                ->comment('pending, active, inactive, banned');
             
             $table->index(['name', 'user_id', 'is_active']);
 
