@@ -10,15 +10,33 @@ use App\Http\Controllers\Auth\GoogleRedirectController;
 use App\Http\Controllers\Auth\GoogleCallbackController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => view('welcome'));
+Route::get('/', function () {
+    return view('pages.beranda');
+})->name('beranda');
+
+Route::get('/tentang-kami', function () {
+    return view('pages.tentang-kami');
+})->name('tentang-kami');
+
+Route::get('/program', function () {
+    return view('pages.program');
+})->name('program');
+
+Route::get('/galeri', function () {
+    return view('pages.galeri');
+})->name('galeri');
+
+Route::get('/kontak', function () {
+    return view('pages.kontak');
+})->name('kontak');
 
 // Guest only
 Route::middleware('guest')->group(function () {
     Route::get('/register', [WebRegisterController::class, 'create'])->name('register');
-    Route::post('/register', [WebRegisterController::class, 'store']);
+    Route::post('/register', [WebRegisterController::class, 'store'])->name('register.post');
 
     Route::get('/login', [WebLoginController::class, 'create'])->name('login');
-    Route::post('/login', [WebLoginController::class, 'store']);
+    Route::post('/login', [WebLoginController::class, 'store'])->name('login.post');
 
     Route::get('/forgot-password', [WebForgotPasswordController::class, 'create'])->name('password.request');
     Route::post('/forgot-password', [WebForgotPasswordController::class, 'store'])->name('password.email');

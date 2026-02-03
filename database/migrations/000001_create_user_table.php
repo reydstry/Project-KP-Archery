@@ -21,10 +21,10 @@ return new class extends Migration
                 ->index();
 
             $table->string('email')->unique();
-            $table->string('email_verified_at')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('phone')->nullable();
 
-            $table->string('password');
+            $table->string('password')->nullable();
             
             $table->rememberToken();
             
