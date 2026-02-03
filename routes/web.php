@@ -20,6 +20,7 @@ Route::get('/galeri', function () {
 Route::get('/kontak', function () {
     return view('pages.kontak');
 })->name('kontak');
+<<<<<<< HEAD
 
 // ===== ROUTES UNTUK LOGIN & REGISTER (FRONTEND ONLY) =====
 Route::get('/login', function () {
@@ -46,3 +47,5 @@ Route::post('/register', function () {
 Route::post('/forgot-password', function () {
     return back()->with('status', 'Reset link sent! Check your email (Backend belum siap).');
 })->name('password.email');
+=======
+>>>>>>> pages-program

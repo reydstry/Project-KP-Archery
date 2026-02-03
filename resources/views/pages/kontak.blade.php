@@ -3,6 +3,7 @@
 @section('title', 'Kontak - FocusOneX Archery')
 
 @section('content')
+<<<<<<< HEAD
 <!-- Hero Section -->
 <div class="bg-gradient-to-br from-orange-50 to-white py-20">
     <div class="container mx-auto px-4">
@@ -36,3 +37,5 @@
 <!-- Testimonials -->
 @include('components.kontak.testimonials')
 @endsection
+=======
+>>>>>>> pages-program
