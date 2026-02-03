@@ -35,7 +35,7 @@
             @foreach($facilities as $facility)
             <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                 <div class="h-56 overflow-hidden">
-                    <img src="{{ asset('asset/img/' . $facility['image']) }}" alt="{{ $facility['title'] }}" 
+                    <img src="{{ asset('asset/img/facilities/' . $facility['image']) }}" alt="{{ $facility['title'] }}" 
                          class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
                 </div>
                 <div class="p-5">
