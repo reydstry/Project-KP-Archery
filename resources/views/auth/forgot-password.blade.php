@@ -53,55 +53,23 @@
             <!-- Email -->
             <div>
                 <label class="block mb-2 text-sm font-medium text-gray-700">
-                    Email
+                    Email Address
                 </label>
                 <input type="email"
                        name="email"
                        value="{{ old('email') }}"
                        required
                        autofocus
+                       placeholder="Masukkan email Anda"
                        class="w-full rounded-lg border border-gray-300 px-4 py-3
                               text-sm outline-none transition
                               focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
             </div>
 
-            <!-- New Password -->
-            <div>
-                <label class="block mb-2 text-sm font-medium text-gray-700">
-                    New Password
-                </label>
-                <input type="password"
-                       name="password"
-                       required
-                       class="w-full rounded-lg border border-gray-300 px-4 py-3
-                              text-sm outline-none transition
-                              focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <!-- Confirm Password -->
-            <div>
-                <label class="block mb-2 text-sm font-medium text-gray-700">
-                    Confirm Password
-                </label>
-                <input type="password"
-                       name="password_confirmation"
-                       required
-                       class="w-full rounded-lg border border-gray-300 px-4 py-3
-                              text-sm outline-none transition
-                              focus:border-blue-500 focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <!-- Terms Checkbox -->
-            <div class="flex items-start pt-2">
-                <input type="checkbox"
-                       name="terms"
-                       id="terms"
-                       required
-                       class="h-4 w-4 mt-0.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                <label for="terms" class="ml-2 text-sm text-gray-700">
-                    I accept the terms and conditions
-                </label>
-            </div>
+            <!-- Info Text -->
+            <p class="text-sm text-gray-600">
+                Kami akan mengirimkan link reset password ke email Anda.
+            </p>
 
             <!-- Submit Button -->
             <button type="submit"
@@ -109,7 +77,7 @@
                            text-sm font-semibold text-white
                            transition hover:bg-blue-700
                            focus:outline-none focus:ring-4 focus:ring-blue-300">
-                Reset Password
+                Kirim Link Reset Password
             </button>
         </form>
 

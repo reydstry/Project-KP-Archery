@@ -36,44 +36,26 @@
     
     <!-- Scripts -->
     <script>
-        // Language dropdown toggle
-        const langToggle = document.getElementById('lang-toggle');
-        const langMenu = document.getElementById('lang-menu');
-        
-        if (langToggle && langMenu) {
-            langToggle.addEventListener('click', () => {
-                langMenu.classList.toggle('hidden');
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!langToggle.contains(e.target) && !langMenu.contains(e.target)) {
-                    langMenu.classList.add('hidden');
-                }
-            });
-        }
-        
-        // Mobile menu toggle
-        const menuToggle = document.getElementById('menu-toggle');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const menuClose = document.getElementById('menu-close');
-        
+        // Mobile menu toggle (prevent redeclaration)
+        let menuToggle = window.menuToggle || document.getElementById('menu-toggle');
+        let mobileMenu = window.mobileMenu || document.getElementById('mobile-menu');
+        let menuClose = window.menuClose || document.getElementById('menu-close');
+        window.menuToggle = menuToggle;
+        window.mobileMenu = mobileMenu;
+        window.menuClose = menuClose;
         if (menuToggle && mobileMenu) {
             menuToggle.addEventListener('click', () => {
                 mobileMenu.classList.remove('hidden');
             });
         }
-        
         if (menuClose && mobileMenu) {
             menuClose.addEventListener('click', () => {
                 mobileMenu.classList.add('hidden');
             });
         }
-        
         // Active nav link
         const currentPath = window.location.pathname;
         const navLinks = document.querySelectorAll('.nav-link');
-        
         navLinks.forEach(link => {
             if (link.getAttribute('href') === currentPath) {
                 link.classList.add('active');

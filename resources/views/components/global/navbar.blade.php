@@ -83,7 +83,7 @@
     </nav>
 
     <div class="mt-10 flex flex-col gap-4">
-        <!-- Mobile Login (NETRAL) -->
+        
         <a href="/login"
             class="w-full text-center py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition">
             Login
@@ -98,19 +98,27 @@
 
 <!-- SCRIPT -->
 <script>
-    // Mobile menu
-    const menuBtn = document.getElementById('mobile-menu-button');
-    const closeBtn = document.getElementById('close-menu');
-    const mobileMenu = document.getElementById('mobile-menu');
-
-    menuBtn.onclick = () => mobileMenu.classList.remove('hidden');
-    closeBtn.onclick = () => mobileMenu.classList.add('hidden');
-
-    // Language dropdown
-    const langToggle = document.getElementById('lang-toggle');
-    const langMenu = document.getElementById('lang-menu');
-
-    langToggle.onclick = () => langMenu.classList.toggle('hidden');
+    // Mobile menu: only assign event listeners if not already set
+    (function() {
+        var menuBtn = document.getElementById('mobile-menu-button');
+        var closeBtn = document.getElementById('close-menu');
+        var mobileMenu = document.getElementById('mobile-menu');
+        if (menuBtn && mobileMenu && !menuBtn.hasAttribute('data-listener')) {
+            menuBtn.onclick = function() { mobileMenu.classList.remove('hidden'); };
+            menuBtn.setAttribute('data-listener', 'true');
+        }
+        if (closeBtn && mobileMenu && !closeBtn.hasAttribute('data-listener')) {
+            closeBtn.onclick = function() { mobileMenu.classList.add('hidden'); };
+            closeBtn.setAttribute('data-listener', 'true');
+        }
+        // Language dropdown: only assign event listeners if not already set
+        var langToggle = document.getElementById('lang-toggle');
+        var langMenu = document.getElementById('lang-menu');
+        if (langToggle && langMenu && !langToggle.hasAttribute('data-listener')) {
+            langToggle.onclick = function() { langMenu.classList.toggle('hidden'); };
+            langToggle.setAttribute('data-listener', 'true');
+        }
+    })();
 </script>
 
 <style>
