@@ -8,8 +8,6 @@ use App\Http\Controllers\Auth\WebResetPasswordController;
 use App\Http\Controllers\Auth\WebSetPasswordController;
 use App\Http\Controllers\Auth\GoogleRedirectController;
 use App\Http\Controllers\Auth\GoogleCallbackController;
-// use App\Http\Controllers\Auth\GoogleResetRedirectController;
-// use App\Http\Controllers\Auth\GoogleResetCallbackController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => view('welcome'));
@@ -30,9 +28,6 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/auth/google/redirect', GoogleRedirectController::class)->name('auth.google.redirect');
     Route::get('/auth/google/callback', GoogleCallbackController::class)->name('auth.google.callback');
-
-    // Route::get('/forgot-password/google', GoogleResetRedirectController::class)->name('password.google.redirect');
-    // Route::get('/forgot-password/google/callback', GoogleResetCallbackController::class)->name('password.google.callback');
 });
 
 // Authenticated
