@@ -56,6 +56,11 @@ class User extends Authenticatable
         return $this->hasOne(Coach::class);
     }
 
+    public function socialAccounts()
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
     /**
      * Get member profile
      */
