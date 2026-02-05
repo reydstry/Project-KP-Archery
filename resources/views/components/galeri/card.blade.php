@@ -8,7 +8,6 @@
     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div class="absolute bottom-0 left-0 right-0 p-4">
             <h3 class="text-white font-semibold text-base sm:text-lg mb-1">{{ $title }}</h3>
-            <p class="text-gray-200 text-xs sm:text-sm">{{ $date }}</p>
         </div>
     </div>
 </div>
