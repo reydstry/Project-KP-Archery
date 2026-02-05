@@ -9,22 +9,22 @@
         @php
             $facilities = [
                 [
-                    'image' => 'outdoor-range.jpg',
+                    'image' => 'section.jpg',
                     'title' => 'Lapangan Outdoor Utama',
                     'description' => 'Lapangan outdoor seluas 2000m² dengan target jarak 10m hingga 70m untuk semua jenis busur'
                 ],
                 [
-                    'image' => 'target-range.jpg',
+                    'image' => 'section.jpg',
                     'title' => 'Area Latihan Jarak Pendek',
                     'description' => 'Zona khusus untuk pemula dengan target jarak 10m-30m dilengkapi dengan sistem keamanan maksimal'
                 ],
                 [
-                    'image' => 'competition.jpg',
+                    'image' => 'section.jpg',
                     'title' => 'Arena Kompetisi',
                     'description' => 'Arena kompetisi standar Perpani untuk latihan turnamen dan simulasi kompetisi resmi'
                 ],
                 [
-                    'image' => 'competition.jpg',
+                    'image' => 'section.jpg',
                     'title' => 'Arena Kompetisi',
                     'description' => 'Arena kompetisi standar Perpani untuk latihan turnamen dan simulasi kompetisi resmi'
                 ]
@@ -35,11 +35,7 @@
             @foreach($facilities as $facility)
             <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                 <div class="h-56 overflow-hidden">
-<<<<<<< HEAD
                     <img src="{{ asset('asset/img/facilities/' . $facility['image']) }}" alt="{{ $facility['title'] }}" 
-=======
-                    <img src="{{ asset('asset/img/' . $facility['image']) }}" alt="{{ $facility['title'] }}" 
->>>>>>> pages-program
                          class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
                 </div>
                 <div class="p-5">

@@ -1,11 +1,11 @@
-<section class="py-20 bg-white overflow-hidden">
+<section class="py-12 sm:py-16 md:py-20 bg-white overflow-hidden">
     <div class="container mx-auto px-4">
         <!-- Section Header -->
-        <div class="text-center mb-12">
-            <h2 class="text-4xl font-bold text-gray-800 mb-4">
+        <div class="text-center mb-8 sm:mb-10 md:mb-12">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-3 sm:mb-4">
                 Di Dukung Oleh
             </h2>
-            <p class="text-lg text-gray-600">
+            <p class="text-base sm:text-lg text-gray-600 px-4">
                 Lebih dari 8 partner telah mempercayai kami untuk program pelatihan panahan mereka
             </p>
         </div>
