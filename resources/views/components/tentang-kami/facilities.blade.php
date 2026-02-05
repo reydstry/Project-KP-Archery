@@ -9,22 +9,22 @@
         @php
             $facilities = [
                 [
-                    'image' => 'outdoor-range.jpg',
+                    'image' => 'section.jpg',
                     'title' => 'Lapangan Outdoor Utama',
                     'description' => 'Lapangan outdoor seluas 2000m² dengan target jarak 10m hingga 70m untuk semua jenis busur'
                 ],
                 [
-                    'image' => 'target-range.jpg',
+                    'image' => 'section.jpg',
                     'title' => 'Area Latihan Jarak Pendek',
                     'description' => 'Zona khusus untuk pemula dengan target jarak 10m-30m dilengkapi dengan sistem keamanan maksimal'
                 ],
                 [
-                    'image' => 'competition.jpg',
+                    'image' => 'section.jpg',
                     'title' => 'Arena Kompetisi',
                     'description' => 'Arena kompetisi standar Perpani untuk latihan turnamen dan simulasi kompetisi resmi'
                 ],
                 [
-                    'image' => 'competition.jpg',
+                    'image' => 'section.jpg',
                     'title' => 'Arena Kompetisi',
                     'description' => 'Arena kompetisi standar Perpani untuk latihan turnamen dan simulasi kompetisi resmi'
                 ]
