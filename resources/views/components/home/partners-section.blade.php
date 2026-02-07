@@ -12,7 +12,7 @@
 
         <!-- Partners Logo Slider -->
         <div class="relative">
-            <div class="flex animate-scroll">
+            <div class="flex animate-marquee">
                 @php
                     $partners = [
                         'pertamina.png',
@@ -47,3 +47,25 @@
         </div>
     </div>
 </section>
+<style>
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-300%);
+    }
+}
+
+/* Desktop */
+.animate-marquee {
+    animation: marquee 100s linear infinite;
+}
+
+/* Mobile = lebih cepat */
+@media (max-width: 768px) {
+    .animate-marquee {
+        animation-duration: 50s;
+    }
+}
+</style>

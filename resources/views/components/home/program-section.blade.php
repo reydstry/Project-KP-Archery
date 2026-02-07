@@ -52,12 +52,12 @@
                     Program Kompetensi
                 </h3>
                 <p class="text-gray-600 mb-4">
-                    Program peningkatan keterampilan dengan Uji Kompetensi Pewarta (UKP) dengan evaluasi berkala versi 3 bulan.
+                    Program peningkatan keterampilan dengan Uji Kompetensi Pemanah (UKP) dengan evaluasi berkala versi 3 bulan.
                 </p>
                 <ul class="text-sm text-gray-600 space-y-2">
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Uji Kompetensi Pewarta
+                        Uji Kompetensi Pemanah
                     </li>
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>

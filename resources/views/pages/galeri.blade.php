@@ -40,7 +40,7 @@ function switchTab(tab) {
 
 // View Berita Function
 function viewBerita(id) {
-    alert('Halaman detail berita akan dibuat oleh backend developer.\nBerita ID: ' + id);
+    window.location.href = '/berita/' + id;
 }
 
 // Initialize first tab

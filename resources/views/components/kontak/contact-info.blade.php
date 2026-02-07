@@ -11,8 +11,8 @@
         </div>
         <div>
             <h4 class="font-semibold text-gray-800 mb-1">Alamat</h4>
-            <p class="text-gray-600">Jl. Panahan Raya No. 123</p>
-            <p class="text-gray-600">Jakarta Selatan, DKI Jakarta 12345</p>
+            <p class="text-gray-600">Gn. Bahagia, Kecamatan Balikpapan Selatan</p>
+            <p class="text-gray-600">Kota Balikpapan, Kalimantan Timur 76114</p>
         </div>
     </div>
 
@@ -25,7 +25,7 @@
         </div>
         <div>
             <h4 class="font-semibold text-gray-800 mb-1">Telepon</h4>
-            <p class="text-gray-600">0821 5524 5534</p>
+            <p class="text-gray-600">0819-5259-8200</p>
         </div>
     </div>
 

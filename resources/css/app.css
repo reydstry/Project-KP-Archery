@@ -21,6 +21,24 @@
     }
 }
 
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-300%);
+    }
+}
+
+@keyframes slow-zoom {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}
+
 @keyframes float-rotate {
     0%,
     100% {
@@ -39,6 +57,36 @@
 
 .animate-scroll {
     animation: scroll-left 30s linear infinite;
+}
+
+.animate-slow-zoom {
+    animation: slow-zoom 20s ease-in-out infinite alternate;
+}
+
+/* Partners Logo Animation - Desktop */
+.animate-marquee {
+    animation: marquee 30s linear infinite;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .animate-marquee {
+        animation-duration: 25s;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .animate-marquee {
+        animation-duration: 20s;
+    }
+}
+
+/* Mobile Small */
+@media (max-width: 480px) {
+    .animate-marquee {
+        animation-duration: 15s;
+    }
 }
 
 .animate-float-rotate {

@@ -3,7 +3,7 @@
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
     <h1 class="text-4xl font-bold text-gray-900 mb-3">Galeri Dokumentasi</h1>
-    <p class="text-gray-600">Dokumentasi kegiatan latihan, kompetisi, dan event FocusOneX Archery</p>
+    <p class="text-gray-600">Dokumentasi kegiatan latihan, kompetisi, dan grup selfie FocusOneX Archery</p>
 </div>
 
 <!-- Tabs Navigation -->
