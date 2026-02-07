@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Enums\UserRoles;
+use App\Enums\StatusMember;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class WebRegisterController extends Controller
 {
@@ -25,17 +28,37 @@ class WebRegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'],
-            'password' => Hash::make($data['password']),
-            'role' => UserRoles::MEMBER,
-        ]);
+        DB::beginTransaction();
+        try {
+            // Create user account
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'password' => Hash::make($data['password']),
+                'role' => UserRoles::MEMBER,
+            ]);
 
-        Auth::login($user);
-        $request->session()->regenerate();
+            // Create member record with pending status
+            Member::create([
+                'user_id' => $user->id,
+                'registered_by' => $user->id,
+                'name' => $user->name,
+                'phone' => $user->phone,
+                'is_self' => true,
+                'is_active' => true,
+                'status' => StatusMember::STATUS_PENDING->value,
+            ]);
 
-        return redirect('/dashboard');
+            DB::commit();
+            
+            Auth::login($user);
+            $request->session()->regenerate();
+
+            return redirect('/dashboard');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 }

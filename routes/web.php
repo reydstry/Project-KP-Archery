@@ -56,6 +56,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/set-password', [WebSetPasswordController::class, 'create'])->name('password.set');
     Route::post('/set-password', [WebSetPasswordController::class, 'store'])->name('password.store');
 
-    // contoh halaman setelah login (ganti sesuai kebutuhan)
+    // Main dashboard router
     Route::get('/dashboard', WebDashboardController::class)->name('dashboard');
+
+    // Admin routes
+    Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+        Route::get('/members', fn() => view('dashboards.admin.members'))->name('members');
+        Route::get('/coaches', fn() => view('dashboards.admin.coaches'))->name('coaches');
+        Route::get('/packages', fn() => view('dashboards.admin.packages'))->name('packages');
+        Route::get('/member-packages', fn() => view('dashboards.admin.member-packages'))->name('member-packages');
+        Route::get('/news', fn() => view('dashboards.admin.news'))->name('news');
+        Route::get('/achievements', fn() => view('dashboards.admin.achievements'))->name('achievements');
+    });
 });
