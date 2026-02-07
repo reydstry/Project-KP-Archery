@@ -16,7 +16,8 @@ class ForgotPasswordTest extends TestCase
     {
         $this->get(route('password.request'))
             ->assertOk()
-            ->assertSee('Lupa Password');
+            ->assertSee('Forgot Password')
+            ->assertSee('action="' . route('password.email') . '"', false);
     }
 
     public function test_forgot_password_sends_reset_link_for_existing_user(): void

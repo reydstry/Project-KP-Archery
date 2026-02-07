@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\MemberPackageController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\AchievementController as AdminAchievementController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PackageController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Coach\AttendanceController;
+use App\Http\Controllers\Coach\DashboardController as CoachDashboardController;
 use App\Http\Controllers\Coach\TrainingSessionController;
 use App\Http\Controllers\Member\DashboardController;
 use App\Http\Controllers\Member\RegistrationController;
@@ -58,9 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Routes untuk COACH (pelatih)
     Route::middleware('role:coach')->prefix('coach')->group(function () {
-        Route::get('/dashboard', function () {
-            return response()->json(['message' => 'Coach dashboard']);
-        });
+        Route::get('/dashboard', [CoachDashboardController::class, 'index']);
         
         // Training Sessions
         Route::get('training-sessions', [TrainingSessionController::class, 'index']);
@@ -79,9 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Routes untuk ADMIN
     Route::middleware('role:admin')->prefix('admin')->group(function () {
-        Route::get('/dashboard', function () {
-            return response()->json(['message' => 'Admin dashboard']);
-        });
+        Route::get('/dashboard', [AdminDashboardController::class, 'index']);
         
         // Master Packages
         Route::apiResource('packages', PackageController::class);
