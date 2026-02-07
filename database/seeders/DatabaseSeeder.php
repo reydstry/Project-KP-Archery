@@ -9,7 +9,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            UserSeeder::class,
+            AdminTestDataSeeder::class,
         ]);
 
         $this->command->info('✅ Seeder berhasil dijalankan!');
