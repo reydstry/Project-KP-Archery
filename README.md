@@ -110,4 +110,4 @@ Dokumentasi test tersedia pada folder berikut:
 ![Tests](https://img.shields.io/badge/tests-172%20passed-brightgreen)
 ![Assertions](https://img.shields.io/badge/assertions-664-green)
 ![Project](https://img.shields.io/badge/Project-Kerja%20Praktek-blue)
-![Status](https://img.shields.io/badge/Status-Production%70Ready-success)
+<!-- ![Status](https://img.shields.io/badge/Status-Production%20Ready-success) -->
