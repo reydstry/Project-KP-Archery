@@ -102,7 +102,12 @@ Dokumentasi test tersedia pada folder berikut:
 
 - [Testing](docs/testing.md)
 
-![Laravel](https://img.shields.io/badge/Laravel-10-red)
-![Tests](https://img.shields.io/badge/tests-172_passed-brightgreen)
-
-git commit -m "Finishing Readme"
+![Laravel](https://img.shields.io/badge/Laravel-12-red)
+![PHP](https://img.shields.io/badge/PHP-8.2-blue)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)
+![Auth](https://img.shields.io/badge/Auth-Laravel%20Sanctum-blueviolet)
+![OAuth](https://img.shields.io/badge/OAuth-Google-red)
+![Tests](https://img.shields.io/badge/tests-172%20passed-brightgreen)
+![Assertions](https://img.shields.io/badge/assertions-664-green)
+![Project](https://img.shields.io/badge/Project-Kerja%20Praktek-blue)
+![Status](https://img.shields.io/badge/Status-Production%70Ready-success)
