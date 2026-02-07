@@ -36,7 +36,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [WebRegisterController::class, 'store'])->name('register.post');
 
     Route::get('/login', [WebLoginController::class, 'create'])->name('login');
-    Route::post('/login', [WebLoginController::class, 'store'])->middleware('throttle:login');
+    Route::post('/login', [WebLoginController::class, 'store'])->name('login.post')->middleware('throttle:login');
 
     Route::get('/forgot-password', [WebForgotPasswordController::class, 'create'])->name('password.request');
     Route::post('/forgot-password', [WebForgotPasswordController::class, 'store'])->name('password.email')->middleware('throttle:forgot-password');

@@ -28,7 +28,7 @@
                 
                 <!-- First Set -->
                 @foreach($partners as $index => $logo)
-                <div class="flex-shrink-0 mx-8 transition-all duration-300">
+                <div class="flex-shrink-0 mx-8 transition-all duration-300 hover:scale-110 hover:shadow-2xl rounded-lg p-4 bg-white/50 hover:bg-white">
                     <img src="{{ asset('asset/img/partners/' . $logo) }}" 
                          alt="Partner {{ $index + 1 }}" 
                          class="h-16 md:h-20 object-contain">
@@ -37,7 +37,7 @@
                 
                 <!-- Duplicate Set for Seamless Loop -->
                 @foreach($partners as $index => $logo)
-                <div class="flex-shrink-0 mx-8 transition-all duration-300">
+                <div class="flex-shrink-0 mx-8 transition-all duration-300 hover:scale-110 hover:shadow-2xl rounded-lg p-4 bg-white/50 hover:bg-white">
                     <img src="{{ asset('asset/img/partners/' . $logo) }}" 
                          alt="Partner {{ $index + 1 }}" 
                          class="h-16 md:h-20 object-contain">
