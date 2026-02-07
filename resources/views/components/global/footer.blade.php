@@ -3,7 +3,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             <!-- Left Section: Logo, Description & Social Media -->
             <div>
-                <img src="{{ asset('asset/img/logofocus.png') }}" alt="FocusOnex Archery" class="h-10 w-auto mb-6">
+                <img src="{{ asset('asset/img/footerlogo.jpeg') }}" alt="FocusOnex Archery" class="h-10 w-auto mb-6">
                 <p class="text-sm text-gray-400 leading-relaxed mb-6">
                     Pusat pelatihan panahan profesional di Balikpapan dengan instruktur bersertifikat dan atlet aktif berprestasi sejak 2017.
                 </p>
