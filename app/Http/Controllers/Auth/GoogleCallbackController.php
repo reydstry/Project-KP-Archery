@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Enums\UserRoles;
+use App\Enums\StatusMember;
 use App\Http\Controllers\Controller;
 use App\Models\SocialAccount;
 use App\Models\User;
+use App\Models\Member;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleCallbackController extends Controller
@@ -50,12 +53,33 @@ class GoogleCallbackController extends Controller
                 ]);
             }
 
-            $user = User::create([
-                'name' => $name,
-                'email' => $email,
-                'role' => UserRoles::MEMBER,
-                'password' => null, // social-only (opsional: boleh set random)
-            ]);
+            DB::beginTransaction();
+            try {
+                $user = User::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'role' => UserRoles::MEMBER,
+                    'password' => null, // social-only (opsional: boleh set random)
+                ]);
+
+                // Create member record with pending status
+                Member::create([
+                    'user_id' => $user->id,
+                    'registered_by' => $user->id,
+                    'name' => $user->name,
+                    'phone' => null, // Will be set in set-password page
+                    'is_self' => true,
+                    'is_active' => true,
+                    'status' => StatusMember::STATUS_PENDING->value,
+                ]);
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return redirect('/login')->withErrors([
+                    'email' => 'Terjadi kesalahan saat membuat akun. Silakan coba lagi.',
+                ]);
+            }
         }
 
         // 4) Simpan social link
@@ -69,7 +93,8 @@ class GoogleCallbackController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        if (!$user->password) {
+        // Redirect to set password if no password or no phone
+        if (!$user->password || !$user->phone) {
             return redirect()->route('password.set');
         }
 
