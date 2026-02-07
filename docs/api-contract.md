@@ -17,6 +17,8 @@ Role values (used by middleware):
 - `coach`
 - `member`
 
+
+
 > Catatan: Label UI seperti “Pelatih” tidak dipakai di API. Middleware mengecek `user.role.value`.
 
 ## Standard Responses
