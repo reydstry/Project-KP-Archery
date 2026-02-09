@@ -68,4 +68,23 @@ Route::middleware('auth')->group(function () {
         Route::get('/news', fn() => view('dashboards.admin.news'))->name('news');
         Route::get('/achievements', fn() => view('dashboards.admin.achievements'))->name('achievements');
     });
+    // Coach routes
+    Route::prefix('coach')->name('coach.')->middleware('role:coach')->group(function () {
+        Route::get('/dashboard', fn() => view('dashboards.coach.dashboard'))->name('dashboard');
+        Route::get('/sessions', fn() => view('dashboards.coach.sessions'))->name('sessions.index');
+        Route::get('/sessions/create', fn() => view('dashboards.coach.sessions-create'))->name('sessions.create');
+        Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.coach.sessions-edit', ['id' => $id]))->name('sessions.edit');
+        Route::get('/attendance', fn() => view('dashboards.coach.attendance'))->name('attendance.index');
+        Route::get('/settings', fn() => view('dashboards.coach.settings'))->name('settings');
+    });
+    // Member routes
+     Route::prefix('member')->name('member.')->middleware('role:member')->group(function () {
+        Route::get('/dashboard', fn() => view('dashboards.member.dashboard'))->name('dashboard');
+        Route::get('/profile', fn() => view('dashboards.member.profile'))->name('profile');
+        Route::get('/bookings', fn() => view('dashboards.member.bookings'))->name('bookings');
+        Route::get('/bookings/create', fn() => view('dashboards.member.bookings-create'))->name('bookings.create');
+        Route::get('/membership', fn() => view('dashboards.member.membership'))->name('membership');
+        Route::get('/achievements', fn() => view('dashboards.member.achievements'))->name('achievements');
+    });
 });
+
