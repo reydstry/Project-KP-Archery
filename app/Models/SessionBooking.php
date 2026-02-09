@@ -11,7 +11,7 @@ class SessionBooking extends Model
 
     protected $fillable = [
         'member_package_id',
-        'training_session_id',
+        'training_session_slot_id',
         'booked_by',
         'status',
         'notes',
@@ -33,11 +33,11 @@ class SessionBooking extends Model
     }
 
     /**
-     * Get the training session
+     * Get the training session slot (specific time within a day)
      */
-    public function trainingSession()
+    public function trainingSessionSlot()
     {
-        return $this->belongsTo(TrainingSession::class);
+        return $this->belongsTo(TrainingSessionSlot::class);
     }
 
     /**

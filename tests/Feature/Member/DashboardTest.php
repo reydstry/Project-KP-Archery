@@ -11,6 +11,7 @@ use App\Models\Package;
 use App\Models\SessionBooking;
 use App\Models\SessionTime;
 use App\Models\TrainingSession;
+use App\Models\TrainingSessionSlot;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -93,7 +94,6 @@ class DashboardTest extends TestCase
     public function test_dashboard_shows_attendance_history()
     {
         $coach = Coach::factory()->create();
-        $sessionTime = SessionTime::factory()->create();
         $package = Package::factory()->create();
 
         $memberPackage = MemberPackage::factory()->create([
@@ -104,13 +104,19 @@ class DashboardTest extends TestCase
 
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
             'date' => now()->subDays(1),
+        ]);
+
+        $sessionTime = SessionTime::factory()->create();
+        $slot = TrainingSessionSlot::create([
+            'training_session_id' => $trainingSession->id,
+            'session_time_id' => $sessionTime->id,
+            'max_participants' => 10,
         ]);
 
         $booking = SessionBooking::factory()->create([
             'member_package_id' => $memberPackage->id,
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'confirmed',
         ]);
 
@@ -133,7 +139,6 @@ class DashboardTest extends TestCase
     public function test_dashboard_shows_attendance_statistics()
     {
         $coach = Coach::factory()->create();
-        $sessionTime = SessionTime::factory()->create();
         $package = Package::factory()->create();
 
         $memberPackage = MemberPackage::factory()->create([
@@ -146,13 +151,19 @@ class DashboardTest extends TestCase
         for ($i = 0; $i < 3; $i++) {
             $trainingSession = TrainingSession::factory()->create([
                 'coach_id' => $coach->id,
-                'session_time_id' => $sessionTime->id,
                 'date' => now()->subDays($i + 1),
+            ]);
+
+            $sessionTime = SessionTime::factory()->create();
+            $slot = TrainingSessionSlot::create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+                'max_participants' => 10,
             ]);
 
             $booking = SessionBooking::factory()->create([
                 'member_package_id' => $memberPackage->id,
-                'training_session_id' => $trainingSession->id,
+                'training_session_slot_id' => $slot->id,
                 'status' => 'confirmed',
             ]);
 
@@ -213,7 +224,6 @@ class DashboardTest extends TestCase
     public function test_only_shows_attendance_history_with_attendance_records()
     {
         $coach = Coach::factory()->create();
-        $sessionTime = SessionTime::factory()->create();
         $package = Package::factory()->create();
 
         $memberPackage = MemberPackage::factory()->create([
@@ -225,11 +235,18 @@ class DashboardTest extends TestCase
         // Booking with attendance
         $trainingSession1 = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $sessionTime1 = SessionTime::factory()->create();
+        $slot1 = TrainingSessionSlot::create([
+            'training_session_id' => $trainingSession1->id,
+            'session_time_id' => $sessionTime1->id,
+            'max_participants' => 10,
+        ]);
+
         $booking1 = SessionBooking::factory()->create([
             'member_package_id' => $memberPackage->id,
-            'training_session_id' => $trainingSession1->id,
+            'training_session_slot_id' => $slot1->id,
         ]);
         Attendance::factory()->create([
             'session_booking_id' => $booking1->id,
@@ -240,11 +257,18 @@ class DashboardTest extends TestCase
         // Booking without attendance
         $trainingSession2 = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $sessionTime2 = SessionTime::factory()->create();
+        $slot2 = TrainingSessionSlot::create([
+            'training_session_id' => $trainingSession2->id,
+            'session_time_id' => $sessionTime2->id,
+            'max_participants' => 10,
+        ]);
+
         SessionBooking::factory()->create([
             'member_package_id' => $memberPackage->id,
-            'training_session_id' => $trainingSession2->id,
+            'training_session_slot_id' => $slot2->id,
         ]);
 
         $response = $this->actingAs($this->user, 'sanctum')

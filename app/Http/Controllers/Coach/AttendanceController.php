@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\SessionBooking;
 use App\Models\TrainingSession;
+use App\Models\TrainingSessionSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +15,7 @@ class AttendanceController extends Controller
     /**
      * Get all bookings for a training session with attendance status
      */
-    public function getSessionBookings(TrainingSession $trainingSession)
+    public function getSessionBookings(TrainingSession $trainingSession, Request $request)
     {
         // Verify coach owns this session
         $coach = auth()->user()->coach;
@@ -24,11 +25,23 @@ class AttendanceController extends Controller
             ], 403);
         }
 
+        $slotId = $request->query('slot_id');
+
+        $slotIdsQuery = TrainingSessionSlot::query()
+            ->where('training_session_id', $trainingSession->id);
+
+        if ($slotId) {
+            $slotIdsQuery->where('id', $slotId);
+        }
+
+        $slotIds = $slotIdsQuery->pluck('id');
+
         $bookings = SessionBooking::with([
             'memberPackage.member',
-            'attendance'
+            'attendance',
+            'trainingSessionSlot.sessionTime',
         ])
-            ->where('training_session_id', $trainingSession->id)
+            ->whereIn('training_session_slot_id', $slotIds)
             ->where('status', 'confirmed')
             ->get()
             ->map(function ($booking) {
@@ -36,6 +49,15 @@ class AttendanceController extends Controller
                     'id' => $booking->id,
                     'member_name' => $booking->memberPackage->member->name,
                     'member_id' => $booking->memberPackage->member->id,
+                    'slot' => [
+                        'id' => $booking->trainingSessionSlot?->id,
+                        'session_time' => [
+                            'id' => $booking->trainingSessionSlot?->sessionTime?->id,
+                            'name' => $booking->trainingSessionSlot?->sessionTime?->name,
+                            'start_time' => $booking->trainingSessionSlot?->sessionTime?->start_time,
+                            'end_time' => $booking->trainingSessionSlot?->sessionTime?->end_time,
+                        ],
+                    ],
                     'has_attendance' => !is_null($booking->attendance),
                     'attendance_status' => $booking->attendance?->status,
                     'validated_at' => $booking->attendance?->validated_at,
@@ -47,8 +69,7 @@ class AttendanceController extends Controller
             'session' => [
                 'id' => $trainingSession->id,
                 'date' => $trainingSession->date,
-                'session_time' => $trainingSession->sessionTime->name ?? null,
-                'status' => $trainingSession->status,
+                'status' => $trainingSession->status?->value,
             ],
             'bookings' => $bookings,
             'total_bookings' => $bookings->count(),
@@ -64,7 +85,13 @@ class AttendanceController extends Controller
     public function validateAttendance(SessionBooking $sessionBooking, Request $request)
     {
         // Get training session
-        $trainingSession = $sessionBooking->trainingSession;
+        $trainingSession = $sessionBooking->trainingSessionSlot?->trainingSession;
+
+        if (!$trainingSession) {
+            return response()->json([
+                'message' => 'Training session not found for this booking'
+            ], 404);
+        }
 
         // Verify coach owns this session
         $coach = auth()->user()->coach;
@@ -157,7 +184,13 @@ class AttendanceController extends Controller
     public function update(SessionBooking $sessionBooking, Request $request)
     {
         // Get training session
-        $trainingSession = $sessionBooking->trainingSession;
+        $trainingSession = $sessionBooking->trainingSessionSlot?->trainingSession;
+
+        if (!$trainingSession) {
+            return response()->json([
+                'message' => 'Training session not found for this booking'
+            ], 404);
+        }
 
         // Verify coach owns this session
         $coach = auth()->user()->coach;

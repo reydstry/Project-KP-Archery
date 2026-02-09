@@ -6,6 +6,7 @@ use App\Enums\TrainingSessionStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Coach;
 use App\Models\TrainingSession;
+use App\Models\TrainingSessionSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -25,7 +26,7 @@ class TrainingSessionController extends Controller
             ], 404);
         }
 
-        $query = TrainingSession::with(['sessionTime', 'coach'])
+        $query = TrainingSession::with(['slots.sessionTime', 'coach'])
             ->where('coach_id', $coach->id);
 
         // Filter by status if provided
@@ -42,9 +43,7 @@ class TrainingSessionController extends Controller
             $query->where('date', '<=', $request->end_date);
         }
 
-        $sessions = $query->orderBy('date')
-            ->orderBy('session_time_id')
-            ->paginate(15);
+        $sessions = $query->orderBy('date')->paginate(15);
 
         return response()->json($sessions);
     }
@@ -55,9 +54,16 @@ class TrainingSessionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'session_time_id' => 'required|exists:session_times,id',
             'date' => 'required|date|after_or_equal:today',
-            'max_participants' => 'required|integer|min:1|max:50',
+
+            // New format: create a day session with multiple slots
+            'slots' => 'sometimes|array|min:1',
+            'slots.*.session_time_id' => 'required_with:slots|exists:session_times,id',
+            'slots.*.max_participants' => 'required_with:slots|integer|min:1|max:50',
+
+            // Backward compatible: create (or add) a single slot for that date
+            'session_time_id' => 'sometimes|exists:session_times,id',
+            'max_participants' => 'sometimes|integer|min:1|max:50',
         ]);
 
         // Get coach record
@@ -69,32 +75,78 @@ class TrainingSessionController extends Controller
             ], 404);
         }
 
-        // Check if session already exists for this date and time
-        $exists = TrainingSession::where('session_time_id', $validated['session_time_id'])
-            ->where('date', $validated['date'])
-            ->exists();
+        $hasSlotsPayload = array_key_exists('slots', $validated);
+        $hasLegacyPayload = array_key_exists('session_time_id', $validated) || array_key_exists('max_participants', $validated);
 
-        if ($exists) {
+        if (!$hasSlotsPayload && !$hasLegacyPayload) {
             return response()->json([
-                'message' => 'Training session already exists for this date and time',
+                'message' => 'Invalid payload. Provide slots[] or session_time_id + max_participants.',
             ], 422);
+        }
+
+        if ($hasLegacyPayload && (!isset($validated['session_time_id']) || !isset($validated['max_participants']))) {
+            return response()->json([
+                'message' => 'For legacy payload, session_time_id and max_participants are required.',
+            ], 422);
+        }
+
+        if ($hasSlotsPayload) {
+            $sessionTimeIds = collect($validated['slots'])->pluck('session_time_id');
+            if ($sessionTimeIds->count() !== $sessionTimeIds->unique()->count()) {
+                return response()->json([
+                    'message' => 'Duplicate session_time_id in slots payload.',
+                ], 422);
+            }
         }
 
         DB::beginTransaction();
         try {
-            $session = TrainingSession::create([
-                'session_time_id' => $validated['session_time_id'],
-                'date' => $validated['date'],
-                'coach_id' => $coach->id,
-                'max_participants' => $validated['max_participants'],
-                'status' => TrainingSessionStatus::OPEN->value,
-            ]);
+            $trainingSession = TrainingSession::firstOrCreate(
+                [
+                    'coach_id' => $coach->id,
+                    'date' => $validated['date'],
+                ],
+                [
+                    'status' => TrainingSessionStatus::OPEN->value,
+                ]
+            );
+
+            if ($hasSlotsPayload) {
+                foreach ($validated['slots'] as $slotPayload) {
+                    TrainingSessionSlot::updateOrCreate(
+                        [
+                            'training_session_id' => $trainingSession->id,
+                            'session_time_id' => $slotPayload['session_time_id'],
+                        ],
+                        [
+                            'max_participants' => $slotPayload['max_participants'],
+                        ]
+                    );
+                }
+            } else {
+                $slotExists = TrainingSessionSlot::where('training_session_id', $trainingSession->id)
+                    ->where('session_time_id', $validated['session_time_id'])
+                    ->exists();
+
+                if ($slotExists) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'Training session slot already exists for this date and time',
+                    ], 422);
+                }
+
+                TrainingSessionSlot::create([
+                    'training_session_id' => $trainingSession->id,
+                    'session_time_id' => $validated['session_time_id'],
+                    'max_participants' => $validated['max_participants'],
+                ]);
+            }
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Training session created successfully',
-                'data' => $session->load(['sessionTime', 'coach']),
+                'data' => $trainingSession->fresh()->load(['slots.sessionTime', 'coach']),
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -119,7 +171,7 @@ class TrainingSessionController extends Controller
             ], 403);
         }
 
-        return response()->json($trainingSession->load(['sessionTime', 'coach']));
+        return response()->json($trainingSession->load(['slots.sessionTime', 'coach']));
     }
 
     /**
@@ -137,16 +189,27 @@ class TrainingSessionController extends Controller
         }
 
         $validated = $request->validate([
+            'slot_id' => 'required|exists:training_session_slots,id',
             'max_participants' => 'required|integer|min:1|max:50',
         ]);
 
-        $trainingSession->update([
+        $slot = TrainingSessionSlot::where('id', $validated['slot_id'])
+            ->where('training_session_id', $trainingSession->id)
+            ->first();
+
+        if (!$slot) {
+            return response()->json([
+                'message' => 'Slot not found for this training session',
+            ], 404);
+        }
+
+        $slot->update([
             'max_participants' => $validated['max_participants'],
         ]);
 
         return response()->json([
             'message' => 'Quota updated successfully',
-            'data' => $trainingSession->load(['sessionTime', 'coach']),
+            'data' => $trainingSession->fresh()->load(['slots.sessionTime', 'coach']),
         ]);
     }
 

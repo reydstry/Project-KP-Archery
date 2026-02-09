@@ -6,6 +6,7 @@ use App\Enums\TrainingSessionStatus;
 use App\Models\Coach;
 use App\Models\SessionTime;
 use App\Models\TrainingSession;
+use App\Models\TrainingSessionSlot;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -35,11 +36,12 @@ class TrainingSessionTest extends TestCase
     public function test_coach_can_create_training_session()
     {
         $sessionTime = SessionTime::factory()->create();
+        $date = now()->addDays(7)->format('Y-m-d');
 
         $response = $this->actingAs($this->coach, 'sanctum')
             ->postJson('/api/coach/training-sessions', [
                 'session_time_id' => $sessionTime->id,
-                'date' => now()->addDays(7)->format('Y-m-d'),
+                'date' => $date,
                 'max_participants' => 15,
             ]);
 
@@ -47,14 +49,24 @@ class TrainingSessionTest extends TestCase
             ->assertJson([
                 'message' => 'Training session created successfully',
             ])
-            ->assertJsonPath('data.max_participants', 15)
-            ->assertJsonPath('data.status', 'open');
+            ->assertJsonPath('data.status', 'open')
+            ->assertJsonPath('data.slots.0.max_participants', 15)
+            ->assertJsonPath('data.slots.0.session_time_id', $sessionTime->id);
 
         $this->assertDatabaseHas('training_sessions', [
-            'session_time_id' => $sessionTime->id,
             'coach_id' => $this->coachProfile->id,
-            'max_participants' => 15,
+            'date' => $date,
             'status' => 'open',
+        ]);
+
+        $trainingSession = TrainingSession::where('coach_id', $this->coachProfile->id)
+            ->where('date', $date)
+            ->firstOrFail();
+
+        $this->assertDatabaseHas('training_session_slots', [
+            'training_session_id' => $trainingSession->id,
+            'session_time_id' => $sessionTime->id,
+            'max_participants' => 15,
         ]);
     }
 
@@ -63,14 +75,16 @@ class TrainingSessionTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $date = now()->addDays(7)->format('Y-m-d');
 
-        // Create first session
-        TrainingSession::factory()->create([
-            'session_time_id' => $sessionTime->id,
-            'date' => $date,
-            'coach_id' => $this->coachProfile->id,
-        ]);
+        // Create first slot via API
+        $this->actingAs($this->coach, 'sanctum')
+            ->postJson('/api/coach/training-sessions', [
+                'session_time_id' => $sessionTime->id,
+                'date' => $date,
+                'max_participants' => 15,
+            ])
+            ->assertStatus(201);
 
-        // Try to create duplicate
+        // Try to create duplicate slot for the same date+time
         $response = $this->actingAs($this->coach, 'sanctum')
             ->postJson('/api/coach/training-sessions', [
                 'session_time_id' => $sessionTime->id,
@@ -80,14 +94,24 @@ class TrainingSessionTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJson([
-                'message' => 'Training session already exists for this date and time',
+                'message' => 'Training session slot already exists for this date and time',
             ]);
     }
 
     public function test_coach_can_view_their_training_sessions()
     {
-        TrainingSession::factory()->count(3)->create([
+        // Ensure dates are unique per coach
+        TrainingSession::factory()->create([
             'coach_id' => $this->coachProfile->id,
+            'date' => now()->addDays(1)->format('Y-m-d'),
+        ]);
+        TrainingSession::factory()->create([
+            'coach_id' => $this->coachProfile->id,
+            'date' => now()->addDays(2)->format('Y-m-d'),
+        ]);
+        TrainingSession::factory()->create([
+            'coach_id' => $this->coachProfile->id,
+            'date' => now()->addDays(3)->format('Y-m-d'),
         ]);
 
         $response = $this->actingAs($this->coach, 'sanctum')
@@ -98,11 +122,10 @@ class TrainingSessionTest extends TestCase
                 'data' => [
                     '*' => [
                         'id',
-                        'session_time_id',
                         'date',
                         'coach_id',
-                        'max_participants',
                         'status',
+                        'slots',
                     ]
                 ]
             ]);
@@ -136,13 +159,27 @@ class TrainingSessionTest extends TestCase
 
     public function test_coach_can_update_session_quota()
     {
+        $sessionTime = SessionTime::factory()->create();
         $session = TrainingSession::factory()->create([
             'coach_id' => $this->coachProfile->id,
-            'max_participants' => 10,
+            'date' => now()->addDays(10)->format('Y-m-d'),
         ]);
+
+        /** @var TrainingSessionSlot $slot */
+        $slot = $session->slots()->where('session_time_id', $sessionTime->id)->first();
+        if (!$slot) {
+            $slot = TrainingSessionSlot::create([
+                'training_session_id' => $session->id,
+                'session_time_id' => $sessionTime->id,
+                'max_participants' => 10,
+            ]);
+        } else {
+            $slot->update(['max_participants' => 10]);
+        }
 
         $response = $this->actingAs($this->coach, 'sanctum')
             ->patchJson("/api/coach/training-sessions/{$session->id}/quota", [
+                'slot_id' => $slot->id,
                 'max_participants' => 20,
             ]);
 
@@ -150,10 +187,13 @@ class TrainingSessionTest extends TestCase
             ->assertJson([
                 'message' => 'Quota updated successfully',
             ])
-            ->assertJsonPath('data.max_participants', 20);
+            ->assertJsonFragment([
+                'id' => $slot->id,
+                'max_participants' => 20,
+            ]);
 
-        $this->assertDatabaseHas('training_sessions', [
-            'id' => $session->id,
+        $this->assertDatabaseHas('training_session_slots', [
+            'id' => $slot->id,
             'max_participants' => 20,
         ]);
     }

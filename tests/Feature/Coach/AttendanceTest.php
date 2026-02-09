@@ -10,6 +10,7 @@ use App\Models\Package;
 use App\Models\SessionBooking;
 use App\Models\SessionTime;
 use App\Models\TrainingSession;
+use App\Models\TrainingSessionSlot;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -29,18 +30,23 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
             'date' => now()->addDays(1),
             'status' => 'open',
         ]);
 
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
+
         // Create bookings
         $booking1 = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'confirmed',
         ]);
         $booking2 = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'confirmed',
         ]);
 
@@ -88,8 +94,13 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach1->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
 
         $response = $this->actingAs($coach2->user)
             ->getJson("/api/coach/training-sessions/{$trainingSession->id}/bookings");
@@ -104,10 +115,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'confirmed',
         ]);
 
@@ -140,10 +156,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'confirmed',
         ]);
 
@@ -174,10 +195,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach1->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
         ]);
 
         $response = $this->actingAs($coach2->user)
@@ -195,10 +221,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'cancelled',
         ]);
 
@@ -217,10 +248,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'confirmed',
         ]);
 
@@ -246,10 +282,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'confirmed',
         ]);
         $attendance = Attendance::factory()->create([
@@ -285,10 +326,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'confirmed',
         ]);
 
@@ -307,10 +353,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'confirmed',
         ]);
 
@@ -330,10 +381,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
         ]);
 
         $response = $this->actingAs($member->user)
@@ -351,10 +407,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
         ]);
 
         $response = $this->actingAs($admin)
@@ -371,10 +432,15 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'status' => 'confirmed',
         ]);
 
@@ -397,8 +463,13 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         
         $memberPackage = MemberPackage::factory()->create([
             'total_sessions' => 10,
@@ -406,7 +477,7 @@ class AttendanceTest extends TestCase
         ]);
         
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'member_package_id' => $memberPackage->id,
             'status' => 'confirmed',
         ]);
@@ -430,8 +501,13 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         
         $memberPackage = MemberPackage::factory()->create([
             'total_sessions' => 10,
@@ -439,7 +515,7 @@ class AttendanceTest extends TestCase
         ]);
         
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'member_package_id' => $memberPackage->id,
             'status' => 'confirmed',
         ]);
@@ -462,8 +538,13 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         
         $memberPackage = MemberPackage::factory()->create([
             'total_sessions' => 10,
@@ -471,7 +552,7 @@ class AttendanceTest extends TestCase
         ]);
         
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'member_package_id' => $memberPackage->id,
             'status' => 'confirmed',
         ]);
@@ -496,8 +577,13 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         
         $memberPackage = MemberPackage::factory()->create([
             'total_sessions' => 10,
@@ -505,7 +591,7 @@ class AttendanceTest extends TestCase
         ]);
         
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'member_package_id' => $memberPackage->id,
             'status' => 'confirmed',
         ]);
@@ -537,8 +623,13 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         
         $memberPackage = MemberPackage::factory()->create([
             'total_sessions' => 10,
@@ -546,7 +637,7 @@ class AttendanceTest extends TestCase
         ]);
         
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'member_package_id' => $memberPackage->id,
             'status' => 'confirmed',
         ]);
@@ -578,8 +669,13 @@ class AttendanceTest extends TestCase
         $sessionTime = SessionTime::factory()->create();
         $trainingSession = TrainingSession::factory()->create([
             'coach_id' => $coach->id,
-            'session_time_id' => $sessionTime->id,
         ]);
+
+        $slot = $trainingSession->slots()->where('session_time_id', $sessionTime->id)->first()
+            ?? TrainingSessionSlot::factory()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+            ]);
         
         $memberPackage = MemberPackage::factory()->create([
             'total_sessions' => 10,
@@ -587,7 +683,7 @@ class AttendanceTest extends TestCase
         ]);
         
         $booking = SessionBooking::factory()->create([
-            'training_session_id' => $trainingSession->id,
+            'training_session_slot_id' => $slot->id,
             'member_package_id' => $memberPackage->id,
             'status' => 'confirmed',
         ]);

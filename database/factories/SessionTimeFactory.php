@@ -2,9 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Coach;
 use App\Models\SessionTime;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,13 +20,11 @@ class SessionTimeFactory extends Factory
     public function definition(): array
     {
         $startHour = $this->faker->numberBetween(8, 18);
-        
+
         return [
-            'day_of_week' => $this->faker->randomElement(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']),
+            'name' => 'Sesi ' . $this->faker->unique()->numberBetween(1, 50),
             'start_time' => sprintf('%02d:00:00', $startHour),
             'end_time' => sprintf('%02d:00:00', $startHour + 2),
-            'max_capacity' => $this->faker->numberBetween(10, 30),
-            'coach_id' => User::factory()->coach(),
             'is_active' => true,
         ];
     }

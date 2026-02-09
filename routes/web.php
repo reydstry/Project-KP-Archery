@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\WebSetPasswordController;
 use App\Http\Controllers\Auth\GoogleRedirectController;
 use App\Http\Controllers\Auth\GoogleCallbackController;
 use App\Http\Controllers\WebDashboardController;
+use App\Models\SessionTime;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -70,11 +71,13 @@ Route::middleware('auth')->group(function () {
     });
     // Coach routes
     Route::prefix('coach')->name('coach.')->middleware('role:coach')->group(function () {
-        Route::get('/dashboard', fn() => view('dashboards.coach.dashboard'))->name('dashboard');
         Route::get('/sessions', fn() => view('dashboards.coach.sessions'))->name('sessions.index');
-        Route::get('/sessions/create', fn() => view('dashboards.coach.sessions-create'))->name('sessions.create');
+        Route::get('/sessions/create', fn() => view('dashboards.coach.sessions-create', [
+            'sessionTimes' => SessionTime::query()->active()->orderBy('start_time')->get(['id', 'name', 'start_time', 'end_time']),
+        ]))->name('sessions.create');
         Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.coach.sessions-edit', ['id' => $id]))->name('sessions.edit');
         Route::get('/attendance', fn() => view('dashboards.coach.attendance'))->name('attendance.index');
+        Route::post('/attendance', fn() => redirect()->route('coach.attendance.index'))->name('attendance.store');
         Route::get('/settings', fn() => view('dashboards.coach.settings'))->name('settings');
     });
     // Member routes

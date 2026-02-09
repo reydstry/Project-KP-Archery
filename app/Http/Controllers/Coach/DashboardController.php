@@ -29,18 +29,32 @@ class DashboardController extends Controller
 
         $today = now()->toDateString();
 
-        $todaySessions = TrainingSession::query()
+        $todaySession = TrainingSession::query()
+            ->with(['slots.sessionTime', 'slots.confirmedBookings'])
             ->where('coach_id', $coach->id)
             ->whereDate('date', $today)
-            ->orderBy('session_time_id')
-            ->get()
-            ->map(fn (TrainingSession $session) => [
-                'id' => $session->id,
-                'date' => $session->date,
-                'status' => $session->status?->value,
-                'max_participants' => $session->max_participants,
-                'session_time_id' => $session->session_time_id,
-            ]);
+            ->first();
+
+        $todaySlots = $todaySession
+            ? $todaySession->slots
+                ->sortBy('session_time_id')
+                ->values()
+                ->map(fn ($slot) => [
+                    'id' => $slot->id,
+                    'training_session_id' => $slot->training_session_id,
+                    'date' => $todaySession->date,
+                    'status' => $todaySession->status?->value,
+                    'max_participants' => $slot->max_participants,
+                    'capacity' => $slot->max_participants,
+                    'total_bookings' => $slot->confirmedBookings->count(),
+                    'session_time' => [
+                        'id' => $slot->sessionTime?->id,
+                        'session_name' => $slot->sessionTime?->name,
+                        'start_time' => $slot->sessionTime?->start_time,
+                        'end_time' => $slot->sessionTime?->end_time,
+                    ],
+                ])
+            : collect();
 
         $upcomingCount = TrainingSession::query()
             ->where('coach_id', $coach->id)
@@ -58,11 +72,11 @@ class DashboardController extends Controller
                 'phone' => $coach->phone,
             ],
             'statistics' => [
-                'today_sessions' => $todaySessions->count(),
+                'today_sessions' => $todaySlots->count(),
                 'upcoming_sessions' => $upcomingCount,
                 'total_sessions' => $totalCount,
             ],
-            'today_sessions' => $todaySessions,
+            'today_sessions' => $todaySlots,
         ]);
     }
 }

@@ -11,10 +11,8 @@ class TrainingSession extends Model
     use HasFactory;
 
     protected $fillable = [
-        'session_time_id',
         'date',
         'coach_id',
-        'max_participants',
         'status',
     ];
 
@@ -27,14 +25,6 @@ class TrainingSession extends Model
     }
 
     /**
-     * Get the session time
-     */
-    public function sessionTime()
-    {
-        return $this->belongsTo(SessionTime::class);
-    }
-
-    /**
      * Get the coach
      */
     public function coach()
@@ -43,36 +33,27 @@ class TrainingSession extends Model
     }
 
     /**
-     * Get attendances for this session
+     * Slots (one per session_time)
      */
-    public function attendances()
+    public function slots()
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasMany(TrainingSessionSlot::class);
     }
 
     /**
-     * Get current participants count
+     * Bookings across all slots
      */
-    public function getCurrentParticipantsAttribute(): int
+    public function bookings()
     {
-        return $this->attendances()->count();
+        return $this->hasManyThrough(SessionBooking::class, TrainingSessionSlot::class);
     }
 
     /**
-     * Check if session is full
-     */
-    public function isFull(): bool
-    {
-        return $this->current_participants >= $this->max_participants;
-    }
-
-    /**
-     * Check if session is open for registration
+     * Check if session is open for registration (day-level)
      */
     public function isOpenForRegistration(): bool
     {
         return $this->status === TrainingSessionStatus::OPEN 
-            && !$this->isFull() 
             && $this->date->isFuture();
     }
 
