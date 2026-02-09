@@ -8,7 +8,7 @@ use App\Http\Controllers\Auth\WebResetPasswordController;
 use App\Http\Controllers\Auth\WebSetPasswordController;
 use App\Http\Controllers\Auth\GoogleRedirectController;
 use App\Http\Controllers\Auth\GoogleCallbackController;
-
+use App\Http\Controllers\WebDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -42,7 +42,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [WebRegisterController::class, 'store'])->name('register.post');
 
     Route::get('/login', [WebLoginController::class, 'create'])->name('login');
-    Route::post('/login', [WebLoginController::class, 'store'])->name('login.post')->middleware('throttle:login');
+    Route::post('/login', [WebLoginController::class, 'store'])->middleware('throttle:login')->name('login.post');
 
     Route::get('/forgot-password', [WebForgotPasswordController::class, 'create'])->name('password.request');
     Route::post('/forgot-password', [WebForgotPasswordController::class, 'store'])->name('password.email')->middleware('throttle:forgot-password');
@@ -61,6 +61,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/set-password', [WebSetPasswordController::class, 'create'])->name('password.set');
     Route::post('/set-password', [WebSetPasswordController::class, 'store'])->name('password.store');
 
-    // contoh halaman setelah login (ganti sesuai kebutuhan)
-    Route::get('/dashboard', fn () => view('dashboard'))->name('dashboard');
+    // Main dashboard router
+    Route::get('/dashboard', WebDashboardController::class)->name('dashboard');
+
+    // Admin routes
+    Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+        Route::get('/members', fn() => view('dashboards.admin.members'))->name('members');
+        Route::get('/coaches', fn() => view('dashboards.admin.coaches'))->name('coaches');
+        Route::get('/packages', fn() => view('dashboards.admin.packages'))->name('packages');
+        Route::get('/member-packages', fn() => view('dashboards.admin.member-packages'))->name('member-packages');
+        Route::get('/news', fn() => view('dashboards.admin.news'))->name('news');
+        Route::get('/achievements', fn() => view('dashboards.admin.achievements'))->name('achievements');
+    });
 });

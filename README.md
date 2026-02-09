@@ -1,59 +1,113 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Club Panahan Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem manajemen berbasis web untuk Club Panahan yang mencakup
+manajemen member, absensi latihan, booking sesi, dan dashboard,
+dibangun menggunakan Laravel sebagai backend API.
 
-## About Laravel
+## Background
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Sebelum sistem ini dibangun, pencatatan kehadiran member dilakukan
+secara manual menggunakan kertas, yang sering menimbulkan konflik
+terkait sisa jatah latihan antara pihak klub dan orang tua member.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Sistem ini dikembangkan untuk menyediakan data absensi yang valid,
+transparansi jatah latihan bulanan, serta mempermudah pengelolaan
+member oleh admin dan pelatih.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Objectives
 
-## Learning Laravel
+- Menyediakan data absensi yang akurat dan tervalidasi
+- Menampilkan sisa jatah latihan bulanan secara transparan
+- Mempermudah admin dan pelatih dalam manajemen member dan sesi latihan
+- Mampu mempromosikan club melalui website resmi
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Tech Stack
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Backend
+- PHP (bahasa utama)
+- Laravel (framework PHP)
+- Composer (package manager PHP)
+- Laravel Sanctum (authentication)
+- Laravel Feature Test (PHPUnit)
 
-## Laravel Sponsors
+### Database
+- MySQL
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Frontend
+- Blade (templating engine Laravel)
+- HTML5, CSS3
+- JavaScript (bisa vanilla atau library)
+- Bootstrap (CSS framework, biasanya default Laravel UI)
+- jQuery (sering dipakai untuk interaksi sederhana)
+- Vue.js (kadang dipakai, tergantung kebutuhan; Laravel mendukung ini)
+- npm (package manager JS, jika ada frontend build)
 
-### Premium Partners
+## User Roles
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Admin
+- CRUD member, pelatih, paket latihan
+- Validasi member baru
+- Manajemen berita & prestasi
 
-## Contributing
+### Coach
+- Membuat dan mengelola sesi latihan
+- Validasi kehadiran member
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Member (Orang Tua / Member)
+- Registrasi akun
+- Mendaftarkan diri sendiri atau anak
+- Booking sesi latihan
+- Melihat dashboard absensi dan sisa kuota
 
-## Code of Conduct
+## Features
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Authentication & Role-Based Access
+- Parent–Child Member Management
+- Training Session Booking
+- Attendance Validation & Quota Management
+- Member Dashboard
+- Company Profile (News & Achievements)
 
-## Security Vulnerabilities
+## Use Case Diagram
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+UCD dapat dilihat pada:
 
-## License
+- [Use Case Diagram](docs/ucd.png)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Deskripsi UCD tersedia pada folder berikut:
+
+- [Use Case Description](docs/ucd-desc.md)
+
+## Arsitektur Sistem
+
+Arsitektur Sistem dapat dilihat pada:
+
+- [Arsitektur Sistem](docs/arsitektur.png)
+
+## API Documentation
+
+Dokumentasi API tersedia pada folder berikut:
+
+- [API Contract](docs/api-contract.md)
+
+## Database Design
+
+ERD dan desain database dapat dilihat pada:
+
+- [Entity Relationship Diagram](docs/erd.png)
+
+## Testing Documentation
+
+Dokumentasi test tersedia pada folder berikut:
+
+- [Testing](docs/testing.md)
+
+![Laravel](https://img.shields.io/badge/Laravel-12-red)
+![PHP](https://img.shields.io/badge/PHP-8.2-blue)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)
+![Auth](https://img.shields.io/badge/Auth-Laravel%20Sanctum-blueviolet)
+![OAuth](https://img.shields.io/badge/OAuth-Google-red)
+![Tests](https://img.shields.io/badge/tests-172%20passed-brightgreen)
+![Assertions](https://img.shields.io/badge/assertions-664-green)
+![Project](https://img.shields.io/badge/Project-Kerja%20Praktek-blue)
+<!-- ![Status](https://img.shields.io/badge/Status-Production%20Ready-success) -->
