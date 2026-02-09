@@ -3,7 +3,7 @@
 @section('title', 'Galeri - FocusOneX Archery')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 py-10 sm:py-12">
+<div class="min-h-screen bg-gray-50 py-10 sm:py-12 mt-20">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         
         @include('components.galeri.header')
@@ -40,7 +40,7 @@ function switchTab(tab) {
 
 // View Berita Function
 function viewBerita(id) {
-    alert('Halaman detail berita akan dibuat oleh backend developer.\nBerita ID: ' + id);
+    window.location.href = '/berita/' + id;
 }
 
 // Initialize first tab

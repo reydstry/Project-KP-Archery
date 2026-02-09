@@ -31,6 +31,11 @@ Route::get('/kontak', function () {
     return view('pages.kontak');
 })->name('kontak');
 
+
+// dummay data berita detail
+use App\Http\Controllers\BeritaController;
+Route::get('/berita/{id}', [BeritaController::class, 'show'])->name('berita.detail');
+
 // Guest only
 Route::middleware('guest')->group(function () {
     Route::get('/register', [WebRegisterController::class, 'create'])->name('register');
