@@ -124,7 +124,7 @@
                     Remember me
                 </label>
 
-                <a href="{{ route('password.request') }}
+                <a href="{{ route('password.request') }}"
                    class="text-sm font-medium text-blue-600 hover:text-blue-700">
                     Forgot password?
                 </a>
