@@ -7,14 +7,14 @@
 <div x-data="packagesData()" x-init="loadPackages()" class="space-y-6">
     
     <!-- Header Actions -->
-    <div class="flex items-center justify-between">
-        <div class="flex-1 max-w-md">
+    <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+        <div class="flex-1 w-full sm:max-w-md">
             <input type="search" x-model="search" placeholder="Search packages..." 
                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
         </div>
         <button @click="openAddModal()" 
-                class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
-            <span class="flex items-center gap-2">
+                class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap shrink-0">
+            <span class="flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Add Package
             </span>
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Packages Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="animation-delay: 0.1s">
         <template x-if="loading">
             <div class="col-span-full text-center py-12 text-slate-400">Loading...</div>
         </template>
