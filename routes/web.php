@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\WebSetPasswordController;
 use App\Http\Controllers\Auth\GoogleRedirectController;
 use App\Http\Controllers\Auth\GoogleCallbackController;
 use App\Http\Controllers\WebDashboardController;
+use App\Models\SessionTime;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,6 +31,11 @@ Route::get('/galeri', function () {
 Route::get('/kontak', function () {
     return view('pages.kontak');
 })->name('kontak');
+
+
+// dummay data berita detail
+use App\Http\Controllers\BeritaController;
+Route::get('/berita/{id}', [BeritaController::class, 'show'])->name('berita.detail');
 
 // Guest only
 Route::middleware('guest')->group(function () {
@@ -70,12 +76,21 @@ Route::middleware('auth')->group(function () {
     });
     // Coach routes
     Route::prefix('coach')->name('coach.')->middleware('role:coach')->group(function () {
-        Route::get('/dashboard', fn() => view('dashboards.coach.dashboard'))->name('dashboard');
         Route::get('/sessions', fn() => view('dashboards.coach.sessions'))->name('sessions.index');
-        Route::get('/sessions/create', fn() => view('dashboards.coach.sessions-create'))->name('sessions.create');
+        Route::get('/bookings/create', fn() => view('dashboards.coach.bookings-create'))->name('bookings.create');
+        Route::get('/sessions/create', fn() => view('dashboards.coach.sessions-create', [
+            'sessionTimes' => SessionTime::query()->active()->orderBy('start_time')->get(['id', 'name', 'start_time', 'end_time']),
+        ]))->name('sessions.create');
         Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.coach.sessions-edit', ['id' => $id]))->name('sessions.edit');
         Route::get('/attendance', fn() => view('dashboards.coach.attendance'))->name('attendance.index');
-        Route::get('/settings', fn() => view('dashboards.coach.settings'))->name('settings');
+        Route::post('/attendance', fn() => redirect()->route('coach.attendance.index'))->name('attendance.store');
+        Route::get('/settings', function() {
+            $user = auth()->user();
+            $coach = $user->coach;
+            return view('dashboards.coach.settings', compact('user', 'coach'));
+        })->name('settings');
+        Route::post('/settings', [\App\Http\Controllers\Coach\ProfileController::class, 'updateProfile'])->name('settings.update');
+        Route::post('/settings/password', [\App\Http\Controllers\Coach\ProfileController::class, 'updatePassword'])->name('settings.password');
     });
     // Member routes
      Route::prefix('member')->name('member.')->middleware('role:member')->group(function () {

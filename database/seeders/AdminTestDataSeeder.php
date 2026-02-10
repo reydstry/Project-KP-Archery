@@ -10,6 +10,7 @@ use App\Models\MemberPackage;
 use App\Models\News;
 use App\Models\Achievement;
 use App\Models\Coach;
+use App\Models\SessionTime;
 use App\Enums\UserRoles;
 use App\Enums\StatusMember;
 use Illuminate\Support\Facades\Hash;
@@ -306,6 +307,23 @@ class AdminTestDataSeeder extends Seeder
             );
         }
 
+        // Create default Session Times (6 template sessions)
+        $defaultSessionTimes = [
+            ['name' => 'Sesi 1', 'start_time' => '07:30:00', 'end_time' => '09:00:00'],
+            ['name' => 'Sesi 2', 'start_time' => '09:00:00', 'end_time' => '10:30:00'],
+            ['name' => 'Sesi 3', 'start_time' => '10:30:00', 'end_time' => '12:00:00'],
+            ['name' => 'Sesi 4', 'start_time' => '13:30:00', 'end_time' => '15:00:00'],
+            ['name' => 'Sesi 5', 'start_time' => '15:00:00', 'end_time' => '16:30:00'],
+            ['name' => 'Sesi 6', 'start_time' => '16:30:00', 'end_time' => '18:00:00'],
+        ];
+
+        foreach ($defaultSessionTimes as $sessionTimeData) {
+            SessionTime::firstOrCreate(
+                ['name' => $sessionTimeData['name']],
+                array_merge($sessionTimeData, ['is_active' => true])
+            );
+        }
+
         // Create Member Packages
         $adminUser = User::where('role', UserRoles::ADMIN->value)->first();
         $activeMembers = Member::where('status', StatusMember::STATUS_ACTIVE->value)->get();
@@ -402,6 +420,7 @@ class AdminTestDataSeeder extends Seeder
         $this->command->info('📰 News articles: ' . News::count());
         $this->command->info('🏆 Achievements: ' . Achievement::count());
         $this->command->info('📋 Member Packages: ' . MemberPackage::count());
+        $this->command->info('� Session Times: ' . SessionTime::count());
         $this->command->info('');
         $this->command->info('💡 Test assigning packages to pending members to see status change to active!');
     }

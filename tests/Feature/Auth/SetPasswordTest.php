@@ -26,7 +26,7 @@ class SetPasswordTest extends TestCase
         $this->actingAs($user)
             ->get(route('password.set'))
             ->assertOk()
-            ->assertSee('Buat Password');
+            ->assertSee('Password Baru');
     }
 
     public function test_user_with_null_password_can_set_password(): void
@@ -37,6 +37,7 @@ class SetPasswordTest extends TestCase
 
         $response = $this->actingAs($user)
             ->post(route('password.store'), [
+                'phone' => '081234567890',
                 'password' => 'newpassword123',
                 'password_confirmation' => 'newpassword123',
             ]);
@@ -44,6 +45,7 @@ class SetPasswordTest extends TestCase
         $response->assertRedirect(route('dashboard'));
 
         $user->refresh();
+        $this->assertEquals('081234567890', $user->phone);
         $this->assertNotNull($user->password);
         $this->assertTrue(Hash::check('newpassword123', $user->password));
     }
@@ -52,6 +54,7 @@ class SetPasswordTest extends TestCase
     {
         $user = User::factory()->create([
             'password' => Hash::make('alreadyset123'),
+            'phone' => '081234567890',
         ]);
 
         $this->actingAs($user)

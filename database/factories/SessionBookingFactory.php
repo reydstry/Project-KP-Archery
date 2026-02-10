@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\MemberPackage;
 use App\Models\SessionBooking;
-use App\Models\TrainingSession;
+use App\Models\TrainingSessionSlot;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -24,7 +24,7 @@ class SessionBookingFactory extends Factory
     {
         return [
             'member_package_id' => MemberPackage::factory(),
-            'training_session_id' => TrainingSession::factory(),
+            'training_session_slot_id' => TrainingSessionSlot::factory(),
             'booked_by' => User::factory()->member(),
             'status' => 'confirmed',
             'notes' => $this->faker->optional()->sentence(),

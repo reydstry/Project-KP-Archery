@@ -32,10 +32,6 @@ class Coach extends Model
     }
 
     /**
-     * Get session times
+     * Session times are global templates (not owned by a coach).
      */
-    public function sessionTimes()
-    {
-        return $this->hasMany(SessionTime::class);
-    }
 }

@@ -1,5 +1,4 @@
-<?php
-@extends('layouts.app')
+@extends('layouts.coach')
 
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
@@ -12,20 +11,19 @@
 
     <!-- Session Filter -->
     <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-            <!-- Session Select -->
-            <div class="md:col-span-2">
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Select Session</label>
-                <select id="sessionSelect" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                    <option value="">Loading sessions...</option>
-                </select>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             <!-- Date Filter -->
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Filter by Date</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Latihan</label>
                 <input type="date" id="dateFilter" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Sesi / Slot</label>
+                <select id="slotFilter" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" disabled>
+                    <option value="">Semua Slot</option>
+                </select>
             </div>
 
         </div>
@@ -64,8 +62,8 @@
                     <p class="text-xs text-red-600 font-medium">Absent</p>
                 </div>
                 <div class="text-center px-6 py-3 bg-orange-50 rounded-xl">
-                    <p class="text-2xl font-bold text-orange-600" id="lateCount">0</p>
-                    <p class="text-xs text-orange-600 font-medium">Late</p>
+                    <p class="text-2xl font-bold text-orange-600" id="notValidatedCount">0</p>
+                    <p class="text-xs text-orange-600 font-medium">Not Validated</p>
                 </div>
             </div>
         </div>
@@ -84,12 +82,10 @@
                 </svg>
                 Mark All Absent
             </button>
-            <button onclick="exportAttendance()" class="ml-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 text-sm flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-                Export Excel
-            </button>
+
+            <a href="{{ route('coach.bookings.create') }}" class="ml-auto px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-sm flex items-center gap-2">
+                Book Member
+            </a>
         </div>
 
         <!-- Search Participants -->
@@ -107,21 +103,15 @@
             <table class="w-full">
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-200">
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                            <input type="checkbox" id="selectAll" class="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                        </th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Participant</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Member ID</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Member</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Slot</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Check-in Time</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Notes</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="participantsTableBody" class="bg-white divide-y divide-slate-200">
                     <!-- Loading state -->
                     <tr>
-                        <td colspan="7" class="px-6 py-12 text-center">
+                        <td colspan="3" class="px-6 py-12 text-center">
                             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                             <p class="text-slate-600 mt-2">Loading participants...</p>
                         </td>
@@ -156,94 +146,164 @@
 
 <script>
 let currentSessionId = null;
+let currentSlotId = null;
+let currentSession = null;
 let participants = [];
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Default date = today
+    const dateInput = document.getElementById('dateFilter');
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    dateInput.value = `${yyyy}-${mm}-${dd}`;
+
     loadSessions();
 
-    document.getElementById('sessionSelect').addEventListener('change', handleSessionChange);
     document.getElementById('dateFilter').addEventListener('change', loadSessions);
+    document.getElementById('slotFilter').addEventListener('change', handleSlotFilterChange);
     document.getElementById('searchParticipant').addEventListener('input', filterParticipants);
-    document.getElementById('selectAll').addEventListener('change', handleSelectAll);
 });
 
 function loadSessions() {
     const dateFilter = document.getElementById('dateFilter').value;
 
-    fetch(`{{ route('coach.attendance.index') }}?date=${dateFilter}`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        const select = document.getElementById('sessionSelect');
-        select.innerHTML = '<option value="">Select a session</option>';
+    // Reset selection
+    currentSessionId = null;
+    currentSlotId = null;
+    currentSession = null;
+    resetSlotFilter();
+    document.getElementById('sessionDetailsCard').classList.add('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
 
-        if (data.sessions && data.sessions.length > 0) {
-            data.sessions.forEach(session => {
-                const option = document.createElement('option');
-                option.value = session.id;
-                option.textContent = `${session.title} - ${session.date} ${session.time}`;
-                select.appendChild(option);
-            });
-        } else {
-            select.innerHTML = '<option value="">No sessions available</option>';
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('sessionSelect').innerHTML = '<option value="">Error loading sessions</option>';
-    });
+    const params = new URLSearchParams();
+    if (dateFilter) {
+        params.set('start_date', dateFilter);
+        params.set('end_date', dateFilter);
+    }
+
+    const url = '/coach/training-sessions' + (params.toString() ? `?${params.toString()}` : '');
+
+    window.API.get(url)
+        .then(data => {
+            const sessions = data?.data || [];
+            if (sessions.length === 0) {
+                return;
+            }
+
+            const chosen = sessions[0];
+            currentSessionId = chosen.id;
+            loadSessionAndAttendance(currentSessionId);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
 
-function handleSessionChange(e) {
-    const sessionId = e.target.value;
+function resetSlotFilter() {
+    const slotFilter = document.getElementById('slotFilter');
+    slotFilter.disabled = true;
+    slotFilter.innerHTML = '<option value="">Semua Slot</option>';
+    currentSlotId = null;
+}
 
-    if (!sessionId) {
-        document.getElementById('sessionDetailsCard').classList.add('hidden');
-        document.getElementById('emptyState').classList.remove('hidden');
+function populateSlotFilter(slots) {
+    const slotFilter = document.getElementById('slotFilter');
+    
+    if (!Array.isArray(slots) || slots.length === 0) {
+        resetSlotFilter();
         return;
     }
 
-    currentSessionId = sessionId;
-    loadSessionDetails(sessionId);
+    slotFilter.disabled = false;
+    slotFilter.innerHTML = '<option value="">Semua Slot</option>';
+
+    const sorted = [...slots].sort((a, b) => {
+        const aTime = a?.session_time?.start_time || '';
+        const bTime = b?.session_time?.start_time || '';
+        return aTime.localeCompare(bTime);
+    });
+
+    sorted.forEach(slot => {
+        const st = slot.session_time || {};
+        const name = st.name || 'Session';
+        const start = st.start_time || '';
+        const end = st.end_time || '';
+        const label = `${name} ${start}${start && end ? ' - ' : ''}${end}`.trim();
+
+        const opt = document.createElement('option');
+        opt.value = slot.id;
+        opt.textContent = label || `Slot #${slot.id}`;
+        slotFilter.appendChild(opt);
+    });
 }
 
-function loadSessionDetails(sessionId) {
-    fetch(`{{ route('coach.attendance.index') }}?session_id=${sessionId}`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.session) {
-            // Update session info
-            document.getElementById('sessionTitle').textContent = data.session.title;
-            document.getElementById('sessionDateTime').textContent = `${data.session.date} at ${data.session.time}`;
-            document.getElementById('sessionLocation').textContent = data.session.location;
+function handleSlotFilterChange(e) {
+    currentSlotId = e.target.value || null;
+    if (currentSessionId) {
+        loadAttendanceData(currentSessionId, currentSlotId);
+    }
+}
 
-            // Store participants
-            participants = data.participants || [];
+function loadSessionAndAttendance(sessionId) {
+    Promise.all([
+        window.API.get(`/coach/training-sessions/${sessionId}`),
+    ])
+        .then(([session]) => {
+            currentSession = session;
 
-            // Render participants
+            const dateStr = (session.date || '').toString().slice(0, 10);
+            document.getElementById('sessionTitle').textContent = `Training Session - ${dateStr}`;
+            document.getElementById('sessionDateTime').textContent = `Date: ${dateStr}`;
+            document.getElementById('sessionLocation').textContent = `Status: ${(session.status || '').toString()}`;
+
+            const slots = Array.isArray(session.slots) ? session.slots : [];
+            populateSlotFilter(slots);
+
+            // Load attendance for all slots by default
+            currentSlotId = null;
+            loadAttendanceData(sessionId, null);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification(error?.message || 'Failed to load session', 'error');
+        });
+}
+
+function loadAttendanceData(sessionId, slotId) {
+    const qs = new URLSearchParams();
+    if (slotId) qs.set('slot_id', slotId);
+
+    window.API.get(`/coach/training-sessions/${sessionId}/bookings${qs.toString() ? `?${qs.toString()}` : ''}`)
+        .then(attendance => {
+            const bookings = attendance?.bookings || [];
+            participants = bookings.map(b => {
+                const slot = b.slot || {};
+                const st = slot.session_time || {};
+                const slotLabel = `${st.name || 'Session'} ${st.start_time || ''}${st.start_time && st.end_time ? ' - ' : ''}${st.end_time || ''}`.trim();
+
+                return {
+                    id: b.id,
+                    member_name: b.member_name,
+                    member_id: b.member_id,
+                    slot_label: slotLabel,
+                    has_attendance: !!b.has_attendance,
+                    original_status: b.attendance_status || '',
+                    status: b.attendance_status || '',
+                };
+            });
+
             renderParticipants(participants);
+            updateAttendanceSummaryFromServer(attendance);
 
-            // Update summary
-            updateAttendanceSummary();
-
-            // Show details card
             document.getElementById('sessionDetailsCard').classList.remove('hidden');
             document.getElementById('emptyState').classList.add('hidden');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to load session details');
-    });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification(error?.message || 'Failed to load attendance', 'error');
+        });
 }
 
 function renderParticipants(filteredParticipants = participants) {
@@ -252,125 +312,86 @@ function renderParticipants(filteredParticipants = participants) {
     if (filteredParticipants.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="px-6 py-12 text-center text-slate-600">
-                    No participants found
-                </td>
+                <td colspan="3" class="px-6 py-12 text-center text-slate-600">No bookings found</td>
             </tr>
         `;
         return;
     }
 
-    tbody.innerHTML = filteredParticipants.map((p, index) => `
-        <tr class="hover:bg-slate-50 transition-colors duration-150">
-            <td class="px-6 py-4">
-                <input type="checkbox" class="participant-checkbox w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" data-index="${index}">
-            </td>
-            <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                        ${p.name.charAt(0).toUpperCase()}
-                    </div>
+    tbody.innerHTML = filteredParticipants.map((p, index) => {
+        const statusClass = getStatusClass(p.status);
+        const canUnvalidate = !p.has_attendance;
+
+        return `
+            <tr class="hover:bg-slate-50 transition-colors duration-150">
+                <td class="px-6 py-4">
                     <div>
-                        <p class="font-semibold text-slate-900">${p.name}</p>
-                        <p class="text-xs text-slate-500">${p.email}</p>
+                        <p class="font-semibold text-slate-900">${p.member_name}</p>
+                        <p class="text-xs text-slate-500">Member ID: ${p.member_id}</p>
                     </div>
-                </div>
-            </td>
-            <td class="px-6 py-4 text-sm text-slate-600">${p.memberId}</td>
-            <td class="px-6 py-4">
-                <select class="attendance-status px-3 py-2 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 ${getStatusClass(p.status)}" data-index="${index}" onchange="updateStatus(${index}, this.value)">
-                    <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>Pending</option>
-                    <option value="present" ${p.status === 'present' ? 'selected' : ''}>Present</option>
-                    <option value="absent" ${p.status === 'absent' ? 'selected' : ''}>Absent</option>
-                    <option value="late" ${p.status === 'late' ? 'selected' : ''}>Late</option>
-                    <option value="excused" ${p.status === 'excused' ? 'selected' : ''}>Excused</option>
-                </select>
-            </td>
-            <td class="px-6 py-4">
-                <input type="time" class="check-in-time px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" value="${p.checkInTime || ''}" data-index="${index}" onchange="updateCheckInTime(${index}, this.value)">
-            </td>
-            <td class="px-6 py-4">
-                <input type="text" class="notes px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 w-full" placeholder="Add notes..." value="${p.notes || ''}" data-index="${index}" onchange="updateNotes(${index}, this.value)">
-            </td>
-            <td class="px-6 py-4">
-                <button onclick="quickMarkPresent(${index})" class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors duration-150" title="Quick mark present">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                </button>
-            </td>
-        </tr>
-    `).join('');
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-600">${p.slot_label || '-'}</td>
+                <td class="px-6 py-4">
+                    <select class="attendance-status px-3 py-2 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 ${statusClass}" data-index="${index}" onchange="updateStatus(${index}, this.value)">
+                        ${canUnvalidate ? `<option value="" ${p.status === '' ? 'selected' : ''}>Not validated</option>` : ''}
+                        <option value="present" ${p.status === 'present' ? 'selected' : ''}>Present</option>
+                        <option value="absent" ${p.status === 'absent' ? 'selected' : ''}>Absent</option>
+                    </select>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function getStatusClass(status) {
     const classes = {
-        pending: 'bg-slate-100 text-slate-700',
         present: 'bg-emerald-100 text-emerald-700',
         absent: 'bg-red-100 text-red-700',
-        late: 'bg-orange-100 text-orange-700',
-        excused: 'bg-blue-100 text-blue-700'
+        '': 'bg-slate-100 text-slate-700'
     };
-    return classes[status] || classes.pending;
+    return classes[status] || classes[''];
 }
 
 function updateStatus(index, status) {
     participants[index].status = status;
-
-    // Auto set check-in time if present
-    if (status === 'present' && !participants[index].checkInTime) {
-        const now = new Date();
-        participants[index].checkInTime = now.toTimeString().slice(0, 5);
-        renderParticipants();
-    }
-
-    updateAttendanceSummary();
 }
 
-function updateCheckInTime(index, time) {
-    participants[index].checkInTime = time;
-}
-
-function updateNotes(index, notes) {
-    participants[index].notes = notes;
-}
-
-function updateAttendanceSummary() {
+function updateAttendanceSummaryLocal() {
     const present = participants.filter(p => p.status === 'present').length;
     const absent = participants.filter(p => p.status === 'absent').length;
-    const late = participants.filter(p => p.status === 'late').length;
+    const notValidated = participants.filter(p => !p.status).length;
 
     document.getElementById('presentCount').textContent = present;
     document.getElementById('absentCount').textContent = absent;
-    document.getElementById('lateCount').textContent = late;
+    document.getElementById('notValidatedCount').textContent = notValidated;
+}
+
+function updateAttendanceSummaryFromServer(attendance) {
+    if (!attendance) {
+        updateAttendanceSummaryLocal();
+        return;
+    }
+    document.getElementById('presentCount').textContent = attendance.attended ?? 0;
+    document.getElementById('absentCount').textContent = attendance.absent ?? 0;
+    document.getElementById('notValidatedCount').textContent = attendance.not_validated ?? 0;
 }
 
 function filterParticipants() {
     const search = document.getElementById('searchParticipant').value.toLowerCase();
     const filtered = participants.filter(p =>
-        p.name.toLowerCase().includes(search) ||
-        p.email.toLowerCase().includes(search) ||
-        p.memberId.toLowerCase().includes(search)
+        (p.member_name || '').toLowerCase().includes(search) ||
+        (p.member_id || '').toString().toLowerCase().includes(search) ||
+        (p.slot_label || '').toLowerCase().includes(search)
     );
     renderParticipants(filtered);
-}
-
-function handleSelectAll(e) {
-    document.querySelectorAll('.participant-checkbox').forEach(checkbox => {
-        checkbox.checked = e.target.checked;
-    });
 }
 
 function markAllPresent() {
     participants.forEach((p, index) => {
         participants[index].status = 'present';
-        if (!participants[index].checkInTime) {
-            const now = new Date();
-            participants[index].checkInTime = now.toTimeString().slice(0, 5);
-        }
     });
     renderParticipants();
-    updateAttendanceSummary();
+    updateAttendanceSummaryLocal();
 }
 
 function markAllAbsent() {
@@ -380,17 +401,7 @@ function markAllAbsent() {
         participants[index].status = 'absent';
     });
     renderParticipants();
-    updateAttendanceSummary();
-}
-
-function quickMarkPresent(index) {
-    participants[index].status = 'present';
-    if (!participants[index].checkInTime) {
-        const now = new Date();
-        participants[index].checkInTime = now.toTimeString().slice(0, 5);
-    }
-    renderParticipants();
-    updateAttendanceSummary();
+    updateAttendanceSummaryLocal();
 }
 
 function saveAttendance() {
@@ -408,44 +419,63 @@ function saveAttendance() {
         <span>Saving...</span>
     `;
 
-    fetch('{{ route("coach.attendance.store") }}', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            session_id: currentSessionId,
-            attendance: participants
+    const tasks = participants
+        .map(p => {
+            const desiredStatus = p.status;
+
+            if (!['present', 'absent'].includes(desiredStatus)) {
+                return null;
+            }
+
+            const statusChanged = (p.original_status || '') !== desiredStatus;
+
+            if (!statusChanged) {
+                return null;
+            }
+
+            const payload = { status: desiredStatus, notes: null };
+            const url = `/coach/bookings/${p.id}/attendance`;
+            const request = p.has_attendance
+                ? () => window.API.patch(url, payload)
+                : () => window.API.post(url, payload);
+
+            return { p, request };
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
+        .filter(Boolean);
+
+    (async () => {
+        let successCount = 0;
+        try {
+            for (const task of tasks) {
+                await task.request();
+                successCount++;
+            }
+
             const now = new Date().toLocaleTimeString();
             document.getElementById('lastSaved').textContent = `Last saved: ${now}`;
+            showNotification(`Attendance saved (${successCount}/${tasks.length})`, 'success');
 
-            // Show success notification
-            showNotification('Attendance saved successfully!', 'success');
-        } else {
-            throw new Error(data.message || 'Failed to save attendance');
+            // Refresh server state
+            if (currentSessionId) {
+                loadAttendanceData(currentSessionId, currentSlotId);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification(error?.message || 'Failed to save attendance', 'error');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalContent;
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification(error.message || 'Failed to save attendance', 'error');
-    })
-    .finally(() => {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = originalContent;
-    });
+    })();
 }
 
-function exportAttendance() {
-    if (!currentSessionId) return;
-
-    window.location.href = `/coach/attendance/export?session_id=${currentSessionId}`;
+function escapeHtml(str) {
+    return (str || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
 }
 
 function showNotification(message, type = 'success') {

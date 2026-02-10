@@ -4,7 +4,9 @@ namespace Tests\Feature\Coach;
 
 use App\Enums\TrainingSessionStatus;
 use App\Models\Coach;
+use App\Models\SessionTime;
 use App\Models\TrainingSession;
+use App\Models\TrainingSessionSlot;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -18,11 +20,20 @@ class DashboardTest extends TestCase
         $coachUser = User::factory()->coach()->create();
         $coachProfile = Coach::factory()->create(['user_id' => $coachUser->id]);
 
-        TrainingSession::factory()->count(2)->create([
+        $trainingSession = TrainingSession::create([
             'coach_id' => $coachProfile->id,
             'date' => now()->toDateString(),
             'status' => TrainingSessionStatus::OPEN->value,
         ]);
+
+        $sessionTimes = SessionTime::factory()->count(2)->create();
+        foreach ($sessionTimes as $sessionTime) {
+            TrainingSessionSlot::create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+                'max_participants' => 10,
+            ]);
+        }
 
         $response = $this->actingAs($coachUser, 'sanctum')
             ->getJson('/api/coach/dashboard');

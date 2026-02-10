@@ -7,6 +7,7 @@ use App\Models\Member;
 use App\Models\MemberPackage;
 use App\Models\SessionBooking;
 use App\Models\TrainingSession;
+use App\Models\TrainingSessionSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -30,7 +31,11 @@ class SessionBookingController extends Controller
         // Get all member packages for this member
         $memberPackageIds = MemberPackage::where('member_id', $member->id)->pluck('id');
 
-        $query = SessionBooking::with(['memberPackage.member', 'trainingSession.sessionTime', 'trainingSession.coach'])
+        $query = SessionBooking::with([
+            'memberPackage.member',
+            'trainingSessionSlot.sessionTime',
+            'trainingSessionSlot.trainingSession.coach'
+        ])
             ->whereIn('member_package_id', $memberPackageIds);
 
         // Filter by status if provided
@@ -49,7 +54,9 @@ class SessionBookingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'training_session_id' => 'required|exists:training_sessions,id',
+            'training_session_slot_id' => 'required_without:training_session_id|exists:training_session_slots,id',
+            'training_session_id' => 'required_without:training_session_slot_id|exists:training_sessions,id',
+            'session_time_id' => 'required_with:training_session_id|exists:session_times,id',
             'member_package_id' => 'required|exists:member_packages,id',
             'notes' => 'nullable|string|max:500',
         ]);
@@ -100,8 +107,38 @@ class SessionBookingController extends Controller
             ], 422);
         }
 
-        // Get training session
-        $trainingSession = TrainingSession::findOrFail($validated['training_session_id']);
+        // Resolve slot
+        if (isset($validated['training_session_slot_id'])) {
+            $trainingSessionSlot = TrainingSessionSlot::with(['trainingSession', 'sessionTime'])
+                ->findOrFail($validated['training_session_slot_id']);
+        } else {
+            $trainingSessionSlot = TrainingSessionSlot::with(['trainingSession', 'sessionTime'])
+                ->where('training_session_id', $validated['training_session_id'])
+                ->where('session_time_id', $validated['session_time_id'])
+                ->firstOrFail();
+        }
+
+        $trainingSession = $trainingSessionSlot->trainingSession;
+
+        $now = now();
+
+        // Auto-close session if it's past or after cutoff
+        $trainingSession->applyAutoClose($now);
+
+        // Preserve explicit message for past sessions
+        if ($trainingSession->date->isPast() && !$trainingSession->date->isToday()) {
+            return response()->json([
+                'message' => 'Cannot book past sessions',
+            ], 422);
+        }
+
+        // Same-day cutoff: after 18:00, session is considered closed for booking
+        if ($trainingSession->date->isToday() && !$trainingSession->isBookableAt($now)) {
+            return response()->json([
+                'message' => 'Training session can no longer be booked (past or after 18:00).',
+                'session_status' => $trainingSession->status->value,
+            ], 422);
+        }
 
         // Check if session is open
         if ($trainingSession->status->value !== 'open') {
@@ -111,29 +148,22 @@ class SessionBookingController extends Controller
             ], 422);
         }
 
-        // Check if session is in the future
-        if ($trainingSession->date->isPast()) {
-            return response()->json([
-                'message' => 'Cannot book past sessions',
-            ], 422);
-        }
-
         // Check if session is full
-        $currentBookings = SessionBooking::where('training_session_id', $trainingSession->id)
+        $currentBookings = SessionBooking::where('training_session_slot_id', $trainingSessionSlot->id)
             ->where('status', 'confirmed')
             ->count();
 
-        if ($currentBookings >= $trainingSession->max_participants) {
+        if ($currentBookings >= $trainingSessionSlot->max_participants) {
             return response()->json([
                 'message' => 'Training session is full',
                 'current_bookings' => $currentBookings,
-                'max_participants' => $trainingSession->max_participants,
+                'max_participants' => $trainingSessionSlot->max_participants,
             ], 422);
         }
 
         // Check if already booked
         $existingBooking = SessionBooking::where('member_package_id', $memberPackage->id)
-            ->where('training_session_id', $trainingSession->id)
+            ->where('training_session_slot_id', $trainingSessionSlot->id)
             ->where('status', 'confirmed')
             ->exists();
 
@@ -148,7 +178,7 @@ class SessionBookingController extends Controller
             // Create booking (quota will be deducted when attendance is marked as present)
             $booking = SessionBooking::create([
                 'member_package_id' => $memberPackage->id,
-                'training_session_id' => $trainingSession->id,
+                'training_session_slot_id' => $trainingSessionSlot->id,
                 'booked_by' => auth()->id(),
                 'status' => 'confirmed',
                 'notes' => $validated['notes'] ?? null,
@@ -158,7 +188,11 @@ class SessionBookingController extends Controller
 
             return response()->json([
                 'message' => 'Session booked successfully',
-                'data' => $booking->load(['memberPackage.member', 'trainingSession.sessionTime', 'trainingSession.coach']),
+                'data' => $booking->load([
+                    'memberPackage.member',
+                    'trainingSessionSlot.sessionTime',
+                    'trainingSessionSlot.trainingSession.coach'
+                ]),
                 'remaining_sessions' => $memberPackage->total_sessions - $memberPackage->used_sessions,
             ], 201);
         } catch (\Exception $e) {
@@ -186,7 +220,11 @@ class SessionBookingController extends Controller
             ], 403);
         }
 
-        return response()->json($sessionBooking->load(['memberPackage.member', 'trainingSession.sessionTime', 'trainingSession.coach']));
+        return response()->json($sessionBooking->load([
+            'memberPackage.member',
+            'trainingSessionSlot.sessionTime',
+            'trainingSessionSlot.trainingSession.coach'
+        ]));
     }
 
     /**
@@ -213,7 +251,15 @@ class SessionBookingController extends Controller
         }
 
         // Check if session is in the future (can only cancel future sessions)
-        if ($sessionBooking->trainingSession->date->isPast()) {
+        $trainingSession = $sessionBooking->trainingSessionSlot?->trainingSession;
+
+        if (!$trainingSession) {
+            return response()->json([
+                'message' => 'Training session not found for this booking',
+            ], 404);
+        }
+
+        if ($trainingSession->date->isPast()) {
             return response()->json([
                 'message' => 'Cannot cancel past sessions',
             ], 422);
@@ -230,7 +276,7 @@ class SessionBookingController extends Controller
 
             return response()->json([
                 'message' => 'Booking cancelled successfully',
-                'data' => $sessionBooking->fresh()->load(['memberPackage.member', 'trainingSession']),
+                'data' => $sessionBooking->fresh()->load(['memberPackage.member', 'trainingSessionSlot.trainingSession']),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

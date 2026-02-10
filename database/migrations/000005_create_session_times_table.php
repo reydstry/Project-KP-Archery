@@ -11,14 +11,9 @@ return new class extends Migration
         Schema::create('session_times', function (Blueprint $table) {
             $table->id();
 
-            $table->string('day_of_week');
-
-            $table->time('start_time');       
-            $table->time('end_time');         
-            
-            $table->integer('max_capacity')->default(10);
-            $table->foreignId('coach_id')->nullable()->constrained('users')->onDelete('set null');
-            
+            $table->string('name');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->boolean('is_active')->default(true);
 
             $table->timestamps();

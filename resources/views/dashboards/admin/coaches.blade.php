@@ -7,14 +7,14 @@
 <div x-data="coachesData()" x-init="loadCoaches()" class="space-y-6">
     
     <!-- Header Actions -->
-    <div class="flex items-center justify-between">
-        <div class="flex-1 max-w-md">
+    <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+        <div class="flex-1 w-full sm:max-w-md">
             <input type="search" x-model="search" placeholder="Search coaches..." 
-                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition">
+                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
         </div>
         <button @click="openAddModal()" 
-                class="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
-            <span class="flex items-center gap-2">
+                class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap shrink-0">
+            <span class="flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Add Coach
             </span>
@@ -22,7 +22,7 @@
     </div>
 
     <!-- Coaches Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="animation-delay: 0.1s">
         <template x-if="loading">
             <div class="col-span-full text-center py-12 text-slate-400">Loading...</div>
         </template>
@@ -33,7 +33,7 @@
             <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all overflow-hidden">
                 <div class="p-6">
                     <div class="flex items-start gap-4">
-                        <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-500 rounded-2xl flex items-center justify-center text-white font-bold text-xl shrink-0">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-500 rounded-2xl flex items-center justify-center text-white font-bold text-xl shrink-0">
                             <span x-text="coach.name.charAt(0).toUpperCase()"></span>
                         </div>
                         <div class="flex-1 min-w-0">
@@ -45,7 +45,7 @@
                 </div>
                 <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
                     <button @click="openEditModal(coach)" 
-                            class="px-4 py-2 text-green-600 hover:bg-green-50 rounded-lg font-medium text-sm transition">
+                            class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg font-medium text-sm transition">
                         Edit
                     </button>
                     <button @click="confirmDelete(coach)" 
@@ -63,7 +63,7 @@
         <div @click.away="closeModal()" 
              class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
              x-transition>
-            <div class="sticky top-0 bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+            <div class="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
                 <h3 class="text-lg font-bold" x-text="editingCoach ? 'Edit Coach' : 'Add New Coach'"></h3>
                 <button @click="closeModal()" class="text-white/80 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -73,27 +73,27 @@
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Name *</label>
                     <input type="text" x-model="form.name" required
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none">
+                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Email *</label>
                     <input type="email" x-model="form.email" required
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none">
+                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Phone</label>
                     <input type="tel" x-model="form.phone"
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none">
+                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                 </div>
                 <div x-show="!editingCoach">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Password *</label>
                     <input type="password" x-model="form.password" :required="!editingCoach"
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none">
+                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                 </div>
                 <div x-show="!editingCoach">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Confirm Password *</label>
                     <input type="password" x-model="form.password_confirmation" :required="!editingCoach"
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none">
+                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                 </div>
                 <div class="flex gap-4 pt-4">
                     <button type="button" @click="closeModal()" 
@@ -101,7 +101,7 @@
                         Cancel
                     </button>
                     <button type="submit" :disabled="saving"
-                            class="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
+                            class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
                         <span x-text="saving ? 'Saving...' : 'Save'"></span>
                     </button>
                 </div>

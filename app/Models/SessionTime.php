@@ -10,37 +10,24 @@ class SessionTime extends Model
     use HasFactory;
 
     protected $fillable = [
-        'day_of_week',
+        'name',
         'start_time',
         'end_time',
-        'max_capacity',
-        'coach_id',
         'is_active',
     ];
 
     protected function casts(): array
     {
         return [
-            'start_time' => 'datetime:H:i',
-            'end_time' => 'datetime:H:i',
+            'start_time' => 'string',
+            'end_time' => 'string',
             'is_active' => 'boolean',
         ];
     }
 
-    /**
-     * Get the coach
-     */
-    public function coach()
+    public function slots()
     {
-        return $this->belongsTo(User::class, 'coach_id');
-    }
-
-    /**
-     * Get training sessions
-     */
-    public function trainingSessions()
-    {
-        return $this->hasMany(TrainingSession::class);
+        return $this->hasMany(TrainingSessionSlot::class);
     }
 
     /**

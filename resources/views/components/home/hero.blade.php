@@ -27,20 +27,18 @@
             Dari pemula hingga atlet profesional, kami siap membimbingmu.
         </p>
 
-        <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
-            
-
+        <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4 max-w-xl mx-auto sm:max-w-none">
             <!-- PRIMARY BUTTON -->
             <a href="{{ route('login') }}"
-                class="px-6 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-blue-500 to-red-500 text-white font-bold rounded-full text-base sm:text-lg
-                       hover:from-blue-600 hover:to-red-600 hover:scale-105 transition-all duration-300 shadow-xl">
+                class="w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 bg-gradient-to-r from-blue-500 to-red-500 text-white font-bold rounded-full text-sm sm:text-base md:text-lg
+                       hover:from-blue-600 hover:to-red-600 hover:scale-105 transition-all duration-300 shadow-xl text-center">
                 Daftar Sekarang
             </a>
 
             <!-- SECONDARY BUTTON -->
             <a href="{{ route('program') }}"
-                class="px-6 sm:px-10 py-3 sm:py-4 bg-white text-gray-800 font-bold rounded-full text-base sm:text-lg
-                       hover:bg-gray-100 hover:scale-105 transition-all duration-300 shadow-xl">
+                class="w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 bg-white text-gray-800 font-bold rounded-full text-sm sm:text-base md:text-lg
+                       hover:bg-gray-100 hover:scale-105 transition-all duration-300 shadow-xl text-center">
                 Lihat Program
             </a>
         </div>

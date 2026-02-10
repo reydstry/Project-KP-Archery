@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TrainingSessionStatus;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,11 +11,15 @@ class TrainingSession extends Model
 {
     use HasFactory;
 
+    /**
+     * Auto-close cutoff time (local app timezone).
+     */
+    public const AUTO_CLOSE_HOUR = 18;
+    public const AUTO_CLOSE_MINUTE = 0;
+
     protected $fillable = [
-        'session_time_id',
         'date',
         'coach_id',
-        'max_participants',
         'status',
     ];
 
@@ -27,14 +32,6 @@ class TrainingSession extends Model
     }
 
     /**
-     * Get the session time
-     */
-    public function sessionTime()
-    {
-        return $this->belongsTo(SessionTime::class);
-    }
-
-    /**
      * Get the coach
      */
     public function coach()
@@ -43,37 +40,81 @@ class TrainingSession extends Model
     }
 
     /**
-     * Get attendances for this session
+     * Slots (one per session_time)
      */
-    public function attendances()
+    public function slots()
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasMany(TrainingSessionSlot::class);
     }
 
     /**
-     * Get current participants count
+     * Bookings across all slots
      */
-    public function getCurrentParticipantsAttribute(): int
+    public function bookings()
     {
-        return $this->attendances()->count();
+        return $this->hasManyThrough(SessionBooking::class, TrainingSessionSlot::class);
     }
 
     /**
-     * Check if session is full
-     */
-    public function isFull(): bool
-    {
-        return $this->current_participants >= $this->max_participants;
-    }
-
-    /**
-     * Check if session is open for registration
+     * Check if session is open for registration (day-level)
      */
     public function isOpenForRegistration(): bool
     {
-        return $this->status === TrainingSessionStatus::OPEN 
-            && !$this->isFull() 
-            && $this->date->isFuture();
+        return $this->isBookableAt(now());
+    }
+
+    public function isBookableAt(CarbonInterface $now): bool
+    {
+        if ($this->status !== TrainingSessionStatus::OPEN) {
+            return false;
+        }
+
+        if ($this->date->isFuture()) {
+            return true;
+        }
+
+        if (!$this->date->isToday()) {
+            return false;
+        }
+
+        $cutoff = $this->date
+            ->copy()
+            ->setTime(self::AUTO_CLOSE_HOUR, self::AUTO_CLOSE_MINUTE, 0);
+
+        return $now->lt($cutoff);
+    }
+
+    public function shouldAutoCloseAt(CarbonInterface $now): bool
+    {
+        if ($this->status !== TrainingSessionStatus::OPEN) {
+            return false;
+        }
+
+        if ($this->date->isPast() && !$this->date->isToday()) {
+            return true;
+        }
+
+        if ($this->date->isToday()) {
+            $cutoff = $this->date
+                ->copy()
+                ->setTime(self::AUTO_CLOSE_HOUR, self::AUTO_CLOSE_MINUTE, 0);
+
+            return $now->gte($cutoff);
+        }
+
+        return false;
+    }
+
+    public function applyAutoClose(CarbonInterface $now): bool
+    {
+        if (!$this->shouldAutoCloseAt($now)) {
+            return false;
+        }
+
+        $this->forceFill(['status' => TrainingSessionStatus::CLOSED]);
+        $this->save();
+
+        return true;
     }
 
     /**

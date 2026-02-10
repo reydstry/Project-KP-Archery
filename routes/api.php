@@ -14,6 +14,8 @@ use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Coach\AttendanceController;
 use App\Http\Controllers\Coach\DashboardController as CoachDashboardController;
+use App\Http\Controllers\Coach\MemberController as CoachMemberController;
+use App\Http\Controllers\Coach\SessionBookingController as CoachSessionBookingController;
 use App\Http\Controllers\Coach\TrainingSessionController;
 use App\Http\Controllers\Member\DashboardController;
 use App\Http\Controllers\Member\RegistrationController;
@@ -62,10 +64,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:coach')->prefix('coach')->group(function () {
         Route::get('/dashboard', [CoachDashboardController::class, 'index']);
         
+        // Members list for booking
+        Route::get('members', [CoachMemberController::class, 'index']);
+        
         // Training Sessions
         Route::get('training-sessions', [TrainingSessionController::class, 'index']);
         Route::post('training-sessions', [TrainingSessionController::class, 'store']);
         Route::get('training-sessions/{trainingSession}', [TrainingSessionController::class, 'show']);
+        Route::delete('training-sessions/{trainingSession}', [TrainingSessionController::class, 'destroy']);
         Route::patch('training-sessions/{trainingSession}/quota', [TrainingSessionController::class, 'updateQuota']);
         Route::post('training-sessions/{trainingSession}/open', [TrainingSessionController::class, 'open']);
         Route::post('training-sessions/{trainingSession}/close', [TrainingSessionController::class, 'close']);
@@ -75,6 +81,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('training-sessions/{trainingSession}/bookings', [AttendanceController::class, 'getSessionBookings']);
         Route::post('bookings/{sessionBooking}/attendance', [AttendanceController::class, 'validateAttendance']);
         Route::patch('bookings/{sessionBooking}/attendance', [AttendanceController::class, 'update']);
+
+        // Coach books for member
+        Route::post('bookings', [CoachSessionBookingController::class, 'store']);
     });
 
     // Routes untuk ADMIN

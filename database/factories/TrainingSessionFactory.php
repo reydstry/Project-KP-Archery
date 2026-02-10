@@ -4,8 +4,9 @@ namespace Database\Factories;
 
 use App\Enums\TrainingSessionStatus;
 use App\Models\Coach;
-use App\Models\SessionTime;
 use App\Models\TrainingSession;
+use App\Models\TrainingSessionSlot;
+use App\Models\SessionTime;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,12 +24,26 @@ class TrainingSessionFactory extends Factory
     public function definition(): array
     {
         return [
-            'session_time_id' => SessionTime::factory(),
             'date' => $this->faker->dateTimeBetween('now', '+2 months'),
             'coach_id' => Coach::factory(),
-            'max_participants' => $this->faker->numberBetween(5, 20),
             'status' => TrainingSessionStatus::OPEN->value,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (TrainingSession $trainingSession) {
+            $sessionTimes = SessionTime::query()->count() > 0
+                ? SessionTime::query()->inRandomOrder()->limit(6)->get()
+                : SessionTime::factory()->count(6)->create();
+
+            foreach ($sessionTimes as $sessionTime) {
+                TrainingSessionSlot::factory()->create([
+                    'training_session_id' => $trainingSession->id,
+                    'session_time_id' => $sessionTime->id,
+                ]);
+            }
+        });
     }
 
     /**

@@ -1,29 +1,35 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Set Password - FocusOneX Archery</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md">
-        <!-- Logo & Header -->
-        <div class="text-center mb-8">
-            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-lg mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10"/>
-                    <circle cx="12" cy="12" r="6"/>
-                    <circle cx="12" cy="12" r="2"/>
-                </svg>
-            </div>
-            <h1 class="text-3xl font-bold text-slate-800 mb-2">Selamat Datang!</h1>
-            <p class="text-slate-600">Lengkapi profil Anda untuk melanjutkan</p>
+@extends('layouts.auth')
+
+@section('title', 'Set Password - FocusOneX Archery')
+
+@section('content')
+<section class="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
+
+    <!-- Background -->
+    <div class="absolute inset-0 z-0">
+        <img src="{{ asset('asset/img/latarbelakanglogin.jpeg') }}"
+             alt="Background"
+             class="w-full h-full object-cover blur-sm">
+        <div class="absolute inset-0 bg-black/40"></div>
+    </div>
+
+    <!-- Set Password Card -->
+    <div class="relative z-10 w-full max-w-lg sm:max-w-xl lg:max-w-4xl
+                bg-white rounded-2xl shadow-2xl p-8 sm:p-10">
+
+        <!-- Logo -->
+        <div class="flex justify-center mb-6">
+            <img src="{{ asset('asset/img/logofocus.png') }}"
+                 alt="FocusOneX"
+                 class="h-12 w-auto">
         </div>
 
-        <!-- Card -->
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+        <!-- Title -->
+        <h1 class="text-2xl font-bold text-center text-gray-900 mb-6">
+            Selamat Datang!
+        </h1>
+
+        <!-- User Info -->
             <div class="mb-6">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -37,63 +43,77 @@
                         <p class="text-sm text-slate-500">{{ $user->email }}</p>
                     </div>
                 </div>
-                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
                     <p class="text-sm text-blue-800">
-                        <span class="font-semibold">📱 Atur nomor telepon dan password</span> untuk dapat login manual menggunakan email.
+                        <span class="font-semibold">🔔 Atur nomor telepon dan password</span> untuk dapat login manual menggunakan email.
                     </p>
                 </div>
             </div>
 
-            @if ($errors->any())
-                <div class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
-                    <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-red-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-                        </svg>
-                        <ul class="text-sm text-red-800 space-y-1">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                </div>
-            @endif
+        <!-- Error Messages -->
+        @if ($errors->any())
+            <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                @foreach ($errors->all() as $error)
+                    <p>{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
 
-            <form method="POST" action="{{ route('password.store') }}" class="space-y-5">
-                @csrf
+        <!-- Form -->
+        <form method="POST" action="{{ route('password.store') }}" class="mt-8 space-y-6">
+            @csrf
 
+            <!-- Phone Number -->
+            <div>
+                <label for="phone" class="block mb-2 text-sm font-medium text-gray-700">
+                    Nomor Telepon
+                </label>
+                <input type="tel" 
+                       id="phone" 
+                       name="phone" 
+                       value="{{ old('phone', $user->phone) }}" 
+                       required 
+                       placeholder="08123456789"
+                       class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                              focus:border-blue-500 focus:ring-2 focus:ring-blue-500 @error('phone') border-red-500 @enderror">
+                @error('phone')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Password Fields -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label for="phone" class="block text-sm font-semibold text-slate-700 mb-2">
-                        Nomor Telepon <span class="text-red-500">*</span>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
+                        Password Baru
                     </label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                            </svg>
-                        </span>
-                        <input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" 
-                               required placeholder="08123456789"
-                               class="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition outline-none @error('phone') border-red-500 @enderror">
-                    </div>
-                    @error('phone')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-semibold text-slate-700 mb-2">
-                        Password Baru <span class="text-red-500">*</span>
-                    </label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                            </svg>
-                        </span>
-                        <input type="password" id="password" name="password" required 
+                    <div class="relative flex items-center">
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               required
                                placeholder="Minimal 8 karakter"
-                               class="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition outline-none @error('password') border-red-500 @enderror">
+                               class="w-full rounded-lg border border-gray-300 pl-4 pr-12 py-3
+                                      text-sm outline-none transition
+                                      focus:border-blue-500 focus:ring-2 focus:ring-blue-500
+                                      [&::-ms-reveal]:!hidden [&::-ms-clear]:!hidden
+                                      [&::-webkit-contacts-auto-fill-button]:!hidden
+                                      [&::-webkit-credentials-auto-fill-button]:!hidden
+                                      @error('password') border-red-500 @enderror">
+                        <button type="button"
+                                onclick="togglePassword('password', 'eye-open-1', 'eye-closed-1')"
+                                tabindex="-1"
+                                class="absolute right-4 top-1/2 -translate-y-1/2
+                                transition-colors focus:outline-none cursor-pointer"
+                                aria-label="Toggle password visibility">
+                            <svg id="eye-open-1" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            <svg id="eye-closed-1" class="h-5 w-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                            </svg>
+                        </button>
                     </div>
                     @error('password')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -101,37 +121,70 @@
                 </div>
 
                 <div>
-                    <label for="password_confirmation" class="block text-sm font-semibold text-slate-700 mb-2">
-                        Konfirmasi Password <span class="text-red-500">*</span>
+                    <label class="block mb-2 text-sm font-medium text-gray-700">
+                        Konfirmasi Password
                     </label>
-                    <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </span>
-                        <input type="password" id="password_confirmation" name="password_confirmation" required 
+                    <div class="relative flex items-center">
+                        <input type="password"
+                               id="password_confirmation"
+                               name="password_confirmation"
+                               required
                                placeholder="Masukkan password yang sama"
-                               class="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition outline-none">
+                               class="w-full rounded-lg border border-gray-300 pl-4 pr-12 py-3
+                                      text-sm outline-none transition
+                                      focus:border-blue-500 focus:ring-2 focus:ring-blue-500
+                                      [&::-ms-reveal]:!hidden [&::-ms-clear]:!hidden
+                                      [&::-webkit-contacts-auto-fill-button]:!hidden
+                                      [&::-webkit-credentials-auto-fill-button]:!hidden">
+                        <button type="button"
+                                onclick="togglePassword('password_confirmation', 'eye-open-2', 'eye-closed-2')"
+                                tabindex="-1"
+                                class="absolute right-4 top-1/2 -translate-y-1/2
+                                transition-colors focus:outline-none cursor-pointer"
+                                aria-label="Toggle password visibility">
+                            <svg id="eye-open-2" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            <svg id="eye-closed-2" class="h-5 w-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                <button type="submit" 
-                        class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200">
-                    <span class="flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        Simpan & Lanjutkan
-                    </span>
-                </button>
-            </form>
-        </div>
+            <script>
+                function togglePassword(inputId, eyeOpenId, eyeClosedId) {
+                    const input = document.getElementById(inputId);
+                    const eyeOpen = document.getElementById(eyeOpenId);
+                    const eyeClosed = document.getElementById(eyeClosedId);
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        eyeOpen.classList.add('hidden');
+                        eyeClosed.classList.remove('hidden');
+                    } else {
+                        input.type = 'password';
+                        eyeOpen.classList.remove('hidden');
+                        eyeClosed.classList.add('hidden');
+                    }
+                }
+            </script>
 
-        <!-- Footer -->
-        <p class="text-center text-sm text-slate-500 mt-6">
+            <!-- Submit Button -->
+            <button type="submit"
+                    class="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white
+                           transition hover:bg-blue-700 focus:ring-4 focus:ring-blue-300">
+                Simpan & Lanjutkan
+            </button>
+        </form>
+
+        <!-- Footer Note -->
+        <p class="mt-6 text-center text-sm text-gray-700">
             Setelah menyimpan, Anda dapat login menggunakan email dan password
         </p>
+
     </div>
-</body>
-</html>
+</section>
+@endsection

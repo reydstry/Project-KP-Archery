@@ -10,8 +10,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminTestDataSeeder::class,
+            CoachTestDataSeeder::class,
         ]);
 
+        $this->command->info('');
         $this->command->info('✅ Seeder berhasil dijalankan!');
 
         $this->command->info('');
