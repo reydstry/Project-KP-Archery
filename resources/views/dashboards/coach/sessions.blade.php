@@ -1,15 +1,15 @@
 @extends('layouts.coach')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
+<div class="min-h-screen bg-white p-4 sm:p-8">
 
     <!-- Header Section -->
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6 sm:mb-8 card-animate" style="animation-delay: 0.1s">
         <div>
-            <h1 class="text-4xl font-bold text-slate-900 mb-2">Training Sessions</h1>
-            <p class="text-slate-600 text-lg">Manage your training sessions and schedules</p>
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Training Sessions</h1>
+            <p class="text-slate-600 text-base sm:text-lg">Manage your training sessions and schedules</p>
         </div>
-        <a href="{{ route('coach.sessions.create') }}" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/30 flex items-center gap-2">
+        <a href="{{ route('coach.sessions.create') }}" class="w-full sm:w-auto shrink-0 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
@@ -18,8 +18,8 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 mb-6 sm:mb-8 card-animate" style="animation-delay: 0.15s">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 sm:gap-4">
 
             <!-- Search -->
             <div class="md:col-span-2">
@@ -56,7 +56,7 @@
     </div>
 
     <!-- Sessions Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6" id="sessionsGrid">
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 card-animate" style="animation-delay: 0.2s" id="sessionsGrid">
         <!-- Loading State -->
         <div class="col-span-full text-center py-12">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>

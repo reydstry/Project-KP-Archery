@@ -1,17 +1,17 @@
 @extends('layouts.coach')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
+<div class="min-h-screen bg-white p-4 sm:p-8">
 
     <!-- Header Section -->
-    <div class="mb-8">
-        <h1 class="text-4xl font-bold text-slate-900 mb-2">Attendance Management</h1>
-        <p class="text-slate-600 text-lg">Track and manage participant attendance for your sessions</p>
+    <div class="mb-6 sm:mb-8 card-animate" style="animation-delay: 0.1s">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Attendance Management</h1>
+        <p class="text-slate-600 text-base sm:text-lg">Track and manage participant attendance for your sessions</p>
     </div>
 
     <!-- Session Filter -->
-    <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 mb-6 sm:mb-8 card-animate" style="animation-delay: 0.15s">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
 
             <!-- Date Filter -->
             <div>
@@ -30,8 +30,8 @@
     </div>
 
     <!-- Session Details Card (Hidden initially) -->
-    <div id="sessionDetailsCard" class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 mb-8 hidden">
-        <div class="flex items-start justify-between mb-6">
+    <div id="sessionDetailsCard" class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 mb-6 sm:mb-8 hidden card-animate" style="animation-delay: 0.2s">
+        <div class="flex flex-col sm:flex-row items-start justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-slate-900 mb-2" id="sessionTitle">-</h2>
                 <div class="flex items-center gap-4 text-sm text-slate-600">
@@ -69,7 +69,7 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="flex items-center gap-3 mb-6">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4 sm:mb-6">
             <button onclick="markAllPresent()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-all duration-200 text-sm flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -121,7 +121,7 @@
         </div>
 
         <!-- Save Button -->
-        <div class="mt-6 flex items-center justify-end gap-4">
+        <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4">
             <p class="text-sm text-slate-600" id="lastSaved">Last saved: Never</p>
             <button onclick="saveAttendance()" id="saveBtn" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30 flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +134,7 @@
     </div>
 
     <!-- Empty State (Shown when no session selected) -->
-    <div id="emptyState" class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-12 text-center">
+    <div id="emptyState" class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-8 sm:p-12 text-center card-animate" style="animation-delay: 0.2s">
         <svg class="w-24 h-24 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>

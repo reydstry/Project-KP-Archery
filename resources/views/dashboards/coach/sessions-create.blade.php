@@ -1,17 +1,17 @@
 @extends('layouts.coach')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
-    <div class="flex items-center justify-between mb-8">
+<div class="min-h-screen bg-white p-4 sm:p-8">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6 sm:mb-8 card-animate" style="animation-delay: 0.1s">
         <div>
-            <h1 class="text-4xl font-bold text-slate-900 mb-2">Create Training Session</h1>
-            <p class="text-slate-600 text-lg">Create a day session with one or more slots</p>
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Create Training Session</h1>
+            <p class="text-slate-600 text-base sm:text-lg">Create a day session with one or more slots</p>
         </div>
-        <a href="{{ route('coach.sessions.index') }}" class="px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200">Back</a>
+        <a href="{{ route('coach.sessions.index') }}" class="w-full sm:w-auto shrink-0 px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-center">Back</a>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 card-animate" style="animation-delay: 0.15s">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Date</label>
                 <input type="date" id="sessionDate" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
@@ -39,8 +39,8 @@
             </table>
         </div>
 
-        <div class="mt-6 flex items-center justify-end gap-3">
-            <button type="button" onclick="submitCreate()" id="createBtn" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30">Create</button>
+        <div class="mt-4 sm:mt-6 flex items-center justify-end gap-3">
+            <button type="button" onclick="submitCreate()" id="createBtn" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30">Create</button>
         </div>
     </div>
 </div>
