@@ -79,7 +79,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.coach.sessions-edit', ['id' => $id]))->name('sessions.edit');
         Route::get('/attendance', fn() => view('dashboards.coach.attendance'))->name('attendance.index');
         Route::post('/attendance', fn() => redirect()->route('coach.attendance.index'))->name('attendance.store');
-        Route::get('/settings', fn() => view('dashboards.coach.settings'))->name('settings');
+        Route::get('/settings', function() {
+            $user = auth()->user();
+            $coach = $user->coach;
+            return view('dashboards.coach.settings', compact('user', 'coach'));
+        })->name('settings');
+        Route::post('/settings', [\App\Http\Controllers\Coach\ProfileController::class, 'updateProfile'])->name('settings.update');
+        Route::post('/settings/password', [\App\Http\Controllers\Coach\ProfileController::class, 'updatePassword'])->name('settings.password');
     });
     // Member routes
      Route::prefix('member')->name('member.')->middleware('role:member')->group(function () {

@@ -197,9 +197,31 @@
                 
                 const response = await fetch(this.baseUrl + url, options);
                 
+                // Check content-type before parsing
+                const contentType = response.headers.get('content-type');
+                const isJson = contentType && contentType.includes('application/json');
+                
                 if (!response.ok) {
-                    const error = await response.json().catch(() => ({ message: 'Request failed' }));
-                    throw new Error(error.message || `HTTP ${response.status}`);
+                    let errorMessage = `HTTP ${response.status}`;
+                    
+                    if (isJson) {
+                        try {
+                            const error = await response.json();
+                            errorMessage = error.message || errorMessage;
+                        } catch (e) {
+                            console.error('Failed to parse error response:', e);
+                        }
+                    } else {
+                        const text = await response.text();
+                        console.error('Non-JSON error response:', text.substring(0, 200));
+                        errorMessage = `Server error (${response.status})`;
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+                
+                if (!isJson) {
+                    throw new Error('Response is not JSON. Check if the API endpoint is correct.');
                 }
                 
                 return await response.json();
