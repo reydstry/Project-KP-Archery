@@ -9,7 +9,9 @@ use App\Models\Package;
 use App\Models\SessionBooking;
 use App\Models\SessionTime;
 use App\Models\TrainingSession;
+use App\Models\TrainingSessionSlot;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -22,6 +24,7 @@ class SessionBookingTest extends TestCase
     private Member $memberProfile;
     private MemberPackage $memberPackage;
     private TrainingSession $trainingSession;
+    private TrainingSessionSlot $trainingSessionSlot;
 
     protected function setUp(): void
     {
@@ -58,19 +61,30 @@ class SessionBookingTest extends TestCase
         $coach = Coach::factory()->create();
         
         $this->trainingSession = TrainingSession::factory()->create([
-            'session_time_id' => $sessionTime->id,
             'coach_id' => $coach->id,
             'date' => now()->addDays(7),
-            'max_participants' => 10,
             'status' => 'open',
         ]);
+
+        $slot = $this->trainingSession->slots()->where('session_time_id', $sessionTime->id)->first();
+        if (!$slot) {
+            $slot = TrainingSessionSlot::create([
+                'training_session_id' => $this->trainingSession->id,
+                'session_time_id' => $sessionTime->id,
+                'max_participants' => 10,
+            ]);
+        } else {
+            $slot->update(['max_participants' => 10]);
+        }
+
+        $this->trainingSessionSlot = $slot;
     }
 
     public function test_member_can_book_training_session()
     {
         $response = $this->actingAs($this->member, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => $this->trainingSession->id,
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
                 'member_package_id' => $this->memberPackage->id,
                 'notes' => 'First booking',
             ]);
@@ -84,7 +98,7 @@ class SessionBookingTest extends TestCase
 
         $this->assertDatabaseHas('session_bookings', [
             'member_package_id' => $this->memberPackage->id,
-            'training_session_id' => $this->trainingSession->id,
+            'training_session_slot_id' => $this->trainingSessionSlot->id,
             'status' => 'confirmed',
         ]);
 
@@ -99,7 +113,7 @@ class SessionBookingTest extends TestCase
 
         $response = $this->actingAs($this->member, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => $this->trainingSession->id,
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
                 'member_package_id' => $this->memberPackage->id,
             ]);
 
@@ -117,7 +131,7 @@ class SessionBookingTest extends TestCase
 
         $response = $this->actingAs($this->member, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => $this->trainingSession->id,
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
                 'member_package_id' => $this->memberPackage->id,
             ]);
 
@@ -136,7 +150,7 @@ class SessionBookingTest extends TestCase
 
         $response = $this->actingAs($this->member, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => $this->trainingSession->id,
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
                 'member_package_id' => $this->memberPackage->id,
             ]);
 
@@ -152,7 +166,7 @@ class SessionBookingTest extends TestCase
 
         $response = $this->actingAs($this->member, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => $this->trainingSession->id,
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
                 'member_package_id' => $this->memberPackage->id,
             ]);
 
@@ -168,7 +182,7 @@ class SessionBookingTest extends TestCase
 
         $response = $this->actingAs($this->member, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => $this->trainingSession->id,
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
                 'member_package_id' => $this->memberPackage->id,
             ]);
 
@@ -178,9 +192,35 @@ class SessionBookingTest extends TestCase
             ]);
     }
 
+    public function test_member_cannot_book_today_after_cutoff_time()
+    {
+        Carbon::setTestNow(now()->startOfDay()->setTime(18, 1, 0));
+
+        $this->trainingSession->update([
+            'date' => today(),
+            'status' => 'open',
+        ]);
+
+        $response = $this->actingAs($this->member, 'sanctum')
+            ->postJson('/api/member/bookings', [
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
+                'member_package_id' => $this->memberPackage->id,
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'Training session can no longer be booked (past or after 18:00).',
+            ]);
+
+        $this->trainingSession->refresh();
+        $this->assertSame('closed', $this->trainingSession->getRawOriginal('status'));
+
+        Carbon::setTestNow();
+    }
+
     public function test_member_cannot_book_full_session()
     {
-        $this->trainingSession->update(['max_participants' => 2]);
+        $this->trainingSessionSlot->update(['max_participants' => 2]);
 
         // Create 2 different packages with bookings to fill the session
         $otherMember1 = Member::factory()->create();
@@ -200,20 +240,20 @@ class SessionBookingTest extends TestCase
         ]);
 
         SessionBooking::factory()->create([
-            'training_session_id' => $this->trainingSession->id,
+            'training_session_slot_id' => $this->trainingSessionSlot->id,
             'member_package_id' => $otherPackage1->id,
             'status' => 'confirmed',
         ]);
 
         SessionBooking::factory()->create([
-            'training_session_id' => $this->trainingSession->id,
+            'training_session_slot_id' => $this->trainingSessionSlot->id,
             'member_package_id' => $otherPackage2->id,
             'status' => 'confirmed',
         ]);
 
         $response = $this->actingAs($this->member, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => $this->trainingSession->id,
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
                 'member_package_id' => $this->memberPackage->id,
             ]);
 
@@ -228,14 +268,14 @@ class SessionBookingTest extends TestCase
         // First booking
         SessionBooking::factory()->create([
             'member_package_id' => $this->memberPackage->id,
-            'training_session_id' => $this->trainingSession->id,
+            'training_session_slot_id' => $this->trainingSessionSlot->id,
             'status' => 'confirmed',
         ]);
 
         // Try to book again
         $response = $this->actingAs($this->member, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => $this->trainingSession->id,
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
                 'member_package_id' => $this->memberPackage->id,
             ]);
 
@@ -260,7 +300,7 @@ class SessionBookingTest extends TestCase
                     '*' => [
                         'id',
                         'member_package_id',
-                        'training_session_id',
+                        'training_session_slot_id',
                         'status',
                     ]
                 ]
@@ -297,7 +337,7 @@ class SessionBookingTest extends TestCase
     {
         $booking = SessionBooking::factory()->create([
             'member_package_id' => $this->memberPackage->id,
-            'training_session_id' => $this->trainingSession->id,
+            'training_session_slot_id' => $this->trainingSessionSlot->id,
             'status' => 'confirmed',
         ]);
 
@@ -343,9 +383,16 @@ class SessionBookingTest extends TestCase
             'date' => now()->subDays(1),
         ]);
 
+        $sessionTime = SessionTime::factory()->create();
+        $pastSlot = TrainingSessionSlot::create([
+            'training_session_id' => $pastSession->id,
+            'session_time_id' => $sessionTime->id,
+            'max_participants' => 10,
+        ]);
+
         $booking = SessionBooking::factory()->create([
             'member_package_id' => $this->memberPackage->id,
-            'training_session_id' => $pastSession->id,
+            'training_session_slot_id' => $pastSlot->id,
         ]);
 
         $response = $this->actingAs($this->member, 'sanctum')
@@ -361,7 +408,7 @@ class SessionBookingTest extends TestCase
     {
         $response = $this->actingAs($this->admin, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => $this->trainingSession->id,
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
                 'member_package_id' => $this->memberPackage->id,
             ]);
 
@@ -372,19 +419,19 @@ class SessionBookingTest extends TestCase
     {
         $response = $this->actingAs($this->member, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => 99999,
+                'training_session_slot_id' => 99999,
                 'member_package_id' => $this->memberPackage->id,
             ]);
 
         $response->assertStatus(422)
-            ->assertJsonValidationErrors('training_session_id');
+            ->assertJsonValidationErrors('training_session_slot_id');
     }
 
     public function test_booking_requires_valid_member_package()
     {
         $response = $this->actingAs($this->member, 'sanctum')
             ->postJson('/api/member/bookings', [
-                'training_session_id' => $this->trainingSession->id,
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
                 'member_package_id' => 99999,
             ]);
 

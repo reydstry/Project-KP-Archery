@@ -57,8 +57,8 @@ class DashboardController extends Controller
         })
             ->whereHas('attendance')
             ->with([
-                'trainingSession.sessionTime',
-                'trainingSession.coach',
+                'trainingSessionSlot.sessionTime',
+                'trainingSessionSlot.trainingSession.coach',
                 'attendance',
                 'memberPackage.package'
             ])
@@ -66,11 +66,14 @@ class DashboardController extends Controller
             ->limit(10)
             ->get()
             ->map(function ($booking) {
+                $trainingSession = $booking->trainingSessionSlot?->trainingSession;
+                $sessionTime = $booking->trainingSessionSlot?->sessionTime;
+
                 return [
                     'id' => $booking->id,
-                    'session_date' => $booking->trainingSession->date,
-                    'session_time' => $booking->trainingSession->sessionTime->name ?? null,
-                    'coach_name' => $booking->trainingSession->coach->name ?? null,
+                    'session_date' => $trainingSession?->date,
+                    'session_time' => $sessionTime?->name,
+                    'coach_name' => $trainingSession?->coach?->name,
                     'package_name' => $booking->memberPackage->package->name ?? null,
                     'attendance_status' => $booking->attendance->status,
                     'validated_at' => $booking->attendance->validated_at,

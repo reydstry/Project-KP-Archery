@@ -13,7 +13,7 @@ class WebDashboardController extends Controller
 
         return match ($user->role) {
             UserRoles::ADMIN => view('dashboards.admin.dashboard', compact('user')),
-            UserRoles::COACH => view('dashboards.coach', compact('user')),
+            UserRoles::COACH => view('dashboards.coach.dashboard', compact('user')),
             default => view('dashboards.member', compact('user')),
         };
     }
