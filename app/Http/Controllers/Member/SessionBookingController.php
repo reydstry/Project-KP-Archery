@@ -120,18 +120,31 @@ class SessionBookingController extends Controller
 
         $trainingSession = $trainingSessionSlot->trainingSession;
 
+        $now = now();
+
+        // Auto-close session if it's past or after cutoff
+        $trainingSession->applyAutoClose($now);
+
+        // Preserve explicit message for past sessions
+        if ($trainingSession->date->isPast() && !$trainingSession->date->isToday()) {
+            return response()->json([
+                'message' => 'Cannot book past sessions',
+            ], 422);
+        }
+
+        // Same-day cutoff: after 18:00, session is considered closed for booking
+        if ($trainingSession->date->isToday() && !$trainingSession->isBookableAt($now)) {
+            return response()->json([
+                'message' => 'Training session can no longer be booked (past or after 18:00).',
+                'session_status' => $trainingSession->status->value,
+            ], 422);
+        }
+
         // Check if session is open
         if ($trainingSession->status->value !== 'open') {
             return response()->json([
                 'message' => 'Training session is not open for booking',
                 'session_status' => $trainingSession->status->value,
-            ], 422);
-        }
-
-        // Check if session is in the future
-        if ($trainingSession->date->isPast()) {
-            return response()->json([
-                'message' => 'Cannot book past sessions',
             ], 422);
         }
 

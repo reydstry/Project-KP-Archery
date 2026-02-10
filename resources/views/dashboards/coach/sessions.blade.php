@@ -197,12 +197,30 @@ function renderSessions(sessions) {
 
                     <div class="flex items-center gap-2">
                         <a href="/coach/sessions/${session.id}/edit" class="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 text-center text-sm">Edit</a>
+                        <button type="button" class="px-4 py-2.5 bg-white hover:bg-slate-50 text-red-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-center text-sm" onclick="deleteSession(${session.id})">Delete</button>
                     </div>
                 </div>
 
             </div>
         `;
     }).join('');
+}
+
+async function deleteSession(sessionId) {
+    const target = allSessions.find(s => Number(s.id) === Number(sessionId));
+    const dateStr = (target?.date || '').toString().slice(0, 10);
+
+    const ok = confirm(`Delete training session ${dateStr || `#${sessionId}` }?\n\nThis will remove all slots. (Not allowed if there are bookings.)`);
+    if (!ok) return;
+
+    try {
+        await window.API.delete(`/coach/training-sessions/${sessionId}`);
+        window.showToast('Training session deleted', 'success');
+        await fetchSessions();
+    } catch (e) {
+        console.error(e);
+        window.showToast(e?.message || 'Failed to delete session', 'error');
+    }
 }
 </script>
 @endsection

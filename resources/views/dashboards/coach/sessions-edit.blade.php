@@ -7,7 +7,10 @@
             <h1 class="text-4xl font-bold text-slate-900 mb-2">Edit Training Session</h1>
             <p class="text-slate-600 text-lg">Update slot quotas for this day</p>
         </div>
-        <a href="{{ route('coach.sessions.index') }}" class="px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200">Back</a>
+        <div class="flex items-center gap-3">
+            <button type="button" id="deleteSessionBtn" onclick="deleteSession()" class="px-5 py-3 bg-white hover:bg-slate-50 text-red-700 rounded-xl font-medium border border-slate-200 transition-all duration-200">Delete Session</button>
+            <a href="{{ route('coach.sessions.index') }}" class="px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200">Back</a>
+        </div>
     </div>
 
     <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6">
@@ -23,7 +26,7 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Session Time</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Time</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Max Participants</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Action</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-200" id="slotsBody">
@@ -38,6 +41,7 @@
 
 <script>
 const SESSION_ID = @json($id ?? null);
+let CURRENT_SESSION = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!SESSION_ID) {
@@ -47,6 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const session = await window.API.get(`/coach/training-sessions/${SESSION_ID}`);
+        CURRENT_SESSION = session;
         const dateStr = (session.date || '').toString().slice(0, 10);
         document.getElementById('sessionHeader').textContent = `Training Session - ${dateStr}`;
         document.getElementById('sessionSubheader').textContent = `Status: ${(session.status || '').toString()}`;
@@ -80,7 +85,10 @@ function renderSlots(slots) {
                     <input type="number" min="1" max="50" value="${slot.max_participants ?? 1}" class="w-28 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" id="quota-${slot.id}">
                 </td>
                 <td class="px-6 py-4">
-                    <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 text-sm" onclick="updateQuota(${slot.id})">Update</button>
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 text-sm" onclick="updateQuota(${slot.id})">Update</button>
+                        <button type="button" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-sm" onclick="bookForMember(${slot.id})">Book for member</button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -104,6 +112,53 @@ async function updateQuota(slotId) {
     } catch (e) {
         console.error(e);
         window.showToast(e?.message || 'Failed to update quota', 'error');
+    }
+}
+
+async function deleteSession() {
+    const dateStr = (CURRENT_SESSION?.date || '').toString().slice(0, 10);
+    const ok = confirm(`Delete this training session ${dateStr || `#${SESSION_ID}` }?\n\nThis will remove all slots. (Not allowed if there are bookings.)`);
+    if (!ok) return;
+
+    const btn = document.getElementById('deleteSessionBtn');
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = 'Deleting...';
+
+    try {
+        await window.API.delete(`/coach/training-sessions/${SESSION_ID}`);
+        window.showToast('Training session deleted', 'success');
+        window.location.href = '{{ route('coach.sessions.index') }}';
+    } catch (e) {
+        console.error(e);
+        window.showToast(e?.message || 'Failed to delete session', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+    }
+}
+
+async function bookForMember(slotId) {
+    const memberPackageIdStr = prompt('Member Package ID to book (member_package_id):');
+    if (!memberPackageIdStr) return;
+    const memberPackageId = Number(memberPackageIdStr);
+    if (!Number.isInteger(memberPackageId) || memberPackageId <= 0) {
+        window.showToast('Invalid member_package_id', 'error');
+        return;
+    }
+
+    const notes = prompt('Notes (optional):') || null;
+
+    try {
+        await window.API.post('/coach/bookings', {
+            training_session_slot_id: slotId,
+            member_package_id: memberPackageId,
+            notes,
+        });
+        window.showToast('Booked successfully', 'success');
+    } catch (e) {
+        console.error(e);
+        window.showToast(e?.message || 'Failed to book', 'error');
     }
 }
 

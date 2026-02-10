@@ -72,6 +72,7 @@ Route::middleware('auth')->group(function () {
     // Coach routes
     Route::prefix('coach')->name('coach.')->middleware('role:coach')->group(function () {
         Route::get('/sessions', fn() => view('dashboards.coach.sessions'))->name('sessions.index');
+        Route::get('/bookings/create', fn() => view('dashboards.coach.bookings-create'))->name('bookings.create');
         Route::get('/sessions/create', fn() => view('dashboards.coach.sessions-create', [
             'sessionTimes' => SessionTime::query()->active()->orderBy('start_time')->get(['id', 'name', 'start_time', 'end_time']),
         ]))->name('sessions.create');

@@ -309,12 +309,12 @@ class AdminTestDataSeeder extends Seeder
 
         // Create default Session Times (6 template sessions)
         $defaultSessionTimes = [
-            ['name' => 'Sesi 1', 'start_time' => '08:00:00', 'end_time' => '10:00:00'],
-            ['name' => 'Sesi 2', 'start_time' => '10:00:00', 'end_time' => '12:00:00'],
-            ['name' => 'Sesi 3', 'start_time' => '13:00:00', 'end_time' => '15:00:00'],
-            ['name' => 'Sesi 4', 'start_time' => '15:00:00', 'end_time' => '17:00:00'],
-            ['name' => 'Sesi 5', 'start_time' => '18:00:00', 'end_time' => '20:00:00'],
-            ['name' => 'Sesi 6', 'start_time' => '20:00:00', 'end_time' => '22:00:00'],
+            ['name' => 'Sesi 1', 'start_time' => '07:30:00', 'end_time' => '09:00:00'],
+            ['name' => 'Sesi 2', 'start_time' => '09:00:00', 'end_time' => '10:30:00'],
+            ['name' => 'Sesi 3', 'start_time' => '10:30:00', 'end_time' => '12:00:00'],
+            ['name' => 'Sesi 4', 'start_time' => '13:30:00', 'end_time' => '15:00:00'],
+            ['name' => 'Sesi 5', 'start_time' => '15:00:00', 'end_time' => '16:30:00'],
+            ['name' => 'Sesi 6', 'start_time' => '16:30:00', 'end_time' => '18:00:00'],
         ];
 
         foreach ($defaultSessionTimes as $sessionTimeData) {

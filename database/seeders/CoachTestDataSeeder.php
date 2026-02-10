@@ -40,9 +40,6 @@ class CoachTestDataSeeder extends Seeder
         $dates = [
             Carbon::now()->subDay(), // Yesterday
             Carbon::now(), // Today
-            Carbon::now()->addDay(), // Tomorrow
-            Carbon::now()->addDays(2), // Day after tomorrow
-            Carbon::now()->addDays(3), // 3 days from now
         ];
 
         foreach ($dates as $date) {

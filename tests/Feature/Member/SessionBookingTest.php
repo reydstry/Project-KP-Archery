@@ -11,6 +11,7 @@ use App\Models\SessionTime;
 use App\Models\TrainingSession;
 use App\Models\TrainingSessionSlot;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -189,6 +190,32 @@ class SessionBookingTest extends TestCase
             ->assertJson([
                 'message' => 'Cannot book past sessions',
             ]);
+    }
+
+    public function test_member_cannot_book_today_after_cutoff_time()
+    {
+        Carbon::setTestNow(now()->startOfDay()->setTime(18, 1, 0));
+
+        $this->trainingSession->update([
+            'date' => today(),
+            'status' => 'open',
+        ]);
+
+        $response = $this->actingAs($this->member, 'sanctum')
+            ->postJson('/api/member/bookings', [
+                'training_session_slot_id' => $this->trainingSessionSlot->id,
+                'member_package_id' => $this->memberPackage->id,
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'Training session can no longer be booked (past or after 18:00).',
+            ]);
+
+        $this->trainingSession->refresh();
+        $this->assertSame('closed', $this->trainingSession->getRawOriginal('status'));
+
+        Carbon::setTestNow();
     }
 
     public function test_member_cannot_book_full_session()

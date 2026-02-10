@@ -27,7 +27,17 @@ class DashboardController extends Controller
             ]);
         }
 
-        $today = now()->toDateString();
+        $now = now();
+        $today = $now->toDateString();
+
+        $shouldCloseToday = $now->hour > TrainingSession::AUTO_CLOSE_HOUR
+            || ($now->hour === TrainingSession::AUTO_CLOSE_HOUR && $now->minute >= TrainingSession::AUTO_CLOSE_MINUTE);
+
+        TrainingSession::query()
+            ->where('coach_id', $coach->id)
+            ->where('status', 'open')
+            ->where('date', $shouldCloseToday ? '<=' : '<', $today)
+            ->update(['status' => 'closed']);
 
         $todaySession = TrainingSession::query()
             ->with(['slots.sessionTime', 'slots.confirmedBookings'])

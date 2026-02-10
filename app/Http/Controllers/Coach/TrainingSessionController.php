@@ -12,6 +12,20 @@ use Illuminate\Support\Facades\DB;
 
 class TrainingSessionController extends Controller
 {
+    private function autoCloseCoachSessionsIfNeeded(Coach $coach): void
+    {
+        $now = now();
+
+        $shouldCloseToday = $now->hour > TrainingSession::AUTO_CLOSE_HOUR
+            || ($now->hour === TrainingSession::AUTO_CLOSE_HOUR && $now->minute >= TrainingSession::AUTO_CLOSE_MINUTE);
+
+        TrainingSession::query()
+            ->where('coach_id', $coach->id)
+            ->where('status', TrainingSessionStatus::OPEN->value)
+            ->where('date', $shouldCloseToday ? '<=' : '<', today()->toDateString())
+            ->update(['status' => TrainingSessionStatus::CLOSED->value]);
+    }
+
     /**
      * Display a listing of training sessions for the authenticated coach
      */
@@ -25,6 +39,8 @@ class TrainingSessionController extends Controller
                 'message' => 'Coach profile not found',
             ], 404);
         }
+
+        $this->autoCloseCoachSessionsIfNeeded($coach);
 
         $query = TrainingSession::with(['slots.sessionTime', 'coach'])
             ->where('coach_id', $coach->id);
@@ -171,6 +187,8 @@ class TrainingSessionController extends Controller
             ], 403);
         }
 
+        $trainingSession->applyAutoClose(now());
+
         return response()->json($trainingSession->load(['slots.sessionTime', 'coach']));
     }
 
@@ -225,6 +243,14 @@ class TrainingSessionController extends Controller
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);
+        }
+
+        if ($trainingSession->shouldAutoCloseAt(now())) {
+            $trainingSession->applyAutoClose(now());
+            return response()->json([
+                'message' => 'Session can no longer be opened (past or after 18:00).',
+                'data' => $trainingSession->fresh(),
+            ], 422);
         }
 
         if ($trainingSession->status === TrainingSessionStatus::OPEN) {
@@ -294,6 +320,34 @@ class TrainingSessionController extends Controller
         return response()->json([
             'message' => 'Training session canceled successfully',
             'data' => $trainingSession->fresh(),
+        ]);
+    }
+
+    /**
+     * Delete a training session (day) and its slots.
+     * Guard: only allowed when there are no bookings.
+     */
+    public function destroy(TrainingSession $trainingSession)
+    {
+        $coach = Coach::where('user_id', auth()->id())->first();
+
+        if (!$coach || $trainingSession->coach_id !== $coach->id) {
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+        $hasBookings = $trainingSession->bookings()->exists();
+        if ($hasBookings) {
+            return response()->json([
+                'message' => 'Cannot delete session that already has bookings',
+            ], 422);
+        }
+
+        $trainingSession->delete();
+
+        return response()->json([
+            'message' => 'Training session deleted successfully',
         ]);
     }
 }

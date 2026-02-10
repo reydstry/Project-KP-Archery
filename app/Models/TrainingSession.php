@@ -3,12 +3,19 @@
 namespace App\Models;
 
 use App\Enums\TrainingSessionStatus;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TrainingSession extends Model
 {
     use HasFactory;
+
+    /**
+     * Auto-close cutoff time (local app timezone).
+     */
+    public const AUTO_CLOSE_HOUR = 18;
+    public const AUTO_CLOSE_MINUTE = 0;
 
     protected $fillable = [
         'date',
@@ -53,8 +60,61 @@ class TrainingSession extends Model
      */
     public function isOpenForRegistration(): bool
     {
-        return $this->status === TrainingSessionStatus::OPEN 
-            && $this->date->isFuture();
+        return $this->isBookableAt(now());
+    }
+
+    public function isBookableAt(CarbonInterface $now): bool
+    {
+        if ($this->status !== TrainingSessionStatus::OPEN) {
+            return false;
+        }
+
+        if ($this->date->isFuture()) {
+            return true;
+        }
+
+        if (!$this->date->isToday()) {
+            return false;
+        }
+
+        $cutoff = $this->date
+            ->copy()
+            ->setTime(self::AUTO_CLOSE_HOUR, self::AUTO_CLOSE_MINUTE, 0);
+
+        return $now->lt($cutoff);
+    }
+
+    public function shouldAutoCloseAt(CarbonInterface $now): bool
+    {
+        if ($this->status !== TrainingSessionStatus::OPEN) {
+            return false;
+        }
+
+        if ($this->date->isPast() && !$this->date->isToday()) {
+            return true;
+        }
+
+        if ($this->date->isToday()) {
+            $cutoff = $this->date
+                ->copy()
+                ->setTime(self::AUTO_CLOSE_HOUR, self::AUTO_CLOSE_MINUTE, 0);
+
+            return $now->gte($cutoff);
+        }
+
+        return false;
+    }
+
+    public function applyAutoClose(CarbonInterface $now): bool
+    {
+        if (!$this->shouldAutoCloseAt($now)) {
+            return false;
+        }
+
+        $this->forceFill(['status' => TrainingSessionStatus::CLOSED]);
+        $this->save();
+
+        return true;
     }
 
     /**

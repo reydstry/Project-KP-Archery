@@ -11,20 +11,19 @@
 
     <!-- Session Filter -->
     <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-            <!-- Session Select -->
-            <div class="md:col-span-2">
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Select Session</label>
-                <select id="sessionSelect" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                    <option value="">Loading sessions...</option>
-                </select>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
             <!-- Date Filter -->
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Filter by Date</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Latihan</label>
                 <input type="date" id="dateFilter" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Sesi / Slot</label>
+                <select id="slotFilter" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" disabled>
+                    <option value="">Semua Slot</option>
+                </select>
             </div>
 
         </div>
@@ -83,9 +82,10 @@
                 </svg>
                 Mark All Absent
             </button>
-            <button onclick="exportAttendance()" class="ml-auto px-4 py-2 bg-slate-200 text-slate-600 rounded-xl font-medium transition-all duration-200 text-sm flex items-center gap-2" type="button">
-                Export (Not available)
-            </button>
+
+            <a href="{{ route('coach.bookings.create') }}" class="ml-auto px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-sm flex items-center gap-2">
+                Book Member
+            </a>
         </div>
 
         <!-- Search Participants -->
@@ -106,13 +106,12 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Member</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Slot</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Notes</th>
                     </tr>
                 </thead>
                 <tbody id="participantsTableBody" class="bg-white divide-y divide-slate-200">
                     <!-- Loading state -->
                     <tr>
-                        <td colspan="4" class="px-6 py-12 text-center">
+                        <td colspan="3" class="px-6 py-12 text-center">
                             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                             <p class="text-slate-600 mt-2">Loading participants...</p>
                         </td>
@@ -147,18 +146,36 @@
 
 <script>
 let currentSessionId = null;
+let currentSlotId = null;
+let currentSession = null;
 let participants = [];
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Default date = today
+    const dateInput = document.getElementById('dateFilter');
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    dateInput.value = `${yyyy}-${mm}-${dd}`;
+
     loadSessions();
 
-    document.getElementById('sessionSelect').addEventListener('change', handleSessionChange);
     document.getElementById('dateFilter').addEventListener('change', loadSessions);
+    document.getElementById('slotFilter').addEventListener('change', handleSlotFilterChange);
     document.getElementById('searchParticipant').addEventListener('input', filterParticipants);
 });
 
 function loadSessions() {
     const dateFilter = document.getElementById('dateFilter').value;
+
+    // Reset selection
+    currentSessionId = null;
+    currentSlotId = null;
+    currentSession = null;
+    resetSlotFilter();
+    document.getElementById('sessionDetailsCard').classList.add('hidden');
+    document.getElementById('emptyState').classList.remove('hidden');
 
     const params = new URLSearchParams();
     if (dateFilter) {
@@ -170,52 +187,96 @@ function loadSessions() {
 
     window.API.get(url)
         .then(data => {
-            const select = document.getElementById('sessionSelect');
-            select.innerHTML = '<option value="">Select a session</option>';
-
             const sessions = data?.data || [];
-            if (sessions.length > 0) {
-                sessions.forEach(session => {
-                    const option = document.createElement('option');
-                    option.value = session.id;
-                    const dateStr = (session.date || '').toString().slice(0, 10);
-                    option.textContent = `${dateStr} (${(session.status || '').toString()})`;
-                    select.appendChild(option);
-                });
-            } else {
-                select.innerHTML = '<option value="">No sessions available</option>';
+            if (sessions.length === 0) {
+                return;
             }
+
+            const chosen = sessions[0];
+            currentSessionId = chosen.id;
+            loadSessionAndAttendance(currentSessionId);
         })
         .catch(error => {
             console.error('Error:', error);
-            document.getElementById('sessionSelect').innerHTML = '<option value="">Error loading sessions</option>';
         });
 }
 
-function handleSessionChange(e) {
-    const sessionId = e.target.value;
+function resetSlotFilter() {
+    const slotFilter = document.getElementById('slotFilter');
+    slotFilter.disabled = true;
+    slotFilter.innerHTML = '<option value="">Semua Slot</option>';
+    currentSlotId = null;
+}
 
-    if (!sessionId) {
-        document.getElementById('sessionDetailsCard').classList.add('hidden');
-        document.getElementById('emptyState').classList.remove('hidden');
+function populateSlotFilter(slots) {
+    const slotFilter = document.getElementById('slotFilter');
+    
+    if (!Array.isArray(slots) || slots.length === 0) {
+        resetSlotFilter();
         return;
     }
 
-    currentSessionId = sessionId;
-    loadSessionDetails(sessionId);
+    slotFilter.disabled = false;
+    slotFilter.innerHTML = '<option value="">Semua Slot</option>';
+
+    const sorted = [...slots].sort((a, b) => {
+        const aTime = a?.session_time?.start_time || '';
+        const bTime = b?.session_time?.start_time || '';
+        return aTime.localeCompare(bTime);
+    });
+
+    sorted.forEach(slot => {
+        const st = slot.session_time || {};
+        const name = st.name || 'Session';
+        const start = st.start_time || '';
+        const end = st.end_time || '';
+        const label = `${name} ${start}${start && end ? ' - ' : ''}${end}`.trim();
+
+        const opt = document.createElement('option');
+        opt.value = slot.id;
+        opt.textContent = label || `Slot #${slot.id}`;
+        slotFilter.appendChild(opt);
+    });
 }
 
-function loadSessionDetails(sessionId) {
+function handleSlotFilterChange(e) {
+    currentSlotId = e.target.value || null;
+    if (currentSessionId) {
+        loadAttendanceData(currentSessionId, currentSlotId);
+    }
+}
+
+function loadSessionAndAttendance(sessionId) {
     Promise.all([
         window.API.get(`/coach/training-sessions/${sessionId}`),
-        window.API.get(`/coach/training-sessions/${sessionId}/bookings`),
     ])
-        .then(([session, attendance]) => {
+        .then(([session]) => {
+            currentSession = session;
+
             const dateStr = (session.date || '').toString().slice(0, 10);
             document.getElementById('sessionTitle').textContent = `Training Session - ${dateStr}`;
             document.getElementById('sessionDateTime').textContent = `Date: ${dateStr}`;
             document.getElementById('sessionLocation').textContent = `Status: ${(session.status || '').toString()}`;
 
+            const slots = Array.isArray(session.slots) ? session.slots : [];
+            populateSlotFilter(slots);
+
+            // Load attendance for all slots by default
+            currentSlotId = null;
+            loadAttendanceData(sessionId, null);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification(error?.message || 'Failed to load session', 'error');
+        });
+}
+
+function loadAttendanceData(sessionId, slotId) {
+    const qs = new URLSearchParams();
+    if (slotId) qs.set('slot_id', slotId);
+
+    window.API.get(`/coach/training-sessions/${sessionId}/bookings${qs.toString() ? `?${qs.toString()}` : ''}`)
+        .then(attendance => {
             const bookings = attendance?.bookings || [];
             participants = bookings.map(b => {
                 const slot = b.slot || {};
@@ -230,8 +291,6 @@ function loadSessionDetails(sessionId) {
                     has_attendance: !!b.has_attendance,
                     original_status: b.attendance_status || '',
                     status: b.attendance_status || '',
-                    original_notes: b.notes || '',
-                    notes: b.notes || '',
                 };
             });
 
@@ -243,7 +302,7 @@ function loadSessionDetails(sessionId) {
         })
         .catch(error => {
             console.error('Error:', error);
-            showNotification(error?.message || 'Failed to load session details', 'error');
+            showNotification(error?.message || 'Failed to load attendance', 'error');
         });
 }
 
@@ -253,7 +312,7 @@ function renderParticipants(filteredParticipants = participants) {
     if (filteredParticipants.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="4" class="px-6 py-12 text-center text-slate-600">No bookings found</td>
+                <td colspan="3" class="px-6 py-12 text-center text-slate-600">No bookings found</td>
             </tr>
         `;
         return;
@@ -279,9 +338,6 @@ function renderParticipants(filteredParticipants = participants) {
                         <option value="absent" ${p.status === 'absent' ? 'selected' : ''}>Absent</option>
                     </select>
                 </td>
-                <td class="px-6 py-4">
-                    <input type="text" class="notes px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 w-full" placeholder="Add notes..." value="${escapeHtml(p.notes || '')}" data-index="${index}" oninput="updateNotes(${index}, this.value)">
-                </td>
             </tr>
         `;
     }).join('');
@@ -298,10 +354,6 @@ function getStatusClass(status) {
 
 function updateStatus(index, status) {
     participants[index].status = status;
-}
-
-function updateNotes(index, notes) {
-    participants[index].notes = notes;
 }
 
 function updateAttendanceSummaryLocal() {
@@ -370,20 +422,18 @@ function saveAttendance() {
     const tasks = participants
         .map(p => {
             const desiredStatus = p.status;
-            const desiredNotes = (p.notes || '').toString();
 
             if (!['present', 'absent'].includes(desiredStatus)) {
                 return null;
             }
 
             const statusChanged = (p.original_status || '') !== desiredStatus;
-            const notesChanged = (p.original_notes || '') !== desiredNotes;
 
-            if (!statusChanged && !notesChanged) {
+            if (!statusChanged) {
                 return null;
             }
 
-            const payload = { status: desiredStatus, notes: desiredNotes || null };
+            const payload = { status: desiredStatus, notes: null };
             const url = `/coach/bookings/${p.id}/attendance`;
             const request = p.has_attendance
                 ? () => window.API.patch(url, payload)
@@ -407,7 +457,7 @@ function saveAttendance() {
 
             // Refresh server state
             if (currentSessionId) {
-                loadSessionDetails(currentSessionId);
+                loadAttendanceData(currentSessionId, currentSlotId);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -417,10 +467,6 @@ function saveAttendance() {
             saveBtn.innerHTML = originalContent;
         }
     })();
-}
-
-function exportAttendance() {
-    showNotification('Export is not available yet', 'error');
 }
 
 function escapeHtml(str) {
