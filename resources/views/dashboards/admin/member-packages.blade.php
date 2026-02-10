@@ -7,14 +7,14 @@
 <div x-data="memberPackagesData()" x-init="init()" class="space-y-6">
     
     <!-- Header Actions -->
-    <div class="flex items-center justify-between">
-        <div class="flex-1 max-w-md">
+    <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+        <div class="flex-1 w-full sm:max-w-md">
             <input type="search" x-model="search" placeholder="Search by member name..." 
                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
         </div>
         <button @click="openAssignModal()" 
-                class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
-            <span class="flex items-center gap-2">
+                class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap shrink-0">
+            <span class="flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Assign Package
             </span>
@@ -22,8 +22,7 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6" style="animation-delay: 0.1s">        <div class="card-animate bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-blue-100 text-sm font-medium">Total Assignments</p>
@@ -34,7 +33,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white">
+        <div class="card-animate bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white" style="animation-delay: 0.15s">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-green-100 text-sm font-medium">Active Packages</p>
@@ -45,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-6 text-white">
+        <div class="card-animate bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-6 text-white" style="animation-delay: 0.2s">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-amber-100 text-sm font-medium">Expired Packages</p>
@@ -56,7 +55,7 @@
                 </div>
             </div>
         </div>
-        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
+        <div class="card-animate bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white" style="animation-delay: 0.25s">
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-purple-100 text-sm font-medium">Total Sessions</p>
@@ -69,8 +68,8 @@
         </div>
     </div>
 
-    <!-- Member Packages Table -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <!-- Member Packages Table - Desktop View -->
+    <div class="card-animate hidden lg:block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" style="animation-delay: 0.3s">
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-slate-50 border-b border-slate-200">
@@ -159,6 +158,94 @@
         </div>
     </div>
 
+    <!-- Member Packages Cards - Mobile View -->
+    <div class="lg:hidden space-y-4">
+        <template x-if="loading">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center text-slate-400">
+                Loading...
+            </div>
+        </template>
+        <template x-if="!loading && filteredMemberPackages.length === 0">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 text-center text-slate-400">
+                No member packages found
+            </div>
+        </template>
+        <template x-for="mp in filteredMemberPackages" :key="mp.id">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
+                <!-- Member Info -->
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <p class="font-bold text-slate-800 text-lg" x-text="mp.member?.name"></p>
+                        <p class="text-sm text-slate-500" x-text="mp.member?.phone"></p>
+                    </div>
+                    <template x-if="mp.is_active && new Date(mp.end_date) >= new Date()">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-2"></span>
+                            Active
+                        </span>
+                    </template>
+                    <template x-if="mp.is_active && new Date(mp.end_date) < new Date()">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                            <span class="w-1.5 h-1.5 bg-amber-500 rounded-full mr-2"></span>
+                            Expired
+                        </span>
+                    </template>
+                    <template x-if="!mp.is_active">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                            <span class="w-1.5 h-1.5 bg-slate-500 rounded-full mr-2"></span>
+                            Inactive
+                        </span>
+                    </template>
+                </div>
+
+                <!-- Package Info -->
+                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-4">
+                    <p class="font-semibold text-slate-800" x-text="mp.package?.name"></p>
+                    <p class="text-sm text-indigo-600 font-medium mt-1">
+                        Rp <span x-text="Number(mp.package?.price || 0).toLocaleString('id-ID')"></span>
+                    </p>
+                </div>
+
+                <!-- Sessions Progress -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-slate-600">Sessions</span>
+                        <span class="text-sm font-bold text-slate-800" x-text="mp.used_sessions + '/' + mp.total_sessions"></span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-full transition-all" 
+                             :style="'width: ' + ((mp.used_sessions / mp.total_sessions) * 100) + '%'"></div>
+                    </div>
+                </div>
+
+                <!-- Period -->
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-slate-500 text-xs mb-1">Start Date</p>
+                        <p class="font-medium text-slate-800" x-text="new Date(mp.start_date).toLocaleDateString('id-ID')"></p>
+                    </div>
+                    <div>
+                        <p class="text-slate-500 text-xs mb-1">End Date</p>
+                        <p class="font-medium text-slate-800" x-text="new Date(mp.end_date).toLocaleDateString('id-ID')"></p>
+                    </div>
+                </div>
+
+                <!-- Validator -->
+                <div class="pt-4 border-t border-slate-100">
+                    <p class="text-xs text-slate-500 mb-1">Validated By</p>
+                    <p class="text-sm font-medium text-slate-700" x-text="mp.validator?.name || '-'"></p>
+                    <p class="text-xs text-slate-500" x-text="mp.validated_at ? new Date(mp.validated_at).toLocaleDateString('id-ID') : '-'"></p>
+                </div>
+
+                <!-- Action -->
+                <button @click="viewDetails(mp)" 
+                        class="w-full px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
+                    View Details
+                </button>
+            </div>
+        </template>
+    </div>
+
     <!-- Assign Package Modal -->
     <div x-show="showAssignModal" x-cloak @click.self="closeAssignModal()"
          class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -239,7 +326,7 @@
                 <!-- Member Info -->
                 <div class="bg-slate-50 rounded-xl p-4">
                     <h4 class="font-bold text-slate-800 mb-3">Member Information</h4>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-slate-500">Name</p>
                             <p class="font-semibold text-slate-800" x-text="selectedMemberPackage?.member?.name"></p>
@@ -258,7 +345,7 @@
                 <!-- Package Info -->
                 <div class="bg-indigo-50 rounded-xl p-4">
                     <h4 class="font-bold text-indigo-900 mb-3">Package Information</h4>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-indigo-600">Package Name</p>
                             <p class="font-semibold text-indigo-900" x-text="selectedMemberPackage?.package?.name"></p>
@@ -292,7 +379,7 @@
                                      :style="'width: ' + ((selectedMemberPackage?.used_sessions / selectedMemberPackage?.total_sessions) * 100) + '%'"></div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <p class="text-sm text-green-600">Start Date</p>
                                 <p class="font-semibold text-green-900" x-text="selectedMemberPackage?.start_date ? new Date(selectedMemberPackage.start_date).toLocaleDateString('id-ID') : '-'"></p>
@@ -308,7 +395,7 @@
                 <!-- Validation Info -->
                 <div class="bg-purple-50 rounded-xl p-4">
                     <h4 class="font-bold text-purple-900 mb-3">Validation Information</h4>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-purple-600">Validated By</p>
                             <p class="font-semibold text-purple-900" x-text="selectedMemberPackage?.validator?.name || '-'"></p>

@@ -7,29 +7,29 @@
 <div x-data="achievementsData()" x-init="init()" class="space-y-6">
     
     <!-- Header Actions -->
-    <div class="flex items-center justify-between flex-wrap gap-4">
-        <div class="flex gap-3">
+    <div class="card-animate flex flex-col lg:flex-row items-stretch lg:items-center gap-3 sm:gap-4">
+        <div class="flex gap-2 sm:gap-3 flex-wrap">
             <button @click="filterType = 'all'; search = ''" 
-                    :class="filterType === 'all' ? 'bg-amber-500 text-white' : 'bg-white text-slate-600 border border-slate-200'"
-                    class="px-4 py-2 rounded-lg font-medium text-sm transition hover:shadow">
+                    :class="filterType === 'all' ? 'bg-blue-500 text-white' : 'bg-white text-slate-600 border border-slate-200'"
+                    class="px-4 py-2 rounded-lg font-medium text-sm transition hover:shadow whitespace-nowrap">
                 All
             </button>
             <button @click="filterType = 'member'; search = ''" 
-                    :class="filterType === 'member' ? 'bg-amber-500 text-white' : 'bg-white text-slate-600 border border-slate-200'"
-                    class="px-4 py-2 rounded-lg font-medium text-sm transition hover:shadow">
+                    :class="filterType === 'member' ? 'bg-blue-500 text-white' : 'bg-white text-slate-600 border border-slate-200'"
+                    class="px-4 py-2 rounded-lg font-medium text-sm transition hover:shadow whitespace-nowrap">
                 Member
             </button>
             <button @click="filterType = 'club'; search = ''" 
-                    :class="filterType === 'club' ? 'bg-amber-500 text-white' : 'bg-white text-slate-600 border border-slate-200'"
-                    class="px-4 py-2 rounded-lg font-medium text-sm transition hover:shadow">
+                    :class="filterType === 'club' ? 'bg-blue-500 text-white' : 'bg-white text-slate-600 border border-slate-200'"
+                    class="px-4 py-2 rounded-lg font-medium text-sm transition hover:shadow whitespace-nowrap">
                 Club
             </button>
         </div>
-        <div class="flex gap-3 flex-1 max-w-xl">
+        <div class="flex flex-col sm:flex-row gap-3 flex-1 w-full lg:max-w-xl">
             <input type="search" x-model="search" placeholder="Search achievements..." 
-                   class="flex-1 px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition">
+                   class="flex-1 w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
             <button @click="openAddModal()" 
-                    class="px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap">
+                    class="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap shrink-0">
                 <span class="flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                     Add Achievement
@@ -53,8 +53,8 @@
                          class="w-full h-48 object-cover">
                 </template>
                 <template x-if="!achievement.photo_path">
-                    <div class="w-full h-48 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                        <svg class="w-20 h-20 text-amber-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>
+                    <div class="w-full h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                        <svg class="w-20 h-20 text-blue-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>
                     </div>
                 </template>
                 <div class="p-5 space-y-3">
@@ -76,7 +76,7 @@
                 </div>
                 <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
                     <button @click="openEditModal(achievement)" 
-                            class="px-4 py-2 text-amber-600 hover:bg-amber-50 rounded-lg font-medium text-sm transition">
+                            class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg font-medium text-sm transition">
                         Edit
                     </button>
                     <button @click="confirmDelete(achievement)" 
@@ -94,7 +94,7 @@
         <div @click.away="closeModal()" 
              class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8"
              x-transition>
-            <div class="sticky top-0 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+            <div class="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
                 <h3 class="text-lg font-bold" x-text="editingAchievement ? 'Edit Achievement' : 'Add New Achievement'"></h3>
                 <button @click="closeModal()" class="text-white/80 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -104,7 +104,7 @@
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Achievement Type *</label>
                     <select x-model="form.type" required
-                            class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none">
+                            class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                         <option value="">Select type...</option>
                         <option value="member">Member Achievement</option>
                         <option value="club">Club Achievement</option>
@@ -113,7 +113,7 @@
                 <div x-show="form.type === 'member'">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Member *</label>
                     <select x-model="form.member_id" :required="form.type === 'member'"
-                            class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none">
+                            class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                         <option value="">Select member...</option>
                         <template x-for="member in members" :key="member.id">
                             <option :value="member.id" x-text="member.name"></option>
@@ -123,22 +123,22 @@
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Title *</label>
                     <input type="text" x-model="form.title" required
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none">
+                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Description *</label>
                     <textarea x-model="form.description" required rows="4"
-                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none resize-none"></textarea>
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Date *</label>
                     <input type="date" x-model="form.date" required
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none">
+                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Photo URL</label>
                     <input type="url" x-model="form.photo_path" placeholder="https://..."
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none">
+                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                     <p class="text-xs text-slate-500 mt-1">Optional: Enter image URL</p>
                 </div>
                 <div class="flex gap-4 pt-4">
@@ -147,7 +147,7 @@
                         Cancel
                     </button>
                     <button type="submit" :disabled="saving"
-                            class="flex-1 px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
+                            class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
                         <span x-text="saving ? 'Saving...' : 'Save'"></span>
                     </button>
                 </div>

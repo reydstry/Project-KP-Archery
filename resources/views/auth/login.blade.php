@@ -169,7 +169,7 @@
         <!-- Register -->
         <p class="mt-6 text-center text-sm text-gray-700">
             Don't have an account?
-            <a href="{{ route('register') }}
+            <a href="{{ route('register') }}"
                class="font-semibold text-blue-600 hover:text-blue-700">
                 Sign up
             </a>
