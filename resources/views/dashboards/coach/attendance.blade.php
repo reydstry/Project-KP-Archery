@@ -1,27 +1,28 @@
 @extends('layouts.coach')
 
-@section('content')
-<div class="min-h-screen bg-white p-4 sm:p-8">
+@section('title', 'Attendance Management')
+@section('subtitle', 'Track and manage participant attendance for your sessions')
 
-    <!-- Header Section -->
-    <div class="mb-6 sm:mb-8 card-animate" style="animation-delay: 0.1s">
-        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Attendance Management</h1>
-        <p class="text-slate-600 text-base sm:text-lg">Track and manage participant attendance for your sessions</p>
-    </div>
+@section('content')
+<div class="min-h-screen bg-white px-2 py-2 sm:p-8">
 
     <!-- Session Filter -->
-    <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 mb-6 sm:mb-8 card-animate" style="animation-delay: 0.15s">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+    <div class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-slate-200/60 p-2 sm:p-4 mb-2 sm:mb-4 card-animate" style="animation-delay: 0.15s">
+        <div class="mb-2 sm:mb-3">
+            <h2 class="text-xs sm:text-sm font-bold text-slate-900 mb-0.5">Pilih Sesi Latihan</h2>
+            <p class="text-slate-500 text-xs sm:text-sm">Pilih tanggal dan slot sesi untuk mengelola kehadiran member.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4">
 
             <!-- Date Filter -->
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Latihan</label>
-                <input type="date" id="dateFilter" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">Tanggal Latihan</label>
+                <input type="date" id="dateFilter" class="w-full px-2.5 py-1.5 sm:px-3 sm:py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-xs sm:text-sm">
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Sesi / Slot</label>
-                <select id="slotFilter" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" disabled>
+                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">Sesi / Slot</label>
+                <select id="slotFilter" class="w-full px-2.5 py-1.5 sm:px-3 sm:py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-xs sm:text-sm" disabled>
                     <option value="">Semua Slot</option>
                 </select>
             </div>
@@ -30,19 +31,19 @@
     </div>
 
     <!-- Session Details Card (Hidden initially) -->
-    <div id="sessionDetailsCard" class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 mb-6 sm:mb-8 hidden card-animate" style="animation-delay: 0.2s">
-        <div class="flex flex-col sm:flex-row items-start justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
+    <div id="sessionDetailsCard" class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-slate-200/60 p-2 sm:p-4 mb-2 sm:mb-4 hidden card-animate" style="animation-delay: 0.2s">
+        <div class="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-3 mb-2 sm:mb-3">
             <div>
-                <h2 class="text-2xl font-bold text-slate-900 mb-2" id="sessionTitle">-</h2>
-                <div class="flex items-center gap-4 text-sm text-slate-600">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <h2 class="text-xs sm:text-sm font-bold text-slate-900 mb-0.5" id="sessionTitle">-</h2>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-slate-600">
+                    <div class="flex items-center gap-1">
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                         <span id="sessionDateTime">-</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-1">
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
@@ -52,47 +53,47 @@
             </div>
 
             <!-- Attendance Summary -->
-            <div class="flex items-center gap-4">
-                <div class="text-center px-6 py-3 bg-emerald-50 rounded-xl">
-                    <p class="text-2xl font-bold text-emerald-600" id="presentCount">0</p>
+            <div class="grid grid-cols-3 gap-1.5 sm:gap-2 w-full sm:w-auto">
+                <div class="text-center px-1.5 py-1.5 bg-emerald-50 rounded-lg">
+                    <p class="text-xs sm:text-sm font-bold text-emerald-600" id="presentCount">0</p>
                     <p class="text-xs text-emerald-600 font-medium">Present</p>
                 </div>
-                <div class="text-center px-6 py-3 bg-red-50 rounded-xl">
-                    <p class="text-2xl font-bold text-red-600" id="absentCount">0</p>
+                <div class="text-center px-1.5 py-1.5 bg-red-50 rounded-lg">
+                    <p class="text-xs sm:text-sm font-bold text-red-600" id="absentCount">0</p>
                     <p class="text-xs text-red-600 font-medium">Absent</p>
                 </div>
-                <div class="text-center px-6 py-3 bg-orange-50 rounded-xl">
-                    <p class="text-2xl font-bold text-orange-600" id="notValidatedCount">0</p>
+                <div class="text-center px-1.5 py-1.5 bg-orange-50 rounded-lg">
+                    <p class="text-xs sm:text-sm font-bold text-orange-600" id="notValidatedCount">0</p>
                     <p class="text-xs text-orange-600 font-medium">Not Validated</p>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4 sm:mb-6">
-            <button onclick="markAllPresent()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium transition-all duration-200 text-sm flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+            <button onclick="markAllPresent()" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-all duration-200 text-xs flex items-center justify-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 Mark All Present
             </button>
-            <button onclick="markAllAbsent()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-all duration-200 text-sm flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button onclick="markAllAbsent()" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-all duration-200 text-xs flex items-center justify-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 Mark All Absent
             </button>
 
-            <a href="{{ route('coach.bookings.create') }}" class="ml-auto px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-sm flex items-center gap-2">
+            <a href="{{ route('coach.bookings.create') }}" class="sm:ml-auto px-3 py-1.5 sm:px-4 sm:py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg font-medium border border-slate-200 transition-all duration-200 text-xs flex items-center justify-center gap-1.5">
                 Book Member
             </a>
         </div>
 
         <!-- Search Participants -->
-        <div class="mb-4">
+        <div class="mb-2 sm:mb-3">
             <div class="relative">
-                <input type="text" id="searchParticipant" placeholder="Search participants by name..." class="w-full px-4 py-3 pl-11 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
-                <svg class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <input type="text" id="searchParticipant" placeholder="Search participants..." class="w-full px-2.5 py-1.5 sm:px-3 sm:py-2 pl-7 sm:pl-8 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-xs sm:text-sm">
+                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
             </div>
@@ -100,12 +101,13 @@
 
         <!-- Participants List -->
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full text-xs sm:text-sm">
+
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-200">
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Member</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Slot</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Status</th>
+                        <th class="px-2 sm:px-3 py-2 sm:py-2.5 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Member</th>
+                        <th class="px-2 sm:px-3 py-2 sm:py-2.5 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Slot</th>
+                        <th class="px-2 sm:px-3 py-2 sm:py-2.5 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Status</th>
                     </tr>
                 </thead>
                 <tbody id="participantsTableBody" class="bg-white divide-y divide-slate-200">
@@ -121,10 +123,10 @@
         </div>
 
         <!-- Save Button -->
-        <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4">
-            <p class="text-sm text-slate-600" id="lastSaved">Last saved: Never</p>
-            <button onclick="saveAttendance()" id="saveBtn" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="mt-2 sm:mt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2">
+            <p class="text-xs sm:text-sm text-slate-600" id="lastSaved">Last saved: Never</p>
+            <button onclick="saveAttendance()" id="saveBtn" class="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30 flex items-center justify-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
                 <span>Save Attendance</span>
@@ -134,12 +136,12 @@
     </div>
 
     <!-- Empty State (Shown when no session selected) -->
-    <div id="emptyState" class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-8 sm:p-12 text-center card-animate" style="animation-delay: 0.2s">
-        <svg class="w-24 h-24 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div id="emptyState" class="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-slate-200/60 p-6 sm:p-8 text-center card-animate" style="animation-delay: 0.2s">
+        <svg class="w-16 h-16 sm:w-20 sm:h-20 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>
-        <h3 class="text-2xl font-bold text-slate-900 mb-2">Select a Session</h3>
-        <p class="text-slate-600 mb-6">Choose a training session to take attendance</p>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-1.5">Select a Session</h3>
+        <p class="text-xs sm:text-sm text-slate-600 mb-4">Choose a training session to take attendance</p>
     </div>
 
     <!-- Mark All Absent Confirmation Modal -->
@@ -208,8 +210,12 @@ function loadSessions() {
     currentSlotId = null;
     currentSession = null;
     resetSlotFilter();
-    document.getElementById('sessionDetailsCard').classList.add('hidden');
-    document.getElementById('emptyState').classList.remove('hidden');
+    
+    const sessionDetailsCard = document.getElementById('sessionDetailsCard');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (sessionDetailsCard) sessionDetailsCard.classList.add('hidden');
+    if (emptyState) emptyState.classList.remove('hidden');
 
     const params = new URLSearchParams();
     if (dateFilter) {
@@ -288,9 +294,13 @@ function loadSessionAndAttendance(sessionId) {
             currentSession = session;
 
             const dateStr = (session.date || '').toString().slice(0, 10);
-            document.getElementById('sessionTitle').textContent = `Training Session - ${dateStr}`;
-            document.getElementById('sessionDateTime').textContent = `Date: ${dateStr}`;
-            document.getElementById('sessionLocation').textContent = `Status: ${(session.status || '').toString()}`;
+            const titleEl = document.getElementById('sessionTitle');
+            const dateTimeEl = document.getElementById('sessionDateTime');
+            const locationEl = document.getElementById('sessionLocation');
+            
+            if (titleEl) titleEl.textContent = `Training Session - ${dateStr}`;
+            if (dateTimeEl) dateTimeEl.textContent = `Date: ${dateStr}`;
+            if (locationEl) locationEl.textContent = `Status: ${(session.status || '').toString()}`;
 
             const slots = Array.isArray(session.slots) ? session.slots : [];
             populateSlotFilter(slots);
@@ -331,8 +341,11 @@ function loadAttendanceData(sessionId, slotId) {
             renderParticipants(participants);
             updateAttendanceSummaryFromServer(attendance);
 
-            document.getElementById('sessionDetailsCard').classList.remove('hidden');
-            document.getElementById('emptyState').classList.add('hidden');
+            const sessionDetailsCard = document.getElementById('sessionDetailsCard');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (sessionDetailsCard) sessionDetailsCard.classList.remove('hidden');
+            if (emptyState) emptyState.classList.add('hidden');
         })
         .catch(error => {
             console.error('Error:', error);
@@ -346,7 +359,7 @@ function renderParticipants(filteredParticipants = participants) {
     if (filteredParticipants.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="3" class="px-6 py-12 text-center text-slate-600">No bookings found</td>
+                <td colspan="3" class="px-2 sm:px-3 py-8 text-center text-xs sm:text-sm text-slate-600">No bookings found</td>
             </tr>
         `;
         return;
@@ -358,15 +371,15 @@ function renderParticipants(filteredParticipants = participants) {
 
         return `
             <tr class="hover:bg-slate-50 transition-colors duration-150">
-                <td class="px-6 py-4">
+                <td class="px-2 sm:px-3 py-2 sm:py-2.5">
                     <div>
-                        <p class="font-semibold text-slate-900">${p.member_name}</p>
+                        <p class="text-xs sm:text-sm font-semibold text-slate-900">${p.member_name}</p>
                         <p class="text-xs text-slate-500">Member ID: ${p.member_id}</p>
                     </div>
                 </td>
-                <td class="px-6 py-4 text-sm text-slate-600">${p.slot_label || '-'}</td>
-                <td class="px-6 py-4">
-                    <select class="attendance-status px-3 py-2 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500 ${statusClass}" data-index="${index}" onchange="updateStatus(${index}, this.value)">
+                <td class="px-2 sm:px-3 py-2 sm:py-2.5 text-xs text-slate-600">${p.slot_label || '-'}</td>
+                <td class="px-2 sm:px-3 py-2 sm:py-2.5">
+                    <select class="attendance-status px-2 py-1 sm:px-2.5 sm:py-1.5 rounded text-xs font-medium focus:ring-2 focus:ring-blue-500 ${statusClass}" data-index="${index}" onchange="updateStatus(${index}, this.value)">
                         ${canUnvalidate ? `<option value="" ${p.status === '' ? 'selected' : ''}>Not validated</option>` : ''}
                         <option value="present" ${p.status === 'present' ? 'selected' : ''}>Present</option>
                         <option value="absent" ${p.status === 'absent' ? 'selected' : ''}>Absent</option>
@@ -395,9 +408,13 @@ function updateAttendanceSummaryLocal() {
     const absent = participants.filter(p => p.status === 'absent').length;
     const notValidated = participants.filter(p => !p.status).length;
 
-    document.getElementById('presentCount').textContent = present;
-    document.getElementById('absentCount').textContent = absent;
-    document.getElementById('notValidatedCount').textContent = notValidated;
+    const presentEl = document.getElementById('presentCount');
+    const absentEl = document.getElementById('absentCount');
+    const notValidatedEl = document.getElementById('notValidatedCount');
+    
+    if (presentEl) presentEl.textContent = present;
+    if (absentEl) absentEl.textContent = absent;
+    if (notValidatedEl) notValidatedEl.textContent = notValidated;
 }
 
 function updateAttendanceSummaryFromServer(attendance) {
@@ -405,9 +422,13 @@ function updateAttendanceSummaryFromServer(attendance) {
         updateAttendanceSummaryLocal();
         return;
     }
-    document.getElementById('presentCount').textContent = attendance.attended ?? 0;
-    document.getElementById('absentCount').textContent = attendance.absent ?? 0;
-    document.getElementById('notValidatedCount').textContent = attendance.not_validated ?? 0;
+    const presentEl = document.getElementById('presentCount');
+    const absentEl = document.getElementById('absentCount');
+    const notValidatedEl = document.getElementById('notValidatedCount');
+    
+    if (presentEl) presentEl.textContent = attendance.attended ?? 0;
+    if (absentEl) absentEl.textContent = attendance.absent ?? 0;
+    if (notValidatedEl) notValidatedEl.textContent = attendance.not_validated ?? 0;
 }
 
 function filterParticipants() {
@@ -454,7 +475,7 @@ function saveAttendance() {
 
     saveBtn.disabled = true;
     saveBtn.innerHTML = `
-        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <svg class="animate-spin h-3.5 w-3.5 sm:h-4 sm:w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>

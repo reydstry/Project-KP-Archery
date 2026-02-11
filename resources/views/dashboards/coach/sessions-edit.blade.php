@@ -1,37 +1,34 @@
 @extends('layouts.coach')
 
+@section('title', 'Edit Training Session')
+@section('subtitle', 'Update slot quotas for this day')
+
 @section('content')
-<div class="min-h-screen bg-white p-4 sm:p-8">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6 sm:mb-8 card-animate" style="animation-delay: 0.1s">
-        <div>
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Edit Training Session</h1>
-            <p class="text-slate-600 text-base sm:text-lg">Update slot quotas for this day</p>
-        </div>
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-            <button type="button" id="deleteSessionBtn" onclick="deleteSession()" class="w-full sm:w-auto px-5 py-3 bg-white hover:bg-slate-50 text-red-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-center">Delete Session</button>
-            <a href="{{ route('coach.sessions.index') }}" class="w-full sm:w-auto px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-center">Back</a>
-        </div>
+<div class="min-h-screen bg-white">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 mb-2 card-animate" style="animation-delay: 0.1s">
+        <button type="button" id="deleteSessionBtn" onclick="deleteSession()" class="w-full sm:w-auto px-3 py-1.5 bg-white hover:bg-slate-50 text-red-700 rounded-lg font-medium border border-slate-200 transition-all duration-200 text-xs text-center">Delete Session</button>
+        <a href="{{ route('coach.sessions.index') }}" class="w-full sm:w-auto px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg font-medium border border-slate-200 transition-all duration-200 text-xs text-center">Back</a>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 card-animate" style="animation-delay: 0.15s">
-        <div class="mb-4 sm:mb-6">
-            <h2 class="text-lg sm:text-xl font-bold text-slate-900" id="sessionHeader">Loading...</h2>
-            <p class="text-xs sm:text-sm text-slate-600" id="sessionSubheader">Please wait</p>
+    <div class="bg-white rounded-xl shadow-lg border border-slate-200/60 p-3 card-animate" style="animation-delay: 0.15s">
+        <div class="mb-2">
+            <h2 class="text-sm sm:text-base font-bold text-slate-900" id="sessionHeader">Loading...</h2>
+            <p class="text-xs text-slate-600" id="sessionSubheader">Please wait</p>
         </div>
 
-        <div class="overflow-x-auto -mx-4 sm:mx-0">
-            <table class="w-full">
+        <div class="overflow-x-auto -mx-3 sm:mx-0">
+            <table class="w-full min-w-[580px]">
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-200">
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Session Time</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Time</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Max Participants</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Actions</th>
+                        <th class="px-2 py-2 sm:px-3 sm:py-2.5 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Session Time</th>
+                        <th class="px-2 py-2 sm:px-3 sm:py-2.5 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Time</th>
+                        <th class="px-2 py-2 sm:px-3 sm:py-2.5 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Max Participants</th>
+                        <th class="px-2 py-2 sm:px-3 sm:py-2.5 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-200" id="slotsBody">
                     <tr>
-                        <td colspan="4" class="px-6 py-10 text-center text-slate-600">Loading slots...</td>
+                        <td colspan="4" class="px-2 py-6 sm:px-4 sm:py-8 text-center text-slate-600 text-xs">Loading slots...</td>
                     </tr>
                 </tbody>
             </table>

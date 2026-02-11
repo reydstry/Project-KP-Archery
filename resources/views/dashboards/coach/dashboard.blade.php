@@ -7,7 +7,7 @@
 <div x-data="dashboardData()" x-init="loadData()">
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
         <!-- Today's Sessions -->
         <div class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 card-animate" style="animation-delay: 0.1s">
             <div class="flex items-center justify-between mb-4">
@@ -64,10 +64,10 @@
     </div>
 
     <!-- Today's Schedule -->
-    <div class="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 border border-slate-100 card-animate" style="animation-delay: 0.4s">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
-            <h3 class="text-2xl font-bold text-slate-800">Jadwal Hari Ini</h3>
-            <span class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl text-sm font-semibold shadow-lg">
+    <div class="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-lg p-4 sm:p-6 border border-slate-100 card-animate" style="animation-delay: 0.4s">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
+            <h3 class="text-lg sm:text-xl font-bold text-slate-800">Jadwal Hari Ini</h3>
+            <span class="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-lg">
                 {{ now()->format('l, d F Y') }}
             </span>
         </div>
@@ -89,29 +89,29 @@
         </template>
 
         <template x-if="!loading && todaySessions.length > 0">
-    <div class="space-y-4">
+    <div class="space-y-3">
         <template x-for="(session, index) in todaySessions" :key="session.id">
-            <div class="flex items-center justify-between p-5 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-100 hover:shadow-lg transition-all duration-300">
+            <div class="flex items-center justify-between p-3 sm:p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-100 hover:shadow-lg transition-all duration-300">
                 <div>
-                    <h4 class="font-bold text-slate-800 text-lg" x-text="session.session_time?.session_name || 'Training Session'"></h4>
-                    <p class="text-slate-600 text-sm">
+                    <h4 class="font-bold text-slate-800 text-sm sm:text-base" x-text="session.session_time?.session_name || 'Training Session'"></h4>
+                    <p class="text-slate-600 text-xs sm:text-sm">
                         <span x-text="session.session_time?.start_time || '00:00'"></span> - 
                         <span x-text="session.session_time?.end_time || '00:00'"></span>
                     </p>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 sm:gap-3">
                     <div>
-                        <p class="text-slate-600 text-sm mb-1">Kapasitas</p>
-                        <p class="font-bold text-slate-800 text-lg">
+                        <p class="text-slate-600 text-xs mb-1">Kapasitas</p>
+                        <p class="font-bold text-slate-800 text-sm sm:text-base">
                             <span class="text-blue-600" x-text="session.total_bookings || 0"></span> / 
                             <span x-text="session.capacity || 0"></span>
                         </p>
                     </div>
                     <!-- Button to View Members -->
                     <button @click="viewSlotMembers(session)" 
-                            class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 transition-all duration-200 hover:shadow-lg"
+                            class="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 transition-all duration-200 hover:shadow-lg"
                             title="Lihat daftar member">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
                     </button>

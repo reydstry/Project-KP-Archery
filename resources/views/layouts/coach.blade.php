@@ -220,12 +220,12 @@
                 </div>
             </div>
 
-            <div class="p-4 sm:p-6 lg:p-8">
+            <div class="p-3 sm:p-6 lg:p-8">
                 <div class="max-w-7xl mx-auto">
                     <!-- Page Header -->
-                    <div class="mb-6 sm:mb-8">
-                        <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">@yield('title')</h2>
-                        <p class="text-slate-500 mt-1 text-sm sm:text-base">@yield('subtitle')</p>
+                    <div class="mb-3 sm:mb-6">
+                        <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-slate-800">@yield('title')</h2>
+                        <p class="text-slate-500 mt-0.5 text-xs sm:text-sm">@yield('subtitle')</p>
                     </div>
 
                     <!-- Content -->
