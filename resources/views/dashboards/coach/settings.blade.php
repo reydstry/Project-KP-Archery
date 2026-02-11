@@ -1,20 +1,20 @@
 @extends('layouts.coach')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 p-8">
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 p-4 sm:p-8">
 
     <!-- Header Section -->
-    <div class="mb-8">
-        <h1 class="text-4xl font-bold text-slate-900 mb-2">Coach Settings</h1>
-        <p class="text-slate-600 text-lg">Manage your profile and preferences</p>
+    <div class="mb-6 sm:mb-8 card-animate" style="animation-delay: 0.1s">
+        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Coach Settings</h1>
+        <p class="text-slate-600 text-base sm:text-lg">Manage your profile and preferences</p>
     </div>
 
     <!-- Two Column Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
 
         <!-- Sidebar Menu -->
-        <div class="lg:col-span-1">
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sticky top-8">
+        <div class="lg:col-span-1 card-animate" style="animation-delay: 0.15s">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 lg:sticky lg:top-8">
                 <nav class="space-y-1">
                     <button onclick="showTab('profile')" class="tab-btn w-full text-left px-4 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-3 bg-blue-50 text-blue-600">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,17 +34,17 @@
         </div>
 
         <!-- Main Content -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-2 card-animate" style="animation-delay: 0.2s">
 
             <!-- Profile Information Tab -->
             <div id="profileTab" class="tab-content">
-                <form id="profileForm" class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-8">
-                    <h2 class="text-2xl font-bold text-slate-900 mb-6">Profile Information</h2>
+                <form id="profileForm" class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 lg:p-8">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-4 sm:mb-6">Profile Information</h2>
 
                     <!-- Profile Photo -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-slate-700 mb-4">Profile Photo</label>
-                        <div class="flex items-center gap-6">
+                    <div class="mb-4 sm:mb-6">
+                        <label class="block text-sm font-semibold text-slate-700 mb-3 sm:mb-4">Profile Photo</label>
+                        <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                             <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
                                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                             </div>
@@ -57,7 +57,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
                         <!-- Full Name -->
                         <div>
@@ -130,11 +130,11 @@
 
                     </div>
 
-                    <div class="mt-6 flex items-center justify-end gap-4">
-                        <button type="button" class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-medium transition-all duration-200">
+                    <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 sm:gap-4">
+                        <button type="button" class="w-full sm:w-auto px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-medium transition-all duration-200">
                             Cancel
                         </button>
-                        <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30">
                             Save Changes
                         </button>
                     </div>
@@ -143,8 +143,8 @@
 
             <!-- Security Tab -->
             <div id="securityTab" class="tab-content hidden">
-                <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-8">
-                    <h2 class="text-2xl font-bold text-slate-900 mb-6">Change Password</h2>
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 lg:p-8">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-4 sm:mb-6">Change Password</h2>
 
                     <form id="passwordForm">
                         <div class="space-y-4">
@@ -174,8 +174,8 @@
                             </div>
                         </div>
 
-                        <div class="mt-6 flex items-center justify-end">
-                            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30">
+                        <div class="mt-4 sm:mt-6 flex items-center justify-end">
+                            <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30">
                                 Update Password
                             </button>
                         </div>

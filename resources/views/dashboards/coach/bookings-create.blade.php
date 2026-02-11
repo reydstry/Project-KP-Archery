@@ -4,16 +4,16 @@
 @section('subtitle', 'Booking slot sesi latihan untuk member (pilih member dari list)')
 
 @section('content')
-<div x-data="bookingPage()" x-init="init()" class="space-y-6">
+<div x-data="bookingPage()" x-init="init()" class="space-y-4 sm:space-y-6">
 
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
-        <div class="p-6 border-b border-slate-200">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm card-animate" style="animation-delay: 0.1s">
+        <div class="p-4 sm:p-6 border-b border-slate-200">
             <h3 class="text-lg font-bold text-slate-800">Form Booking</h3>
             <p class="text-sm text-slate-500 mt-1">Pilih sesi, pilih jam (slot), lalu pilih member dari daftar.</p>
         </div>
 
-        <div class="p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div class="p-4 sm:p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Training Session</label>
                     <select x-model.number="form.training_session_id" @change="onSessionChange()"
@@ -109,15 +109,15 @@
                 </div>
             </div>
 
-            <div class="mt-6 flex items-center gap-3">
+            <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <button @click="submit()" :disabled="submitting || selectedMembers.length === 0"
-                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/30 disabled:opacity-60 disabled:cursor-not-allowed">
+                        class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/30 disabled:opacity-60 disabled:cursor-not-allowed">
                     <span x-show="!submitting">Booking (<span x-text="selectedMembers.length"></span> member)</span>
                     <span x-show="submitting" x-cloak>Memproses...</span>
                 </button>
 
                 <button @click="resetForm()" :disabled="submitting"
-                        class="px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
+                        class="w-full sm:w-auto px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
                     Reset
                 </button>
             </div>

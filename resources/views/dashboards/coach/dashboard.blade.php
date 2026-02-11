@@ -7,9 +7,9 @@
 <div x-data="dashboardData()" x-init="loadData()">
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <!-- Today's Sessions -->
-        <div class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-lg p-6 border border-blue-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 card-animate" style="animation-delay: 0.1s">
+        <div class="bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 card-animate" style="animation-delay: 0.1s">
             <div class="flex items-center justify-between mb-4">
                 <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -27,7 +27,7 @@
         </div>
 
         <!-- Upcoming Sessions -->
-        <div class="bg-gradient-to-br from-white to-emerald-50 rounded-2xl shadow-lg p-6 border border-emerald-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 card-animate" style="animation-delay: 0.2s">
+        <div class="bg-gradient-to-br from-white to-emerald-50 rounded-2xl shadow-lg p-4 sm:p-6 border border-emerald-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 card-animate" style="animation-delay: 0.2s">
             <div class="flex items-center justify-between mb-4">
                 <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center text-white shadow-lg">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -45,7 +45,7 @@
         </div>
 
         <!-- Total Sessions -->
-        <div class="bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-lg p-6 border border-purple-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 card-animate" style="animation-delay: 0.3s">
+        <div class="bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-lg p-4 sm:p-6 border border-purple-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 card-animate" style="animation-delay: 0.3s">
             <div class="flex items-center justify-between mb-4">
                 <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center text-white shadow-lg">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -64,8 +64,8 @@
     </div>
 
     <!-- Today's Schedule -->
-    <div class="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-lg p-8 border border-slate-100 card-animate" style="animation-delay: 0.4s">
-        <div class="flex items-center justify-between mb-6">
+    <div class="bg-gradient-to-br from-white to-slate-50 rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8 border border-slate-100 card-animate" style="animation-delay: 0.4s">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
             <h3 class="text-2xl font-bold text-slate-800">Jadwal Hari Ini</h3>
             <span class="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl text-sm font-semibold shadow-lg">
                 {{ now()->format('l, d F Y') }}
