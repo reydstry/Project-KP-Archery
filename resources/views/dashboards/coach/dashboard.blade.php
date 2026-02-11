@@ -89,36 +89,39 @@
         </template>
 
         <template x-if="!loading && todaySessions.length > 0">
-            <div class="space-y-4">
-                <template x-for="(session, index) in todaySessions" :key="session.id">
-                    <div class="flex items-center justify-between p-5 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-100 hover:shadow-lg transition-all duration-300">
-                        <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <circle cx="12" cy="12" r="6"/>
-                                    <circle cx="12" cy="12" r="2"/>
-                                </svg>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-slate-800 text-lg" x-text="session.session_time?.session_name || 'Training Session'"></h4>
-                                <p class="text-slate-600 text-sm">
-                                    <span x-text="session.session_time?.start_time || '00:00'"></span> - 
-                                    <span x-text="session.session_time?.end_time || '00:00'"></span>
-                                </p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-slate-600 text-sm mb-1">Kapasitas</p>
-                            <p class="font-bold text-slate-800 text-lg">
-                                <span class="text-blue-600" x-text="session.total_bookings || 0"></span> / 
-                                <span x-text="session.capacity || 0"></span>
-                            </p>
-                        </div>
+    <div class="space-y-4">
+        <template x-for="(session, index) in todaySessions" :key="session.id">
+            <div class="flex items-center justify-between p-5 bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl border border-slate-100 hover:shadow-lg transition-all duration-300">
+                <div>
+                    <h4 class="font-bold text-slate-800 text-lg" x-text="session.session_time?.session_name || 'Training Session'"></h4>
+                    <p class="text-slate-600 text-sm">
+                        <span x-text="session.session_time?.start_time || '00:00'"></span> - 
+                        <span x-text="session.session_time?.end_time || '00:00'"></span>
+                    </p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div>
+                        <p class="text-slate-600 text-sm mb-1">Kapasitas</p>
+                        <p class="font-bold text-slate-800 text-lg">
+                            <span class="text-blue-600" x-text="session.total_bookings || 0"></span> / 
+                            <span x-text="session.capacity || 0"></span>
+                        </p>
                     </div>
-                </template>
+                    <!-- Button to View Members -->
+                    <button @click="viewSlotMembers(session)" 
+                            class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 transition-all duration-200 hover:shadow-lg"
+                            title="Lihat daftar member">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </template>
+    </div>
+</template>
+
+
 
         <template x-if="error">
             <div class="text-center py-12">
@@ -128,6 +131,82 @@
                 <p class="text-red-500" x-text="error"></p>
             </div>
         </template>
+    </div>
+
+    <!-- Members List Modal -->
+    <div id="membersListModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" @click="closeMembersModal()"></div>
+            
+            <!-- Modal panel -->
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                <div class="bg-white px-6 pt-6 pb-4">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-1" x-text="selectedSlot?.session_time?.session_name || 'Session'"></h3>
+                            <p class="text-sm text-gray-600">
+                                <span x-text="selectedSlot?.session_time?.start_time"></span> - 
+                                <span x-text="selectedSlot?.session_time?.end_time"></span>
+                            </p>
+                        </div>
+                        <button @click="closeMembersModal()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-5">
+                        <template x-if="loadingMembers">
+                            <div class="text-center py-8">
+                                <div class="inline-block w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                                <p class="text-slate-500 mt-2">Loading members...</p>
+                            </div>
+                        </template>
+
+                        <template x-if="!loadingMembers && slotMembers.length === 0">
+                            <div class="text-center py-8">
+                                <svg class="w-16 h-16 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <p class="text-slate-600 font-medium">Belum ada member yang booking</p>
+                            </div>
+                        </template>
+
+                        <template x-if="!loadingMembers && slotMembers.length > 0">
+                            <div class="max-h-96 overflow-y-auto">
+                                <div class="space-y-2">
+                                    <template x-for="(member, idx) in slotMembers" :key="member.id">
+                                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                                                    <span x-text="(idx + 1)"></span>
+                                                </div>
+                                                <div>
+                                                    <p class="font-semibold text-slate-900" x-text="member.member_name || 'Unknown'"></p>
+                                                    <p class="text-xs text-slate-500" x-text="'Member ID: ' + (member.member_id || '-')"></p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
+                                                    Booked
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-6 py-4">
+                    <button @click="closeMembersModal()" class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
@@ -145,6 +224,9 @@
                 total_sessions: 0
             },
             todaySessions: [],
+            selectedSlot: null,
+            slotMembers: [],
+            loadingMembers: false,
 
             async loadData() {
                 this.loading = true;
@@ -165,6 +247,35 @@
                 } finally {
                     this.loading = false;
                 }
+            },
+
+            async viewSlotMembers(session) {
+                this.selectedSlot = session;
+                this.slotMembers = [];
+                this.loadingMembers = true;
+                
+                document.getElementById('membersListModal').classList.remove('hidden');
+
+                try {
+                    // Get training session ID - bisa dari training_session_id atau parent session
+                    const sessionId = session.training_session_id || session.session_id;
+                    const slotId = session.slot_id || session.id;
+                    
+                    const response = await API.get(`/coach/training-sessions/${sessionId}/bookings?slot_id=${slotId}`);
+                    this.slotMembers = response?.bookings || [];
+                } catch (err) {
+                    console.error('Failed to load members:', err);
+                    showToast(err?.message || 'Failed to load members', 'error');
+                    this.slotMembers = [];
+                } finally {
+                    this.loadingMembers = false;
+                }
+            },
+
+            closeMembersModal() {
+                document.getElementById('membersListModal').classList.add('hidden');
+                this.selectedSlot = null;
+                this.slotMembers = [];
             }
         }
     }
