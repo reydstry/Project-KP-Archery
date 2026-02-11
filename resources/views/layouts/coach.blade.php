@@ -74,7 +74,7 @@
 
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside class="fixed left-0 top-0 h-screen w-72 sm:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-950 border-r border-slate-700/50 z-50 transition-transform duration-300 overflow-y-auto shadow-2xl"
+        <aside class="fixed left-0 top-0 h-screen w-68 sm:w-64 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-950 border-r border-slate-700/50 z-50 transition-transform duration-300 overflow-y-auto shadow-2xl"
                :class="sidebarOpen || !isMobile ? 'translate-x-0' : '-translate-x-full'"
                x-show="sidebarOpen || !isMobile"
                x-transition:enter="transition ease-out duration-300"
@@ -87,7 +87,7 @@
             <!-- Logo -->
             <div class="p-5 sm:p-6 border-b border-slate-700/50 sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10">
                 <div class="flex items-center justify-between gap-3">
-                    <img src="{{ asset('asset/img/logodasboard.png') }}" alt="FocusOneX Archery" class="h-16 sm:h-20 w-auto">
+                    <img src="{{ asset('asset/img/logowhite.png') }}" alt="FocusOneX Archery" class="h-7 sm:h-10 w-auto">
                     <button @click="sidebarOpen = false" class="lg:hidden text-slate-400 hover:text-white transition">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
