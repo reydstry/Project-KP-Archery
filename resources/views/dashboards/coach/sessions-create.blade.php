@@ -23,7 +23,7 @@
         </div>
 
         <div class="overflow-x-auto -mx-2 sm:mx-0">
-            <table class="w-full min-w-[480px]">
+            <table class="w-full text-xs sm:text-sm">
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-200">
                         <th class="px-2 sm:px-3 py-2 sm:py-2.5 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Use</th>

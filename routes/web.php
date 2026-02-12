@@ -9,8 +9,12 @@ use App\Http\Controllers\Auth\WebSetPasswordController;
 use App\Http\Controllers\Auth\GoogleRedirectController;
 use App\Http\Controllers\Auth\GoogleCallbackController;
 use App\Http\Controllers\WebDashboardController;
+use App\Http\Controllers\LanguageController;
 use App\Models\SessionTime;
 use Illuminate\Support\Facades\Route;
+
+// Language switching
+Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 
 Route::get('/', function () {
     return view('pages.beranda');

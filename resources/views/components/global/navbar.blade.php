@@ -9,11 +9,11 @@
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="{{ route('beranda') }}" class="nav-link">Beranda</a>
-                <a href="{{ route('tentang-kami') }}" class="nav-link">Tentang Kami</a>
-                <a href="{{ route('program') }}" class="nav-link">Program</a>
-                <a href="{{ route('galeri') }}" class="nav-link">Galeri</a>
-                <a href="{{ route('kontak') }}" class="nav-link">Kontak</a>
+                <a href="{{ route('beranda') }}" class="nav-link">{{ __('nav.home') }}</a>
+                <a href="{{ route('tentang-kami') }}" class="nav-link">{{ __('nav.about') }}</a>
+                <a href="{{ route('program') }}" class="nav-link">{{ __('nav.program') }}</a>
+                <a href="{{ route('galeri') }}" class="nav-link">{{ __('nav.gallery') }}</a>
+                <a href="{{ route('kontak') }}" class="nav-link">{{ __('nav.contact') }}</a>
             </div>
 
             <!-- Right Desktop -->
@@ -23,7 +23,7 @@
                 <div class="relative">
                     <button id="lang-toggle"
                         class="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition">
-                        <span>ID</span>
+                        <span>{{ strtoupper(app()->getLocale()) }}</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M19 9l-7 7-7-7"/>
@@ -32,8 +32,8 @@
 
                     <div id="lang-menu"
                         class="hidden absolute right-0 mt-2 w-24 bg-white shadow-lg rounded-md">
-                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">ID</a>
-                        <a href="#" class="block px-4 py-2 hover:bg-gray-100">EN</a>
+                        <a href="{{ route('language.switch', 'id') }}" class="block px-4 py-2 hover:bg-gray-100 {{ app()->getLocale() == 'id' ? 'bg-gray-100 font-semibold' : '' }}">ID</a>
+                        <a href="{{ route('language.switch', 'en') }}" class="block px-4 py-2 hover:bg-gray-100 {{ app()->getLocale() == 'en' ? 'bg-gray-100 font-semibold' : '' }}">EN</a>
                     </div>
                 </div>
 
@@ -45,7 +45,7 @@
                             d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
                             clip-rule="evenodd"/>
                     </svg>
-                    Login
+                    {{ __('nav.login') }}
                 </a>
             </div>
 
@@ -75,23 +75,23 @@
     </div>
 
     <nav class="flex flex-col gap-6 text-lg font-medium">
-        <a href="{{ route('beranda') }}" class="text-gray-700 hover:text-gray-900">Beranda</a>
-        <a href="{{ route('tentang-kami') }}" class="text-gray-700 hover:text-gray-900">Tentang Kami</a>
-        <a href="{{ route('program') }}" class="text-gray-700 hover:text-gray-900">Program</a>
-        <a href="{{ route('galeri') }}" class="text-gray-700 hover:text-gray-900">Galeri</a>
-        <a href="{{ route('kontak') }}" class="text-gray-700 hover:text-gray-900">Kontak</a>
+        <a href="{{ route('beranda') }}" class="text-gray-700 hover:text-gray-900">{{ __('nav.home') }}</a>
+        <a href="{{ route('tentang-kami') }}" class="text-gray-700 hover:text-gray-900">{{ __('nav.about') }}</a>
+        <a href="{{ route('program') }}" class="text-gray-700 hover:text-gray-900">{{ __('nav.program') }}</a>
+        <a href="{{ route('galeri') }}" class="text-gray-700 hover:text-gray-900">{{ __('nav.gallery') }}</a>
+        <a href="{{ route('kontak') }}" class="text-gray-700 hover:text-gray-900">{{ __('nav.contact') }}</a>
     </nav>
 
     <div class="mt-10 flex flex-col gap-4">
         
         <a href="/login"
             class="w-full text-center py-3 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition">
-            Login
+            {{ __('nav.login') }}
         </a>
 
         <div class="flex justify-center gap-3">
-            <button class="px-4 py-2 bg-gray-800 text-white rounded-md">ID</button>
-            <button class="px-4 py-2 bg-gray-100 rounded-md">EN</button>
+            <a href="{{ route('language.switch', 'id') }}" class="px-4 py-2 rounded-md {{ app()->getLocale() == 'id' ? 'bg-gray-800 text-white' : 'bg-gray-100' }}">ID</a>
+            <a href="{{ route('language.switch', 'en') }}" class="px-4 py-2 rounded-md {{ app()->getLocale() == 'en' ? 'bg-gray-800 text-white' : 'bg-gray-100' }}">EN</a>
         </div>
     </div>
 </div>

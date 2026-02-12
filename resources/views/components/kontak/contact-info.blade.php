@@ -1,5 +1,5 @@
 <div class="bg-white rounded-2xl shadow-lg p-8">
-    <h3 class="text-2xl font-bold text-gray-800 mb-6">Informasi Kontak</h3>
+    <h3 class="text-2xl font-bold text-gray-800 mb-6">{{ __('contact.contact_info') }}</h3>
     
     <!-- Alamat -->
     <div class="flex items-start mb-6">
@@ -10,9 +10,9 @@
             </svg>
         </div>
         <div>
-            <h4 class="font-semibold text-gray-800 mb-1">Alamat</h4>
-            <p class="text-gray-600">Gn. Bahagia, Kecamatan Balikpapan Selatan</p>
-            <p class="text-gray-600">Kota Balikpapan, Kalimantan Timur 76114</p>
+            <h4 class="font-semibold text-gray-800 mb-1">{{ __('contact.address') }}</h4>
+            <p class="text-gray-600">{{ __('contact.address_line_1') }}</p>
+            <p class="text-gray-600">   {{ __('contact.address_line_2') }}</p>
         </div>
     </div>
 
@@ -24,7 +24,7 @@
             </svg>
         </div>
         <div>
-            <h4 class="font-semibold text-gray-800 mb-1">Telepon</h4>
+            <h4 class="font-semibold text-gray-800 mb-1">{{ __('contact.phone') }}</h4>
             <p class="text-gray-600">0819-5259-8200</p>
         </div>
     </div>
@@ -37,7 +37,7 @@
             </svg>
         </div>
         <div>
-            <h4 class="font-semibold text-gray-800 mb-1">Email</h4>
+            <h4 class="font-semibold text-gray-800 mb-1">{{ __('contact.email') }}</h4>
             <p class="text-gray-600">focusonexarchery@gmail.com</p>
         </div>
     </div>
@@ -50,15 +50,15 @@
             </svg>
         </div>
         <div>
-            <h4 class="font-semibold text-gray-800 mb-1">Jam Operasional</h4>
-            <p class="text-gray-600">Senin - Jumat: 08:00 - 21:00</p>
-            <p class="text-gray-600">Sabtu - Minggu: 07:00 - 20:00</p>
+            <h4 class="font-semibold text-gray-800 mb-1">{{ __('contact.operating_hours') }}</h4>
+            <p class="text-gray-600">{{ __('contact.monday_friday') }}: 08:00 - 21:00</p>
+            <p class="text-gray-600">{{ __('contact.saturday_sunday') }}: 07:00 - 20:00</p>
         </div>
     </div>
 
     <!-- Social Media -->
     <div>
-        <h4 class="font-semibold text-gray-800 mb-3">Ikuti Kami</h4>
+        <h4 class="font-semibold text-gray-800 mb-3">{{ app()->getLocale() == 'id' ? 'Ikuti Kami' : 'Follow Us' }}</h4>
         <div class="flex space-x-3">
             <a href="#" class="bg-gray-100 hover:bg-orange-500 hover:text-white transition-colors duration-300 rounded-full p-3">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
