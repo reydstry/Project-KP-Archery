@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminTestDataSeeder::class,
             CoachTestDataSeeder::class,
+            MemberDashboardTestSeeder::class,
         ]);
 
         $this->command->info('');
@@ -20,6 +21,6 @@ class DatabaseSeeder extends Seeder
         $this->command->info('📧 Login Credentials:');
         $this->command->info('📧 Admin: admin@clubpanahan.com / admin123');
         $this->command->info('📧 Coach: budi.coach@clubpanahan.com / coach123');
-        $this->command->info('📧 Member: rudi@example.com / member123');
+        $this->command->info('📧 Member Dashboard Test: memberdashboard@test.com / password123');
     }
 }

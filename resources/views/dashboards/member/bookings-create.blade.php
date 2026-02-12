@@ -1,14 +1,14 @@
-@extends('dashboards.member._layout')
+@extends('layouts.member')
 
 @section('title', 'Booking Sesi Baru')
 @section('subtitle', 'Pilih jadwal dan coach untuk sesi latihan')
 
 @section('content')
 <div x-data="bookingCreateData()" x-init="init()">
-    
+
     <!-- Back Button -->
     <div class="mb-6">
-        <a href="{{ route('member.bookings') }}" 
+        <a href="{{ route('member.bookings') }}"
            class="inline-flex items-center gap-2 text-slate-600 hover:text-slate-800 font-semibold transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
             Kembali
@@ -22,10 +22,10 @@
 
     <!-- Main Content -->
     <div x-show="!loading" x-cloak class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         <!-- Booking Form -->
         <div class="lg:col-span-2 space-y-6">
-            
+
             <!-- Step 1: Select Active Package -->
             <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
                 <div class="flex items-center gap-3 mb-4">
@@ -46,8 +46,8 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex-1">
                                     <div class="flex items-center gap-3 mb-2">
-                                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold"
-                                             x-text="pkg.member?.name.charAt(0).toUpperCase()">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
                                         </div>
                                         <div>
                                             <p class="font-semibold text-slate-800" x-text="pkg.package?.name"></p>
@@ -95,38 +95,54 @@
 
                 <div x-show="selectedPackage && sessions.length > 0" class="space-y-3">
                     <template x-for="session in sessions" :key="session.id">
-                        <div @click="selectSession(session)"
-                             class="p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md"
-                             :class="selectedSession?.id === session.id ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-green-300'">
-                            <div class="flex items-center justify-between">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-3 mb-2">
-                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold text-slate-800" x-text="formatDate(session.session_date)"></p>
-                                            <p class="text-sm text-slate-600 flex items-center gap-1">
-                                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                <span x-text="session.session_time"></span>
-                                            </p>
-                                        </div>
+                        <div class="p-4 border-2 rounded-xl transition-all"
+                             :class="selectedSession?.id === session.id ? 'border-green-500 bg-green-50' : 'border-slate-200'">
+                            <div class="flex items-start justify-between mb-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
                                     </div>
-                                    <div class="flex items-center gap-4 text-sm">
-                                        <div class="flex items-center gap-2 text-slate-600">
-                                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-                                            <span x-text="session.coach_name"></span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">
-                                                <span x-text="session.current_participants"></span>/<span x-text="session.max_participants"></span> peserta
-                                            </span>
-                                        </div>
+                                    <div>
+                                        <p class="font-bold text-slate-800" x-text="session.date_formatted"></p>
+                                        <p class="text-sm text-slate-600 flex items-center gap-1 mt-1">
+                                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                                            <span x-text="session.coach?.name || 'Coach'"></span>
+                                        </p>
                                     </div>
                                 </div>
-                                <div x-show="selectedSession?.id === session.id" class="text-green-600">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                </div>
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded-md text-xs font-medium">
+                                    Open
+                                </span>
+                            </div>
+
+                            <!-- Time Slots -->
+                            <div class="space-y-2 mt-3">
+                                <p class="text-xs font-semibold text-slate-600 mb-2">Pilih Waktu:</p>
+                                <template x-for="slot in session.slots" :key="slot.id">
+                                    <div @click="selectSession(session); selectSlot(slot)"
+                                         class="p-3 border-2 rounded-lg cursor-pointer transition-all hover:shadow-sm"
+                                         :class="{
+                                             'border-green-500 bg-green-50': selectedSlot?.id === slot.id,
+                                             'border-slate-200 hover:border-green-300': selectedSlot?.id !== slot.id && !slot.is_full,
+                                             'border-slate-100 bg-slate-50 cursor-not-allowed opacity-50': slot.is_full
+                                         }">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                <span class="font-semibold text-slate-700" x-text="formatTime(slot.session_time?.start_time) + ' - ' + formatTime(slot.session_time?.end_time)"></span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs px-2 py-1 rounded-md"
+                                                      :class="slot.is_full ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'">
+                                                    <span x-text="slot.available_slots"></span> slot tersisa
+                                                </span>
+                                                <div x-show="selectedSlot?.id === slot.id" class="text-green-600">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </template>
@@ -168,17 +184,18 @@
                     <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4">
                         <p class="text-xs text-slate-300 mb-2">Jadwal Sesi</p>
                         <div x-show="selectedSession">
-                            <p class="font-semibold mb-1" x-text="formatDate(selectedSession?.session_date)"></p>
-                            <div class="flex items-center gap-4 text-sm">
-                                <div class="flex items-center gap-1.5 text-slate-300">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    <span x-text="selectedSession?.session_time"></span>
-                                </div>
+                            <p class="font-semibold mb-1" x-text="selectedSession?.date_formatted"></p>
+                            <div x-show="selectedSlot" class="flex items-center gap-1.5 text-sm text-slate-300 mt-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span x-text="formatTime(selectedSlot?.session_time?.start_time) + ' - ' + formatTime(selectedSlot?.session_time?.end_time)"></span>
                             </div>
                             <div class="mt-3 pt-3 border-t border-white/20">
                                 <div class="flex items-center gap-2 text-sm">
                                     <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
-                                    <span x-text="selectedSession?.coach_name"></span>
+                                    <span x-text="selectedSession?.coach?.name || 'Coach'"></span>
+                                </div>
+                                <div x-show="selectedSlot" class="text-xs text-slate-300 mt-2">
+                                    <span x-text="selectedSlot?.available_slots"></span> slot tersisa
                                 </div>
                             </div>
                         </div>
@@ -193,11 +210,14 @@
                         <span x-show="submitting">Memproses...</span>
                     </button>
 
-                    <p x-show=paketubmit" class="text-xs text-slate-300 text-center">
-                        Pilih member dan sesi terlebih dahulu
+                    <p x-show="!canSubmit" class="text-xs text-slate-300 text-center">
+                        Pilih paket, sesi, dan waktu terlebih dahulu
                     </p>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 </div>
@@ -206,96 +226,87 @@
 <script>
 function bookingCreateData() {
     return {
+        loading: true,
         activePackages: [],
         sessions: [],
         selectedPackage: null,
         selectedSession: null,
+        selectedSlot: null,
         submitting: false,
-        
+
         get canSubmit() {
-            return this.selectedPackage
-            return this.selectedMember && this.selectedSession;
+            return this.selectedPackage && this.selectedSession && this.selectedSlot && !this.submitting;
         },
-        
+
         async init() {
-            await Promise.ActivePackages(),
-                this.fetchSessions()
-            ]);
+            await this.fetchAvailableSessions();
             this.loading = false;
         },
-        
-        async fetchActivePackages() {
+
+        async fetchAvailableSessions() {
             try {
-                const response = await API.get('/member/dashboard');
-                // Get active package from dashboard
-                if (response.quota) {
-                    // Create mock package structure for selection
-                    this.activePackages = [{
-                        id: 1, // This will be fetched from real API later
-                        member: { name: response.member.name },
-                        package: { name: response.quota.package_name },
-                        total_sessions: response.quota.total_sessions,
-                        used_sessions: response.quota.used_sessions,
-                // TODO: Member needs endpoint to browse available training sessions
-                // For now using mock data
-                this.sessions = [];
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Gagal memuat data sesi', 'error');
-            }
-        },
-        
-        selectPackage(pkg) {
-            this.selectedPackage = pkg
-        async fetchSessions() {
-            try {
-                const data = await API.get('/member/training-sessions');
+                const data = await API.get('/member/bookings/available');
+                this.activePackages = data.active_packages || [];
                 this.sessions = data.sessions || [];
             } catch (error) {
                 console.error('Error:', error);
                 showToast('Gagal memuat data sesi', 'error');
             }
         },
-        
-        selectMember(member) {
-            this.selectedMember = member;Package
+
+        selectPackage(pkg) {
+            this.selectedPackage = pkg;
         },
-        
+
         selectSession(session) {
             this.selectedSession = session;
+            this.selectedSlot = null; // Reset slot selection
         },
-        
+
+        selectSlot(slot) {
+            if (slot.is_full) {
+                showToast('Slot ini sudah penuh', 'error');
+                return;
+            }
+            this.selectedSlot = slot;
+        },
+
         async submitBooking() {
             if (!this.canSubmit) return;
-            
+
             this.submitting = true;
             try {
                 await API.post('/member/bookings', {
-                    member_package_id: this.selectedMember.id,
-                    training_session_id: this.selectedSession.id
+                    member_package_id: this.selectedPackage.id,
+                    training_session_slot_id: this.selectedSlot.id
                 });
-                
+
                 showToast('Booking berhasil dibuat!', 'success');
-                
+
                 setTimeout(() => {
                     window.location.href = '{{ route("member.bookings") }}';
                 }, 1500);
             } catch (error) {
                 console.error('Error:', error);
                 showToast(error.message || 'Gagal membuat booking', 'error');
-               this.submitting = false;
+                this.submitting = false;
             }
         },
-        
+
         formatDate(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', { 
+            return date.toLocaleDateString('id-ID', {
                 weekday: 'long',
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
+        },
+
+        formatTime(time) {
+            if (!time) return '-';
+            return time.substring(0, 5); // HH:MM
         }
     }
 }

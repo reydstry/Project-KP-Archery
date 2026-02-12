@@ -1,11 +1,11 @@
-@extends('dashboards.member._layout')
+@extends('layouts.member')
 
 @section('title', 'Profil Saya')
 @section('subtitle', 'Kelola informasi profil dan akun Anda')
 
 @section('content')
-<div x-data="profileData()" x-init="fetchProfile()">
-    
+<div x-data="profileData()" x-init="init(); fetchProfile();">
+
     <!-- Loading State -->
     <div x-show="loading" class="flex justify-center items-center h-64">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -13,20 +13,10 @@
 
     <!-- Profile Content -->
     <div x-show="!loading" x-cloak class="space-y-6">
-        
+
         <!-- Profile Header Card -->
         <div class="card-animate bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 rounded-2xl shadow-lg p-8 text-white">
             <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
-                <!-- Avatar -->
-                <div class="relative">
-                    <div class="w-32 h-32 bg-gradient-to-br from-white/30 to-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center border-4 border-white/30">
-                        <span class="text-5xl font-bold" x-text="profile.name?.charAt(0).toUpperCase()"></span>
-                    </div>
-                    <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center border-4 border-blue-600">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                </div>
-
                 <!-- User Info -->
                 <div class="flex-1 text-center md:text-left">
                     <h2 class="text-3xl font-bold mb-2" x-text="profile.name"></h2>
@@ -50,18 +40,11 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Edit Toggle Button -->
-                <button @click="editMode = !editMode"
-                        class="px-6 py-3 bg-white text-blue-600 rounded-xl font-semibold hover:shadow-xl transition-all inline-flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
-                    <span x-text="editMode ? 'Batal' : 'Edit Profil'"></span>
-                </button>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
+
             <!-- Profile Form -->
             <div class="lg:col-span-2">
                 <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm p-6" style="animation-delay: 0.1s">
@@ -157,7 +140,7 @@
 
             <!-- Quick Stats Sidebar -->
             <div class="lg:col-span-1 space-y-6">
-                
+
                 <!-- Activity Stats -->
                 <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm p-6" style="animation-delay: 0.1s">
                     <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
@@ -182,7 +165,7 @@
                                 <span class="text-2xl font-bold text-green-600" x-text="stats.total_attended || 0"></span>
                             </div>
                             <div class="w-full bg-slate-200 rounded-full h-2">
-                                <div class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full" 
+                                <div class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full"
                                      :style="`width: ${stats.total_bookings ? (stats.total_attended / stats.total_bookings * 100) : 0}%`"></div>
                             </div>
                         </div>
@@ -193,7 +176,7 @@
                                 <span class="text-2xl font-bold text-amber-600" x-text="stats.total_achievements || 0"></span>
                             </div>
                             <div class="w-full bg-slate-200 rounded-full h-2">
-                                <div class="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full" 
+                                <div class="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full"
                                      :style="`width: ${Math.min(stats.total_achievements * 10, 100)}%`"></div>
                             </div>
                         </div>
@@ -255,7 +238,25 @@ function profileData() {
             new_password: '',
             new_password_confirmation: ''
         },
-        
+
+        init() {
+            // Listen to toggle event from header button
+            window.addEventListener('toggle-edit-mode', () => {
+                this.editMode = !this.editMode;
+                // Notify header button about the change
+                window.dispatchEvent(new CustomEvent('edit-mode-changed', {
+                    detail: { editMode: this.editMode }
+                }));
+            });
+
+            // Watch editMode changes
+            this.$watch('editMode', (value) => {
+                window.dispatchEvent(new CustomEvent('edit-mode-changed', {
+                    detail: { editMode: value }
+                }));
+            });
+        },
+
         async fetchProfile() {
             this.loading = true;
             try {
@@ -267,13 +268,13 @@ function profileData() {
                     address: 'Jl. Contoh No. 123, Jakarta',
                     created_at: '{{ auth()->user()->created_at }}'
                 };
-                
+
                 this.stats = {
                     total_bookings: 25,
                     total_attended: 20,
                     total_achievements: 5
                 };
-                
+
                 this.resetForm();
             } catch (error) {
                 console.error('Error:', error);
@@ -282,17 +283,17 @@ function profileData() {
                 this.loading = false;
             }
         },
-        
+
         resetForm() {
             this.form = { ...this.profile };
         },
-        
+
         async saveProfile() {
             this.submitting = true;
             try {
                 // Replace with actual API call
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                
+
                 this.profile = { ...this.form };
                 this.editMode = false;
                 showToast('Profil berhasil diperbarui', 'success');
@@ -303,18 +304,18 @@ function profileData() {
                 this.submitting = false;
             }
         },
-        
+
         async changePassword() {
             if (this.passwordForm.new_password !== this.passwordForm.new_password_confirmation) {
                 showToast('Konfirmasi password tidak cocok', 'error');
                 return;
             }
-            
+
             this.passwordSubmitting = true;
             try {
                 // Replace with actual API call
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                
+
                 this.passwordForm = {
                     current_password: '',
                     new_password: '',
@@ -328,18 +329,19 @@ function profileData() {
                 this.passwordSubmitting = false;
             }
         },
-        
+
         formatDate(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+            return date.toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
         }
     }
 }
 </script>
 @endpush
+
 @endsection

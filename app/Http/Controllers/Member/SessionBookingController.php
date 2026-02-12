@@ -14,22 +14,99 @@ use Illuminate\Support\Facades\DB;
 class SessionBookingController extends Controller
 {
     /**
-     * Display a listing of member's bookings
+     * Get available training sessions for booking
      */
-    public function index(Request $request)
+    public function availableSessions(Request $request)
     {
-        $member = Member::where('user_id', auth()->id())
-            ->where('is_self', true)
-            ->first();
-        
-        if (!$member) {
+        $memberIds = Member::where('user_id', auth()->id())->pluck('id');
+
+        if ($memberIds->isEmpty()) {
             return response()->json([
                 'message' => 'Member profile not found',
             ], 404);
         }
 
-        // Get all member packages for this member
-        $memberPackageIds = MemberPackage::where('member_id', $member->id)->pluck('id');
+        // Get active member packages with remaining quota
+        $activePackages = MemberPackage::with(['member', 'package'])
+            ->whereIn('member_id', $memberIds)
+            ->active()
+            ->get()
+            ->filter(function ($pkg) {
+                return ($pkg->total_sessions - $pkg->used_sessions) > 0;
+            })
+            ->values()
+            ->map(function ($pkg) {
+                return [
+                    'id' => $pkg->id,
+                    'member' => $pkg->member,
+                    'package' => $pkg->package,
+                    'total_sessions' => $pkg->total_sessions,
+                    'used_sessions' => $pkg->used_sessions,
+                    'remaining_sessions' => $pkg->total_sessions - $pkg->used_sessions,
+                    'start_date' => $pkg->start_date->format('Y-m-d'),
+                    'end_date' => $pkg->end_date->format('Y-m-d'),
+                ];
+            });
+
+        // Get available sessions (OPEN status, today or future)
+        $sessions = TrainingSession::with([
+            'coach:id,name',
+            'slots.sessionTime:id,name,start_time,end_time'
+        ])
+            ->where('status', 'open')
+            ->where('date', '>=', now()->startOfDay())
+            ->orderBy('date', 'asc')
+            ->get()
+            ->filter(fn ($session) => $session->isBookableAt(now()))
+            ->values()
+            ->map(function ($session) {
+                $slots = $session->slots->map(function ($slot) {
+                    $currentBookings = SessionBooking::where('training_session_slot_id', $slot->id)
+                        ->where('status', 'confirmed')
+                        ->count();
+
+                    return [
+                        'id' => $slot->id,
+                        'session_time_id' => $slot->session_time_id,
+                        'session_time' => $slot->sessionTime,
+                        'max_participants' => $slot->max_participants,
+                        'current_bookings' => $currentBookings,
+                        'available_slots' => $slot->max_participants - $currentBookings,
+                        'is_full' => $currentBookings >= $slot->max_participants,
+                    ];
+                });
+
+                return [
+                    'id' => $session->id,
+                    'date' => $session->date->format('Y-m-d'),
+                    'date_formatted' => $session->date->locale('id')->isoFormat('dddd, D MMMM YYYY'),
+                    'coach' => $session->coach,
+                    'status' => $session->status->value,
+                    'slots' => $slots,
+                ];
+            });
+
+        return response()->json([
+            'active_packages' => $activePackages,
+            'sessions' => $sessions,
+        ]);
+    }
+
+    /**
+     * Display a listing of member's bookings
+     */
+    public function index(Request $request)
+    {
+        $memberIds = Member::where('user_id', auth()->id())->pluck('id');
+
+        if ($memberIds->isEmpty()) {
+            return response()->json([
+                'message' => 'Member profile not found',
+            ], 404);
+        }
+
+        // Get all member packages for all members under this account
+        $memberPackageIds = MemberPackage::whereIn('member_id', $memberIds)->pluck('id');
 
         $query = SessionBooking::with([
             'memberPackage.member',
@@ -61,20 +138,17 @@ class SessionBookingController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        // Get member
-        $member = Member::where('user_id', auth()->id())
-            ->where('is_self', true)
-            ->first();
-        
-        if (!$member) {
+        $memberIds = Member::where('user_id', auth()->id())->pluck('id');
+
+        if ($memberIds->isEmpty()) {
             return response()->json([
                 'message' => 'Member profile not found. Please register first.',
             ], 404);
         }
 
-        // Verify member package belongs to this member
+        // Verify member package belongs to this account (self or family)
         $memberPackage = MemberPackage::where('id', $validated['member_package_id'])
-            ->where('member_id', $member->id)
+            ->whereIn('member_id', $memberIds)
             ->first();
 
         if (!$memberPackage) {
@@ -209,12 +283,8 @@ class SessionBookingController extends Controller
      */
     public function show(SessionBooking $sessionBooking)
     {
-        // Verify booking belongs to the authenticated member
-        $member = Member::where('user_id', auth()->id())
-            ->where('is_self', true)
-            ->first();
-        
-        if (!$member || $sessionBooking->memberPackage->member_id !== $member->id) {
+        $member = $sessionBooking->memberPackage?->member;
+        if (!$member || (int) $member->user_id !== (int) auth()->id()) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);
@@ -232,12 +302,8 @@ class SessionBookingController extends Controller
      */
     public function cancel(SessionBooking $sessionBooking)
     {
-        // Verify booking belongs to the authenticated member
-        $member = Member::where('user_id', auth()->id())
-            ->where('is_self', true)
-            ->first();
-        
-        if (!$member || $sessionBooking->memberPackage->member_id !== $member->id) {
+        $member = $sessionBooking->memberPackage?->member;
+        if (!$member || (int) $member->user_id !== (int) auth()->id()) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);

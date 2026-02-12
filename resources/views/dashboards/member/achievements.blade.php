@@ -1,11 +1,11 @@
-@extends('dashboards.member._layout')
+@extends('layouts.member')
 
 @section('title', 'Prestasi Saya')
 @section('subtitle', 'Koleksi pencapaian dan penghargaan Anda')
 
 @section('content')
 <div x-data="achievementsData()" x-init="fetchAchievements()">
-    
+
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
@@ -96,7 +96,7 @@
             <div @click="openModal(achievement)"
                  class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl transition-all cursor-pointer group overflow-hidden"
                  :style="`animation-delay: ${(index % 9) * 0.05}s`">
-                
+
                 <!-- Achievement Header -->
                 <div class="p-6 bg-gradient-to-br from-amber-50 via-amber-100 to-orange-100 border-b border-amber-200 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-300/30 to-orange-300/30 rounded-full -mr-16 -mt-16"></div>
@@ -117,9 +117,9 @@
                     <h4 class="font-bold text-slate-800 text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition"
                         x-text="achievement.title">
                     </h4>
-                    
+
                     <p class="text-slate-600 text-sm mb-4 line-clamp-3" x-text="achievement.description"></p>
-                    
+
                     <div class="flex items-center justify-between pt-4 border-t border-slate-200">
                         <div class="flex items-center gap-2 text-sm text-slate-500">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
@@ -146,7 +146,7 @@
     </div>
 
     <!-- Achievement Detail Modal -->
-    <div x-show="modalOpen" 
+    <div x-show="modalOpen"
          x-cloak
          @click.self="closeModal()"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
@@ -156,7 +156,7 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
-        
+
         <div @click.stop
              class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
              x-transition:enter="transition ease-out duration-300"
@@ -165,7 +165,7 @@
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-95">
-            
+
             <!-- Modal Header -->
             <div class="p-8 bg-gradient-to-br from-amber-50 via-amber-100 to-orange-100 border-b border-amber-200 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-300/30 to-orange-300/30 rounded-full -mr-32 -mt-32"></div>
@@ -174,7 +174,7 @@
                         <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-amber-500 rounded-2xl flex items-center justify-center shadow-xl">
                             <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>
                         </div>
-                        <button @click="closeModal()" 
+                        <button @click="closeModal()"
                                 class="w-10 h-10 bg-white/80 backdrop-blur-sm hover:bg-white rounded-xl flex items-center justify-center transition-all shadow-sm">
                             <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
@@ -239,21 +239,21 @@ function achievementsData() {
         availableYears: [],
         modalOpen: false,
         selectedAchievement: null,
-        
+
         get achievementsThisYear() {
             const currentYear = new Date().getFullYear();
             return this.achievements.filter(a => new Date(a.date).getFullYear() === currentYear).length;
         },
-        
+
         get uniqueCategories() {
             return new Set(this.achievements.map(a => a.category).filter(Boolean)).size;
         },
-        
+
         get latestYear() {
             if (this.achievements.length === 0) return new Date().getFullYear();
             return Math.max(...this.achievements.map(a => new Date(a.date).getFullYear()));
         },
-        
+
         async fetchAchievements() {
             this.loading = true;
             try {
@@ -268,12 +268,12 @@ function achievementsData() {
                 this.loading = false;
             }
         },
-        
+
         extractYears() {
             const years = [...new Set(this.achievements.map(a => new Date(a.date).getFullYear()))];
             this.availableYears = years.sort((a, b) => b - a);
         },
-        
+
         filterAchievements() {
             if (this.filterYear === null) {
                 this.filteredAchievements = [...this.achievements];
@@ -283,26 +283,26 @@ function achievementsData() {
                 );
             }
         },
-        
+
         openModal(achievement) {
             this.selectedAchievement = achievement;
             this.modalOpen = true;
             document.body.style.overflow = 'hidden';
         },
-        
+
         closeModal() {
             this.modalOpen = false;
             this.selectedAchievement = null;
             document.body.style.overflow = '';
         },
-        
+
         formatDate(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+            return date.toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
         }
     }

@@ -106,9 +106,6 @@
                         <!-- User Profile Desktop -->
                         <div x-data="{ profileOpen: false }" class="relative">
                         <button @click="profileOpen = !profileOpen" class="flex items-center gap-3 px-4 py-2 rounded-xl bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 transition-all shadow-sm border border-slate-200">
-                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
-                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                            </div>
                             <div class="text-left">
                                 <p class="text-slate-800 font-semibold text-sm leading-tight">{{ auth()->user()->name }}</p>
                                 <p class="text-slate-500 text-xs">Member</p>
@@ -133,13 +130,12 @@
                                 <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-slate-500 mt-0.5">{{ auth()->user()->email }}</p>
                             </div>
-                            @if(request()->routeIs('member.profile'))
-                            <button @click="$dispatch('toggle-edit-mode')" class="w-full px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition text-left">
-                                <span x-data="{ editMode: false }"
-                                      @edit-mode-changed.window="editMode = $event.detail.editMode"
-                                      x-text="editMode ? 'Batal' : 'Edit Profil'">Edit Profil</span>
-                            </button>
-                            @endif
+                            <a href="{{ route('member.profile') }}" class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                                Edit Profil
+                            </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition">

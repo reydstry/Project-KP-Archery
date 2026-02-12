@@ -41,22 +41,6 @@
                 <form id="profileForm" class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-8">
                     <h2 class="text-2xl font-bold text-slate-900 mb-6">Profile Information</h2>
 
-                    <!-- Profile Photo -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-semibold text-slate-700 mb-4">Profile Photo</label>
-                        <div class="flex items-center gap-6">
-                            <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
-                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                            </div>
-                            <div>
-                                <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 text-sm">
-                                    Change Photo
-                                </button>
-                                <p class="text-xs text-slate-500 mt-2">JPG, GIF or PNG. Max size 2MB</p>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                         <!-- Full Name -->

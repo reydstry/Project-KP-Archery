@@ -185,7 +185,7 @@ class MemberTestDataSeeder extends Seeder
 
         // 8. Create Training Sessions (Past, Today, Future)
         $this->command->info('📅 Creating Training Sessions...');
-        
+
         // Past sessions (for attendance history)
         for ($i = 10; $i >= 1; $i--) {
             $sessionTime = $createdSessionTimes[array_rand($createdSessionTimes)];
@@ -231,7 +231,7 @@ class MemberTestDataSeeder extends Seeder
 
         // 9. Create Session Bookings with Attendance
         $this->command->info('📝 Creating Session Bookings & Attendance...');
-        
+
         $pastSessions = TrainingSession::where('status', TrainingSessionStatus::STATUS_COMPLETED)
             ->orderBy('date', 'desc')
             ->limit(5)
