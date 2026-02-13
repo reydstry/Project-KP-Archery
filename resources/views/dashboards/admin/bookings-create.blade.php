@@ -147,9 +147,17 @@ function adminBookingPage() {
         },
 
         async loadSessions() {
+            if (this.loadingSessions) return; // Prevent multiple simultaneous loads
+            
             this.loadingSessions = true;
             try {
                 const res = await window.API.get('/admin/training-sessions?status=open&start_date=' + this.today());
+                
+                // Validate response
+                if (!res || typeof res !== 'object') {
+                    throw new Error('Invalid response from server');
+                }
+                
                 const sessions = Array.isArray(res?.data) ? res.data : [];
                 
                 // Get the latest session (first one)
@@ -160,9 +168,10 @@ function adminBookingPage() {
                     this.latestSession = null;
                     this.slots = [];
                 }
-            } catch (e) {
-                console.error(e);
-                window.showToast(e?.message || 'Gagal memuat training sessions', 'error');
+            } catch (error) {
+                console.error('Failed to load sessions:', error);
+                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal memuat training sessions';
+                window.showToast(errorMsg, 'error');
                 this.latestSession = null;
                 this.slots = [];
             } finally {
@@ -171,17 +180,28 @@ function adminBookingPage() {
         },
 
         async loadSlotsForLatestSession() {
-            if (!this.latestSession) return;
+            if (!this.latestSession || !this.latestSession.id) {
+                this.slots = [];
+                return;
+            }
+            
+            if (this.loadingSlots) return; // Prevent multiple simultaneous loads
 
             this.loadingSlots = true;
             try {
                 const session = await window.API.get(`/admin/training-sessions/${this.latestSession.id}`);
-                this.slots = session?.slots || [];
-                if (!Array.isArray(this.slots)) this.slots = [];
+                
+                // Validate response
+                if (!session || typeof session !== 'object') {
+                    throw new Error('Invalid response from server');
+                }
+                
+                this.slots = Array.isArray(session?.slots) ? session.slots : [];
                 this.slots.sort((a, b) => (a?.session_time?.start_time || '').localeCompare(b?.session_time?.start_time || ''));
-            } catch (e) {
-                console.error(e);
-                window.showToast(e?.message || 'Gagal memuat slot sesi', 'error');
+            } catch (error) {
+                console.error('Failed to load slots:', error);
+                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal memuat slot sesi';
+                window.showToast(errorMsg, 'error');
                 this.slots = [];
             } finally {
                 this.loadingSlots = false;
@@ -194,14 +214,23 @@ function adminBookingPage() {
         },
 
         async loadMembers() {
+            if (this.loadingMembers) return; // Prevent multiple simultaneous loads
+            
             this.loadingMembers = true;
             try {
                 const res = await window.API.get('/admin/booking-members');
+                
+                // Validate response
+                if (!res || typeof res !== 'object') {
+                    throw new Error('Invalid response from server');
+                }
+                
                 this.members = Array.isArray(res?.data) ? res.data : [];
                 this.filterMembers();
-            } catch (e) {
-                console.error(e);
-                window.showToast(e?.message || 'Gagal memuat members', 'error');
+            } catch (error) {
+                console.error('Failed to load members:', error);
+                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal memuat members';
+                window.showToast(errorMsg, 'error');
                 this.members = [];
                 this.filteredMembers = [];
             } finally {

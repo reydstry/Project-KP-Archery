@@ -259,12 +259,12 @@
                 </div>
             </div>
 
-            <div class="p-4 sm:p-6 lg:p-8">
+            <div class="p-3 sm:p-6 lg:p-8">
                 <div class="max-w-7xl mx-auto">
                     <!-- Page Header -->
-                    <div class="mb-6 sm:mb-8 bg-white border border-slate-200 rounded-2xl px-5 sm:px-6 py-4 shadow-sm">
-                        <h2 class="text-2xl sm:text-3xl font-bold text-[#1a307b]">@yield('title')</h2>
-                        <p class="text-slate-500 mt-1 text-sm sm:text-base">@yield('subtitle')</p>
+                    <div class="mb-3 sm:mb-6 bg-white border border-slate-200 rounded-2xl px-5 sm:px-6 py-4 shadow-sm">
+                        <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-[#1a307b]">@yield('title')</h2>
+                        <p class="text-slate-500 mt-0.5 text-xs sm:text-sm">@yield('subtitle')</p>
                     </div>
 
                     <!-- Content -->
@@ -402,6 +402,275 @@
                 window.showToast(@json(session('status')), 'success');
             @endif
         });
+    </script>
+
+    <!-- Admin Modal System -->
+    <script>
+        // Custom Modal System for Admin Panel
+        (function() {
+            'use strict';
+
+            // Create modal container on DOM load
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initModal);
+            } else {
+                initModal();
+            }
+
+            function initModal() {
+                // Add modal styles
+                const style = document.createElement('style');
+                style.textContent = `
+                    .admin-modal-overlay {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: rgba(0, 0, 0, 0.5);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 9999;
+                        padding: 1rem;
+                    }
+                    .admin-modal {
+                        background: white;
+                        border-radius: 0.5rem;
+                        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+                        max-width: 28rem;
+                        width: 100%;
+                        overflow: hidden;
+                    }
+                    .admin-modal-header {
+                        padding: 1rem 1.5rem;
+                        color: white;
+                        font-weight: 600;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    }
+                    .admin-modal-body {
+                        padding: 1.5rem;
+                        color: #374151;
+                        white-space: pre-line;
+                    }
+                    .admin-modal-footer {
+                        padding: 1rem 1.5rem;
+                        background-color: #f9fafb;
+                        display: flex;
+                        gap: 0.75rem;
+                        justify-content: flex-end;
+                    }
+                    .admin-modal-btn {
+                        padding: 0.5rem 1rem;
+                        border-radius: 0.375rem;
+                        font-weight: 500;
+                        cursor: pointer;
+                        border: none;
+                        transition: all 0.2s;
+                    }
+                    .admin-modal-btn-primary {
+                        background-color: #3b82f6;
+                        color: white;
+                    }
+                    .admin-modal-btn-primary:hover {
+                        background-color: #2563eb;
+                    }
+                    .admin-modal-btn-danger {
+                        background-color: #ef4444;
+                        color: white;
+                    }
+                    .admin-modal-btn-danger:hover {
+                        background-color: #dc2626;
+                    }
+                    .admin-modal-btn-warning {
+                        background-color: #f59e0b;
+                        color: white;
+                    }
+                    .admin-modal-btn-warning:hover {
+                        background-color: #d97706;
+                    }
+                    .admin-modal-btn-secondary {
+                        background-color: #e5e7eb;
+                        color: #374151;
+                    }
+                    .admin-modal-btn-secondary:hover {
+                        background-color: #d1d5db;
+                    }
+                    .admin-modal-overlay.fade-in {
+                        animation: fadeIn 0.2s ease-out;
+                    }
+                    .admin-modal.slide-up {
+                        animation: slideUp 0.3s ease-out;
+                    }
+                    @keyframes fadeIn {
+                        from { opacity: 0; }
+                        to { opacity: 1; }
+                    }
+                    @keyframes slideUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(1rem);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+
+            // Show confirmation modal
+            window.showConfirm = function(title, message, onConfirm, options = {}) {
+                const {
+                    confirmText = 'Confirm',
+                    cancelText = 'Cancel',
+                    type = 'info', // info, warning, danger
+                    icon = ''
+                } = options;
+
+                const overlay = document.createElement('div');
+                overlay.className = 'admin-modal-overlay fade-in';
+
+                const headerColors = {
+                    info: 'background-color: #3b82f6;',
+                    warning: 'background-color: #f59e0b;',
+                    danger: 'background-color: #ef4444;'
+                };
+
+                const buttonClass = {
+                    info: 'admin-modal-btn-primary',
+                    warning: 'admin-modal-btn-warning',
+                    danger: 'admin-modal-btn-danger'
+                };
+
+                overlay.innerHTML = `
+                    <div class="admin-modal slide-up">
+                        <div class="admin-modal-header" style="${headerColors[type]}">
+                            ${icon ? `<span style="font-size: 1.25rem;">${icon}</span>` : ''}
+                            <span>${title}</span>
+                        </div>
+                        <div class="admin-modal-body">${message}</div>
+                        <div class="admin-modal-footer">
+                            <button class="admin-modal-btn admin-modal-btn-secondary" data-action="cancel">
+                                ${cancelText}
+                            </button>
+                            <button class="admin-modal-btn ${buttonClass[type]}" data-action="confirm">
+                                ${confirmText}
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(overlay);
+                document.body.style.overflow = 'hidden';
+
+                const modal = overlay.querySelector('.admin-modal');
+                
+                const closeModal = () => {
+                    document.body.style.overflow = '';
+                    overlay.remove();
+                };
+
+                // Handle confirm
+                overlay.querySelector('[data-action="confirm"]').addEventListener('click', () => {
+                    closeModal();
+                    if (onConfirm) onConfirm();
+                });
+
+                // Handle cancel
+                overlay.querySelector('[data-action="cancel"]').addEventListener('click', closeModal);
+
+                // ESC key to cancel
+                const handleEsc = (e) => {
+                    if (e.key === 'Escape') {
+                        closeModal();
+                        document.removeEventListener('keydown', handleEsc);
+                    }
+                };
+                document.addEventListener('keydown', handleEsc);
+
+                // Prevent click on modal content from closing
+                modal.addEventListener('click', (e) => e.stopPropagation());
+            };
+
+            // Show alert modal (no cancel button)
+            window.showAlert = function(title, message, type = 'info') {
+                const overlay = document.createElement('div');
+                overlay.className = 'admin-modal-overlay fade-in';
+
+                const headerColors = {
+                    success: 'background-color: #10b981;',
+                    error: 'background-color: #ef4444;',
+                    warning: 'background-color: #f59e0b;',
+                    info: 'background-color: #3b82f6;'
+                };
+
+                const icons = {
+                    success: '✅',
+                    error: '❌',
+                    warning: '⚠️',
+                    info: 'ℹ️'
+                };
+
+                overlay.innerHTML = `
+                    <div class="admin-modal slide-up">
+                        <div class="admin-modal-header" style="${headerColors[type]}">
+                            <span style="font-size: 1.25rem;">${icons[type]}</span>
+                            <span>${title}</span>
+                        </div>
+                        <div class="admin-modal-body">${message}</div>
+                        <div class="admin-modal-footer">
+                            <button class="admin-modal-btn admin-modal-btn-primary" data-action="close">
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(overlay);
+                document.body.style.overflow = 'hidden';
+
+                const modal = overlay.querySelector('.admin-modal');
+                
+                const closeModal = () => {
+                    document.body.style.overflow = '';
+                    overlay.remove();
+                };
+
+                overlay.querySelector('[data-action="close"]').addEventListener('click', closeModal);
+                
+                // ESC key or click outside to close
+                const handleEsc = (e) => {
+                    if (e.key === 'Escape') {
+                        closeModal();
+                        document.removeEventListener('keydown', handleEsc);
+                    }
+                };
+                document.addEventListener('keydown', handleEsc);
+                overlay.addEventListener('click', closeModal);
+                modal.addEventListener('click', (e) => e.stopPropagation());
+            };
+
+            // Shorthand functions
+            window.showSuccess = function(message, title = 'Success') {
+                window.showAlert(title, message, 'success');
+            };
+
+            window.showError = function(message, title = 'Error') {
+                window.showAlert(title, message, 'error');
+            };
+
+            window.showWarning = function(message, title = 'Warning') {
+                window.showAlert(title, message, 'warning');
+            };
+
+            window.showInfo = function(message, title = 'Information') {
+                window.showAlert(title, message, 'info');
+            };
+        })();
     </script>
 
     @stack('scripts')
