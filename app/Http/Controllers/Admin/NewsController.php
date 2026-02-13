@@ -24,9 +24,16 @@ class NewsController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'publish_date' => 'required|date',
-            'photo_path' => 'nullable|string|max:255',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120',
         ]);
 
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('news', 'public');
+            $validated['photo_path'] = $path;
+        }
+
+        unset($validated['photo']);
         $news = News::create($validated);
 
         return response()->json([
@@ -48,9 +55,20 @@ class NewsController extends Controller
             'title' => 'sometimes|required|string|max:255',
             'content' => 'sometimes|required|string',
             'publish_date' => 'sometimes|required|date',
-            'photo_path' => 'nullable|string|max:255',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120',
         ]);
 
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($news->photo_path && \Storage::disk('public')->exists($news->photo_path)) {
+                \Storage::disk('public')->delete($news->photo_path);
+            }
+            $path = $request->file('photo')->store('news', 'public');
+            $validated['photo_path'] = $path;
+        }
+
+        unset($validated['photo']);
         $news->update($validated);
 
         return response()->json([
@@ -61,6 +79,11 @@ class NewsController extends Controller
 
     public function destroy(News $news)
     {
+        // Delete photo if exists
+        if ($news->photo_path && \Storage::disk('public')->exists($news->photo_path)) {
+            \Storage::disk('public')->delete($news->photo_path);
+        }
+
         $news->delete();
 
         return response()->json([

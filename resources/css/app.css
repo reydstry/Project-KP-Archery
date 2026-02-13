@@ -1,23 +1,83 @@
 @import "tailwindcss";
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* ===============================
+   Laravel Source Files
+================================ */
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+@source "../**/*.blade.php";
+@source "../**/*.js";
 
+/* ===============================
+   Theme Configuration
+================================ */
 @theme {
     --font-sans:
-        "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
-        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+        "Instrument Sans",
+        ui-sans-serif,
+        system-ui,
+        sans-serif,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
         "Noto Color Emoji";
 }
 
+/* ===============================
+   Global & Base Styles
+================================ */
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Alpine.js */
+[x-cloak] {
+    display: none !important;
+}
+
+/* ===============================
+   Animations - Keyframes
+================================ */
 @keyframes scroll-left {
-    0% {
+    from {
         transform: translateX(0);
     }
-    100% {
+    to {
         transform: translateX(-50%);
+    }
+}
+
+@keyframes marquee {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-300%);
+    }
+}
+
+@keyframes slow-zoom {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.1);
     }
 }
 
@@ -37,10 +97,147 @@
     }
 }
 
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* ===============================
+   Animation Utilities
+================================ */
 .animate-scroll {
     animation: scroll-left 30s linear infinite;
 }
 
+.animate-marquee {
+    animation: marquee 30s linear infinite;
+}
+
+.animate-slow-zoom {
+    animation: slow-zoom 20s ease-in-out infinite alternate;
+}
+
 .animate-float-rotate {
     animation: float-rotate 4s ease-in-out infinite;
+}
+
+.card-animate {
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.sidebar-animate {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* ===============================
+   Responsive Animation
+================================ */
+@media (max-width: 1024px) {
+    .animate-marquee {
+        animation-duration: 25s;
+    }
+}
+
+@media (max-width: 768px) {
+    .animate-marquee {
+        animation-duration: 20s;
+    }
+}
+
+@media (max-width: 480px) {
+    .animate-marquee {
+        animation-duration: 15s;
+    }
+}
+
+/* ===============================
+   Admin Dashboard Styles
+================================ */
+.admin-bg {
+    background: linear-gradient(
+        to bottom right,
+        #f8fafc,
+        #dbeafe,
+        #eef2ff
+    );
+}
+
+.sidebar-bg {
+    background: linear-gradient(
+        to bottom,
+        #0f172a,
+        #1e293b,
+        #0f172a
+    );
+}
+
+.sidebar-border {
+    border-color: rgba(71, 85, 105, 0.5);
+}
+
+.mobile-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Backdrop Blur */
+.sidebar-backdrop {
+    backdrop-filter: blur(8px);
+}
+
+.mobile-header-backdrop {
+    backdrop-filter: blur(12px);
+}
+
+/* ===============================
+   Custom Shadows & Components
+================================ */
+.toast-shadow {
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Menu Active Shadows */
+.menu-active-blue {
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+}
+
+.menu-active-cyan {
+    box-shadow: 0 10px 15px -3px rgba(6, 182, 212, 0.3);
+}
+
+.menu-active-emerald {
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+}
+
+.menu-active-purple {
+    box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.3);
+}
+
+.menu-active-indigo {
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+}
+
+.menu-active-amber {
+    box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.3);
+}
+
+.menu-active-rose {
+    box-shadow: 0 10px 15px -3px rgba(244, 63, 94, 0.3);
 }

@@ -1,7 +1,9 @@
 <!-- Header -->
-<div class="mb-8 sm:mb-10 md:mb-12 text-center">
-    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-3 sm:mb-4">Galeri Dokumentasi</h1>
-    <p class="text-sm sm:text-base md:text-lg text-gray-600 px-4">Dokumentasi kegiatan latihan, kompetisi, dan event FocusOneX Archery</p>
+<section class="bg-gradient-to-br from-gray-50 to-white py-20 mt-20">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+    <h1 class="text-4xl font-bold text-gray-900 mb-3">Galeri Dokumentasi</h1>
+    <p class="text-gray-600">Dokumentasi kegiatan latihan, kompetisi, dan grup selfie FocusOneX Archery</p>
 </div>
 
 <!-- Tabs Navigation -->

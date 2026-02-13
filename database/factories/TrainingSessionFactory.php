@@ -7,6 +7,7 @@ use App\Models\Coach;
 use App\Models\TrainingSession;
 use App\Models\TrainingSessionSlot;
 use App\Models\SessionTime;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,7 +26,7 @@ class TrainingSessionFactory extends Factory
     {
         return [
             'date' => $this->faker->dateTimeBetween('now', '+2 months'),
-            'coach_id' => Coach::factory(),
+            'created_by' => User::factory(),
             'status' => TrainingSessionStatus::OPEN->value,
         ];
     }
@@ -37,11 +38,19 @@ class TrainingSessionFactory extends Factory
                 ? SessionTime::query()->inRandomOrder()->limit(6)->get()
                 : SessionTime::factory()->count(6)->create();
 
+            // Get or create a coach
+            $coach = Coach::query()->count() > 0
+                ? Coach::query()->inRandomOrder()->first()
+                : Coach::factory()->create();
+
             foreach ($sessionTimes as $sessionTime) {
-                TrainingSessionSlot::factory()->create([
+                $slot = TrainingSessionSlot::factory()->create([
                     'training_session_id' => $trainingSession->id,
                     'session_time_id' => $sessionTime->id,
                 ]);
+
+                // Assign coach to slot
+                $slot->coaches()->attach($coach->id);
             }
         });
     }

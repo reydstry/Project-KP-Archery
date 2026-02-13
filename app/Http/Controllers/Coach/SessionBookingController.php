@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Coach;
 
 use App\Http\Controllers\Controller;
+use App\Enums\StatusMember;
 use App\Models\Coach;
 use App\Models\MemberPackage;
 use App\Models\SessionBooking;
@@ -12,9 +13,21 @@ use Illuminate\Support\Facades\DB;
 
 class SessionBookingController extends Controller
 {
+    private function isCoachAssignedToSlot(?Coach $coach, TrainingSessionSlot $slot): bool
+    {
+        if (!$coach) {
+            return false;
+        }
+
+        return $slot->coaches()
+            ->where('coaches.id', $coach->id)
+            ->exists();
+    }
+
     /**
      * Coach books a session slot for a member (using member_package_id).
      */
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -30,7 +43,7 @@ class SessionBookingController extends Controller
             ], 404);
         }
 
-        $memberPackage = MemberPackage::with(['member'])
+        $memberPackage = MemberPackage::with(['member', 'package'])
             ->where('id', $validated['member_package_id'])
             ->first();
 
@@ -40,9 +53,21 @@ class SessionBookingController extends Controller
             ], 404);
         }
 
+        if (!$memberPackage->member?->is_active || $memberPackage->member?->status === StatusMember::STATUS_INACTIVE->value) {
+            return response()->json([
+                'message' => 'Member is inactive',
+            ], 422);
+        }
+
         if (!$memberPackage->is_active) {
             return response()->json([
                 'message' => 'Member package is not active',
+            ], 422);
+        }
+
+        if (!$memberPackage->package?->is_active) {
+            return response()->json([
+                'message' => 'Package is inactive',
             ], 422);
         }
 
@@ -71,9 +96,9 @@ class SessionBookingController extends Controller
             ], 404);
         }
 
-        if ($trainingSession->coach_id !== $coach->id) {
+        if (!$this->isCoachAssignedToSlot($coach, $trainingSessionSlot)) {
             return response()->json([
-                'message' => 'You can only book slots for your own training sessions',
+                'message' => 'You can only book slots where you are assigned as a coach',
             ], 403);
         }
 
@@ -156,7 +181,7 @@ class SessionBookingController extends Controller
                 'data' => $booking->load([
                     'memberPackage.member',
                     'trainingSessionSlot.sessionTime',
-                    'trainingSessionSlot.trainingSession.coach',
+                    'trainingSessionSlot.coaches',
                 ]),
                 'remaining_sessions' => $memberPackage->total_sessions - $memberPackage->used_sessions,
             ], 201);

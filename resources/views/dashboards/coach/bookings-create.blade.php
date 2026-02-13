@@ -4,39 +4,61 @@
 @section('subtitle', 'Booking slot sesi latihan untuk member (pilih member dari list)')
 
 @section('content')
-<div x-data="bookingPage()" x-init="init()" class="space-y-6">
+<div x-data="bookingPage()" x-init="init()" class="space-y-4 sm:space-y-6">
 
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
-        <div class="p-6 border-b border-slate-200">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm card-animate" style="animation-delay: 0.1s">
+        <div class="p-4 sm:p-6 border-b border-slate-200">
             <h3 class="text-lg font-bold text-slate-800">Form Booking</h3>
-            <p class="text-sm text-slate-500 mt-1">Pilih sesi, pilih jam (slot), lalu pilih member dari daftar.</p>
+            <p class="text-sm text-slate-500 mt-1">Pilih slot waktu latihan, lalu pilih member dari daftar.</p>
         </div>
 
-        <div class="p-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Training Session</label>
-                    <select x-model.number="form.training_session_id" @change="onSessionChange()"
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
-                        <option value="">-- Pilih sesi --</option>
-                        <template x-for="s in sessions" :key="s.id">
-                            <option :value="s.id" x-text="formatSessionLabel(s)"></option>
-                        </template>
-                    </select>
-                    <p class="text-xs text-slate-500 mt-2" x-show="loadingSessions" x-cloak>Memuat sesi...</p>
+        <div class="p-4 sm:p-6">
+            <!-- Training Session Info -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <label class="block text-sm font-semibold text-slate-700">Training Session</label>
+                    <span class="text-xs text-slate-500" x-show="loadingSessions" x-cloak>Memuat...</span>
                 </div>
+                <template x-if="latestSession">
+                    <div class="px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-xl">
+                        <p class="font-semibold text-blue-900" x-text="formatSessionLabel(latestSession)"></p>
+                    </div>
+                </template>
+                <template x-if="!loadingSessions && !latestSession">
+                    <div class="px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-500 text-sm">
+                        Tidak ada training session tersedia
+                    </div>
+                </template>
+            </div>
 
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Slot (Jam)</label>
-                    <select x-model.number="form.training_session_slot_id" @change="onSlotChange()" :disabled="!slots.length || loadingSlots"
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white disabled:bg-slate-50 disabled:text-slate-400">
-                        <option value="">-- Pilih slot --</option>
+            <!-- Slot Selection with Bubbles -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-slate-700 mb-3">Pilih Slot Waktu</label>
+                <template x-if="loadingSlots">
+                    <p class="text-sm text-slate-500">Memuat slot...</p>
+                </template>
+                <template x-if="!loadingSlots && slots.length === 0">
+                    <p class="text-sm text-slate-500">Tidak ada slot tersedia</p>
+                </template>
+                <template x-if="!loadingSlots && slots.length > 0">
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
                         <template x-for="slot in slots" :key="slot.id">
-                            <option :value="slot.id" x-text="formatSlotLabel(slot)"></option>
+                            <button type="button"
+                                @click="selectSlot(slot.id)"
+                                :class="{
+                                    'bg-blue-600 text-white border-blue-700': form.training_session_slot_id === slot.id,
+                                    'bg-white text-slate-700 border-slate-200 hover:border-blue-500 hover:text-blue-600': form.training_session_slot_id !== slot.id
+                                }"
+                                class="px-4 py-3 border-2 rounded-xl font-medium transition-all duration-200 text-sm w-full">
+                                <div class="flex flex-col items-start">
+                                    <span class="font-bold" x-text="slot.session_time?.name || 'Slot'"></span>
+                                    <span class="text-xs opacity-90" x-text="`${slot.session_time?.start_time || ''} - ${slot.session_time?.end_time || ''}`"></span>
+                                    <span class="text-xs opacity-75 mt-1" x-text="`Kuota: ${slot.max_participants || 0}`"></span>
+                                </div>
+                            </button>
                         </template>
-                    </select>
-                    <p class="text-xs text-slate-500 mt-2" x-show="loadingSlots" x-cloak>Memuat slot...</p>
-                </div>
+                    </div>
+                </template>
             </div>
 
             <!-- Member Selection Section -->
@@ -44,23 +66,12 @@
                 <div class="border-t border-slate-200 pt-6">
                     <h4 class="text-base font-bold text-slate-800 mb-4">Pilih Member</h4>
                     
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Cari Member</label>
-                            <input type="text" x-model="memberSearch" @input="filterMembers()" 
-                                   placeholder="Cari nama member..."
-                                   class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-600 mb-1">Status Member</label>
-                            <select x-model="statusFilter" @change="filterMembers()"
-                                    class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                                <option value="">Semua Status</option>
-                                <option value="active">Active</option>
-                                <option value="pending">Pending</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Cari Member</label>
+                        <input type="text" x-model="memberSearch" @input="filterMembers()" 
+                               placeholder="Cari nama member aktif..."
+                               class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <p class="text-xs text-slate-500 mt-1">Hanya menampilkan member dengan status aktif</p>
                     </div>
 
                     <div class="bg-slate-50 rounded-xl p-4 max-h-96 overflow-y-auto">
@@ -109,15 +120,15 @@
                 </div>
             </div>
 
-            <div class="mt-6 flex items-center gap-3">
+            <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <button @click="submit()" :disabled="submitting || selectedMembers.length === 0"
-                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/30 disabled:opacity-60 disabled:cursor-not-allowed">
+                        class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/30 disabled:opacity-60 disabled:cursor-not-allowed">
                     <span x-show="!submitting">Booking (<span x-text="selectedMembers.length"></span> member)</span>
                     <span x-show="submitting" x-cloak>Memproses...</span>
                 </button>
 
                 <button @click="resetForm()" :disabled="submitting"
-                        class="px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
+                        class="w-full sm:w-auto px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
                     Reset
                 </button>
             </div>
@@ -130,19 +141,17 @@
 <script>
 function bookingPage() {
     return {
-        sessions: [],
+        latestSession: null,
         slots: [],
         members: [],
         filteredMembers: [],
         selectedMembers: [],
         memberSearch: '',
-        statusFilter: '',
         loadingSessions: false,
         loadingSlots: false,
         loadingMembers: false,
         submitting: false,
         form: {
-            training_session_id: '',
             training_session_slot_id: '',
         },
 
@@ -155,26 +164,32 @@ function bookingPage() {
             this.loadingSessions = true;
             try {
                 const res = await window.API.get('/coach/training-sessions?status=open&start_date=' + this.today());
-                this.sessions = Array.isArray(res?.data) ? res.data : [];
+                const sessions = Array.isArray(res?.data) ? res.data : [];
+                
+                // Get the latest session (first one)
+                if (sessions.length > 0) {
+                    this.latestSession = sessions[0];
+                    await this.loadSlotsForLatestSession();
+                } else {
+                    this.latestSession = null;
+                    this.slots = [];
+                }
             } catch (e) {
                 console.error(e);
                 window.showToast(e?.message || 'Gagal memuat training sessions', 'error');
-                this.sessions = [];
+                this.latestSession = null;
+                this.slots = [];
             } finally {
                 this.loadingSessions = false;
             }
         },
 
-        async onSessionChange() {
-            this.form.training_session_slot_id = '';
-            this.slots = [];
-            this.selectedMembers = [];
-
-            if (!this.form.training_session_id) return;
+        async loadSlotsForLatestSession() {
+            if (!this.latestSession) return;
 
             this.loadingSlots = true;
             try {
-                const session = await window.API.get(`/coach/training-sessions/${this.form.training_session_id}`);
+                const session = await window.API.get(`/coach/training-sessions/${this.latestSession.id}`);
                 this.slots = session?.slots || [];
                 if (!Array.isArray(this.slots)) this.slots = [];
                 this.slots.sort((a, b) => (a?.session_time?.start_time || '').localeCompare(b?.session_time?.start_time || ''));
@@ -187,7 +202,8 @@ function bookingPage() {
             }
         },
 
-        onSlotChange() {
+        selectSlot(slotId) {
+            this.form.training_session_slot_id = slotId;
             this.selectedMembers = [];
         },
 
@@ -208,15 +224,12 @@ function bookingPage() {
         },
 
         filterMembers() {
-            let filtered = [...this.members];
+            // Only show active members
+            let filtered = this.members.filter(m => (m.status || '').toLowerCase() === 'active');
 
             if (this.memberSearch.trim()) {
                 const search = this.memberSearch.toLowerCase();
                 filtered = filtered.filter(m => (m.name || '').toLowerCase().includes(search));
-            }
-
-            if (this.statusFilter) {
-                filtered = filtered.filter(m => (m.status || '').toLowerCase() === this.statusFilter.toLowerCase());
             }
 
             this.filteredMembers = filtered;
@@ -290,12 +303,9 @@ function bookingPage() {
         },
 
         resetForm() {
-            this.form.training_session_id = '';
             this.form.training_session_slot_id = '';
-            this.slots = [];
             this.selectedMembers = [];
             this.memberSearch = '';
-            this.statusFilter = '';
         },
 
         today() {

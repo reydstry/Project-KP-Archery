@@ -4,11 +4,11 @@
 
 @section('content')
 <!-- Hero Section -->
-<div class="bg-gradient-to-br from-orange-50 to-white py-20">
+<div class="bg-gradient-to-br from-orange-50 to-white py-20 mt-20">
     <div class="container mx-auto px-4">
         <div class="text-center max-w-3xl mx-auto">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Hubungi Kami</h1>
-            <p class="text-lg text-gray-600">Ada pertanyaan? Kami siap membantu Anda</p>
+            <h1 class="text-4xl font-bold text-gray-900 mb-3">Hubungi Kami</h1>
+            <p class="text-gray-600">Ada pertanyaan? Kami siap membantu Anda</p>
         </div>
     </div>
 </div>

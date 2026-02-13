@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\WebSetPasswordController;
 use App\Http\Controllers\Auth\GoogleRedirectController;
 use App\Http\Controllers\Auth\GoogleCallbackController;
 use App\Http\Controllers\WebDashboardController;
+use App\Models\Coach;
 use App\Models\SessionTime;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,11 @@ Route::get('/galeri', function () {
 Route::get('/kontak', function () {
     return view('pages.kontak');
 })->name('kontak');
+
+
+// dummay data berita detail
+use App\Http\Controllers\BeritaController;
+Route::get('/berita/{id}', [BeritaController::class, 'show'])->name('berita.detail');
 
 // Guest only
 Route::middleware('guest')->group(function () {
@@ -66,6 +72,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/coaches', fn() => view('dashboards.admin.coaches'))->name('coaches');
         Route::get('/packages', fn() => view('dashboards.admin.packages'))->name('packages');
         Route::get('/member-packages', fn() => view('dashboards.admin.member-packages'))->name('member-packages');
+        Route::get('/sessions/create', fn() => view('dashboards.admin.sessions-create', [
+            'sessionTimes' => SessionTime::query()->active()->orderBy('start_time')->get(['id', 'name', 'start_time', 'end_time']),
+            'coaches' => Coach::query()->orderBy('name')->get(['id', 'name']),
+        ]))->name('sessions.create');
+        Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.admin.sessions-edit', [
+            'id' => $id,
+            'coaches' => Coach::query()->orderBy('name')->get(['id', 'name']),
+        ]))->name('sessions.edit');
+        Route::get('/bookings/create', fn() => view('dashboards.admin.bookings-create'))->name('bookings.create');
         Route::get('/news', fn() => view('dashboards.admin.news'))->name('news');
         Route::get('/achievements', fn() => view('dashboards.admin.achievements'))->name('achievements');
     });
@@ -75,8 +90,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/bookings/create', fn() => view('dashboards.coach.bookings-create'))->name('bookings.create');
         Route::get('/sessions/create', fn() => view('dashboards.coach.sessions-create', [
             'sessionTimes' => SessionTime::query()->active()->orderBy('start_time')->get(['id', 'name', 'start_time', 'end_time']),
+            'coaches' => Coach::query()->orderBy('name')->get(['id', 'name']),
+            'myCoachId' => auth()->user()?->coach?->id,
         ]))->name('sessions.create');
-        Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.coach.sessions-edit', ['id' => $id]))->name('sessions.edit');
+        Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.coach.sessions-edit', [
+            'id' => $id,
+            'coaches' => Coach::query()->orderBy('name')->get(['id', 'name']),
+            'myCoachId' => auth()->user()?->coach?->id,
+        ]))->name('sessions.edit');
         Route::get('/attendance', fn() => view('dashboards.coach.attendance'))->name('attendance.index');
         Route::post('/attendance', fn() => redirect()->route('coach.attendance.index'))->name('attendance.store');
         Route::get('/change-password', function() {

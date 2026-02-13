@@ -34,6 +34,8 @@ class PackageController extends Controller
             'session_count' => ['required', 'integer', 'min:1'],
         ]);
 
+        $data['is_active'] = true;
+
         $package = Package::create($data);
 
         return response()->json([
@@ -79,10 +81,20 @@ class PackageController extends Controller
      */
     public function destroy(Package $package)
     {
-        $package->delete();
+        $package->update(['is_active' => false]);
 
         return response()->json([
             'message' => 'Package berhasil dihapus',
+        ]);
+    }
+
+    public function restore(Package $package)
+    {
+        $package->update(['is_active' => true]);
+
+        return response()->json([
+            'message' => 'Package berhasil diaktifkan',
+            'data' => $package->fresh(),
         ]);
     }
 }

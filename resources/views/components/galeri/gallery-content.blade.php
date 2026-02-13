@@ -3,22 +3,19 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         
         <x-galeri.card 
-            :image="asset('asset/img/latarbelakanglogin.jpeg')"
+            :image="asset('asset/img/galeri/latihan/Latihan dasar.jpg')"
             title="Latihan Rutin Mingguan"
-            date="25 Januari 2026"
             alt="Latihan Rutin" />
 
         <x-galeri.card 
-            :image="asset('asset/img/latarbelakanglogin.jpeg')"
-            title="Latihan Teknik Dasar"
-            date="20 Januari 2026"
-            alt="Latihan Teknik" />
+            :image="asset('asset/img/galeri/latihan/Latihan dasar1.png')"
+            title="Latihan Rutin"
+            alt="Latihan Rutin" />
 
         <x-galeri.card 
-            :image="asset('asset/img/latarbelakanglogin.jpeg')"
-            title="Latihan Mental & Fokus"
-            date="18 Januari 2026"
-            alt="Latihan Mental" />
+            :image="asset('asset/img/galeri/latihan/Latihan dasar2.png')"
+            title="Latihan Rutin"
+            alt="Latihan Rutin" />
 
     </div>
 </div>
@@ -28,51 +25,54 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         
         <x-galeri.card 
-            :image="asset('asset/img/latarbelakanglogin.jpeg')"
-            title="Kompetisi Regional"
-            date="15 Januari 2026"
-            alt="Kompetisi Regional" />
+            :image="asset('asset/img/galeri/kompetisi/kompetisi manah1.jpg')"
+            title="Seleksi kejurnas provinsi"
+            alt="Seleksi kejurnas provinsi" />
 
         <x-galeri.card 
-            :image="asset('asset/img/latarbelakanglogin.jpeg')"
-            title="Turnamen Nasional"
-            date="10 Januari 2026"
-            alt="Turnamen Nasional" />
+            :image="asset('asset/img/galeri/kompetisi/kompetisi manah.png')"
+            title="Seleksi kejurnas provinsi"
+            alt="Seleksi kejurnas provinsi" />
+
+        <x-galeri.card 
+            :image="asset('asset/img/galeri/kompetisi/penghargaan.jpg')"
+            title="Seleksi kejurnas provinsi"
+            alt="Seleksi kejurnas provinsi" />
 
     </div>
 </div>
 
-<!-- Tab Content: Event -->
+<!-- Tab Content: -->
 <div id="content-event" class="tab-content hidden">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         
         <x-galeri.card 
             :image="asset('asset/img/galeri/group/baltim.jpg')"
             title=""
-            alt="Workshop Pemula" />
+            alt="" />
 
         <x-galeri.card 
             :image="asset('asset/img/galeri/group/baltim1.JPG')"
             title=""
-            alt="Workshop Pemula" />
+            alt=" " />
 
          <x-galeri.card 
             :image="asset('asset/img/galeri/group/bkpo.png')"
             title=""
-            alt="Workshop Pemula" />
+            alt=" " />
 
          <x-galeri.card 
             :image="asset('asset/img/galeri/group/kejurnas.JPG')"
             title=""
-            alt="Workshop Pemula" />
+            alt=" " />
          <x-galeri.card 
             :image="asset('asset/img/galeri/group/kejurnas1.JPG')"
             title=""
-            alt="Workshop Pemula" />
+            alt=" " />
         <x-galeri.card 
             :image="asset('asset/img/galeri/group/17an.png')"
             title=""
-            alt="Workshop Pemula" />
+            alt=" " />
     </div>
     
 </div>
