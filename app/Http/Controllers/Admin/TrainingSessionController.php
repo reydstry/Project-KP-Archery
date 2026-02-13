@@ -41,22 +41,36 @@ class TrainingSessionController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'date' => 'required|date|after_or_equal:today',
+        $validated = $request->validate(
+            [
+                'date' => 'required|date|after_or_equal:today|unique:training_sessions,date',
 
-            // Create a day session with multiple slots
-            'slots' => 'required|array|min:1',
-            'slots.*.session_time_id' => 'required|exists:session_times,id',
-            'slots.*.max_participants' => 'required|integer|min:1|max:50',
-            'slots.*.coach_ids' => 'required|array|min:1',
-            'slots.*.coach_ids.*' => 'required|exists:coaches,id',
-        ]);
+                'slots' => 'required|array|min:1',
+                'slots.*.session_time_id' => 'required|exists:session_times,id',
+                'slots.*.max_participants' => 'required|integer|min:1|max:50',
+                'slots.*.coach_ids' => 'required|array|min:1',
+                'slots.*.coach_ids.*' => 'required|exists:coaches,id',
+            ],
+            [
+                'date.required' => 'Tanggal sesi wajib diisi.',
+                'date.after_or_equal' => 'Tanggal sesi tidak boleh sebelum hari ini.',
+                'date.unique' => 'Sesi untuk tanggal ini sudah ada. Pilih tanggal lain.',
+                'slots.required' => 'Minimal pilih satu slot sesi.',
+                'slots.min' => 'Minimal pilih satu slot sesi.',
+                'slots.*.session_time_id.required' => 'Waktu sesi wajib dipilih.',
+                'slots.*.max_participants.required' => 'Kuota peserta wajib diisi.',
+                'slots.*.max_participants.min' => 'Kuota minimal 1 peserta.',
+                'slots.*.max_participants.max' => 'Kuota maksimal 50 peserta.',
+                'slots.*.coach_ids.required' => 'Setiap slot wajib memiliki minimal 1 coach.',
+                'slots.*.coach_ids.min' => 'Setiap slot wajib memiliki minimal 1 coach.',
+            ]
+        );
 
         // Check for duplicate session times
         $sessionTimeIds = collect($validated['slots'])->pluck('session_time_id');
         if ($sessionTimeIds->count() !== $sessionTimeIds->unique()->count()) {
             return response()->json([
-                'message' => 'Duplicate session_time_id in slots payload.',
+                'message' => 'Ada slot waktu yang dipilih lebih dari sekali.',
             ], 422);
         }
 
@@ -105,7 +119,12 @@ class TrainingSessionController extends Controller
         $trainingSession->applyAutoClose(now());
 
         return response()->json(
-            $trainingSession->load(['slots.sessionTime', 'slots.coaches', 'createdBy'])
+            $trainingSession->load([
+                'slots.sessionTime',
+                'slots.coaches',
+                'slots.confirmedBookings.memberPackage.member',
+                'createdBy',
+            ])
         );
     }
 
@@ -120,15 +139,44 @@ class TrainingSessionController extends Controller
         $validated = $request->validate([
             'coach_ids' => 'required|array|min:1',
             'coach_ids.*' => 'required|exists:coaches,id',
+            'max_participants' => 'nullable|integer|min:1|max:50',
         ]);
 
         $coachIds = collect($validated['coach_ids'])->map(fn ($id) => (int) $id)->filter()->unique()->values()->all();
 
         $trainingSessionSlot->coaches()->sync($coachIds);
 
+        if (array_key_exists('max_participants', $validated) && $validated['max_participants'] !== null) {
+            $trainingSessionSlot->update([
+                'max_participants' => $validated['max_participants'],
+            ]);
+        }
+
         return response()->json([
             'message' => 'Coaches updated successfully',
             'data' => $trainingSessionSlot->fresh()->load(['sessionTime', 'coaches']),
+        ]);
+    }
+
+    public function destroy(TrainingSession $trainingSession)
+    {
+        $hasBookings = $trainingSession->slots()->whereHas('confirmedBookings')->exists();
+
+        if ($hasBookings) {
+            return response()->json([
+                'message' => 'Cannot delete session that already has bookings',
+            ], 422);
+        }
+
+        $trainingSession->slots()->each(function (TrainingSessionSlot $slot) {
+            $slot->coaches()->detach();
+            $slot->delete();
+        });
+
+        $trainingSession->delete();
+
+        return response()->json([
+            'message' => 'Training session deleted successfully',
         ]);
     }
 }

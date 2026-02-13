@@ -32,12 +32,6 @@ class MemberPackageController extends Controller
      */
     public function assignPackage(Request $request, Member $member)
     {
-        if (!$member->is_active || $member->status === StatusMember::STATUS_INACTIVE->value) {
-            return response()->json([
-                'message' => 'Member is inactive',
-            ], 422);
-        }
-
         $validated = $request->validate([
             'package_id' => 'required|exists:packages,id',
             'start_date' => 'required|date',
@@ -79,9 +73,13 @@ class MemberPackageController extends Controller
             $memberPackage->validated_at = now();
             $memberPackage->save();
 
-            // Update member status from pending to active
-            if ($member->status === StatusMember::STATUS_PENDING->value) {
+            if (
+                !$member->is_active
+                || $member->status === StatusMember::STATUS_PENDING->value
+                || $member->status === StatusMember::STATUS_INACTIVE->value
+            ) {
                 $member->update([
+                    'is_active' => true,
                     'status' => StatusMember::STATUS_ACTIVE->value,
                 ]);
             }

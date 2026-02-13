@@ -82,6 +82,12 @@ function renderSlots(slots) {
         const st = slot.session_time || slot.sessionTime || {};
         const slotCoaches = Array.isArray(slot.coaches) ? slot.coaches.map(c => Number(c.id)) : [];
         const additionalCoaches = slotCoaches.filter(id => id !== myIdNum);
+        const bookings = Array.isArray(slot.confirmed_bookings) ? slot.confirmed_bookings : (Array.isArray(slot.confirmedBookings) ? slot.confirmedBookings : []);
+        const slotOptions = slots.map(s => {
+            const sTime = s.session_time || s.sessionTime || {};
+            const sLabel = `${escapeHtml(sTime.name || 'Slot')} (${escapeHtml(sTime.start_time || '')}${sTime.start_time && sTime.end_time ? ' - ' : ''}${escapeHtml(sTime.end_time || '')})`;
+            return `<option value="${s.id}">${sLabel}</option>`;
+        }).join('');
         
         return `
             <tr>
@@ -112,10 +118,41 @@ function renderSlots(slots) {
                         <button type="button" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 text-sm" onclick="updateQuota(${slot.id})">Update Quota</button>
                         <button type="button" class="w-full sm:w-auto px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-sm whitespace-nowrap" onclick="bookForMember(${slot.id})">Book for member</button>
                     </div>
+                    <div class="mt-3 space-y-2">
+                        ${bookings.length > 0 ? bookings.map(booking => {
+                            const mp = booking.member_package || booking.memberPackage || {};
+                            const member = mp.member || {};
+                            return `
+                                <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
+                                    <p class="text-xs font-semibold text-slate-700 truncate">${escapeHtml(member.name || 'Member')}</p>
+                                    <div class="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                        <select id="move-slot-${booking.id}" class="sm:col-span-2 w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500">
+                                            ${slotOptions}
+                                        </select>
+                                        <div class="flex gap-2">
+                                            <button type="button" class="flex-1 px-2 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium" onclick="moveBooking(${booking.id})">Pindah</button>
+                                            <button type="button" class="flex-1 px-2 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-xs font-medium" onclick="removeBooking(${booking.id})">Hapus</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('') : '<p class="text-xs text-slate-500">Belum ada member booking</p>'}
+                    </div>
                 </td>
             </tr>
         `;
     }).join('');
+
+    // Set selected slot value for move selectors
+    slots.forEach(slot => {
+        const bookings = Array.isArray(slot.confirmed_bookings) ? slot.confirmed_bookings : (Array.isArray(slot.confirmedBookings) ? slot.confirmedBookings : []);
+        bookings.forEach(booking => {
+            const select = document.getElementById(`move-slot-${booking.id}`);
+            if (select) {
+                select.value = String(slot.id);
+            }
+        });
+    });
 }
 
 let currentSlotId = null;
@@ -320,6 +357,45 @@ async function bookForMember(slotId) {
     } catch (e) {
         console.error(e);
         window.showToast(e?.message || 'Failed to book', 'error');
+    }
+}
+
+async function moveBooking(bookingId) {
+    const targetSelect = document.getElementById(`move-slot-${bookingId}`);
+    const targetSlotId = Number(targetSelect?.value || 0);
+
+    if (!Number.isInteger(targetSlotId) || targetSlotId <= 0) {
+        window.showToast('Pilih slot tujuan yang valid', 'error');
+        return;
+    }
+
+    try {
+        await window.API.patch(`/coach/bookings/${bookingId}`, {
+            training_session_slot_id: targetSlotId,
+        });
+        window.showToast('Member berhasil dipindah slot', 'success');
+        const session = await window.API.get(`/coach/training-sessions/${SESSION_ID}`);
+        CURRENT_SESSION = session;
+        renderSlots(session.slots || []);
+    } catch (e) {
+        console.error(e);
+        window.showToast(e?.message || 'Gagal memindahkan member', 'error');
+    }
+}
+
+async function removeBooking(bookingId) {
+    const ok = confirm('Hapus member dari sesi ini?');
+    if (!ok) return;
+
+    try {
+        await window.API.delete(`/coach/bookings/${bookingId}`);
+        window.showToast('Member berhasil dihapus dari sesi', 'success');
+        const session = await window.API.get(`/coach/training-sessions/${SESSION_ID}`);
+        CURRENT_SESSION = session;
+        renderSlots(session.slots || []);
+    } catch (e) {
+        console.error(e);
+        window.showToast(e?.message || 'Gagal menghapus member dari sesi', 'error');
     }
 }
 

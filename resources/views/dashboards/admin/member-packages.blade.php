@@ -365,7 +365,6 @@
                     </button>
 
                     <button @click="openAssignFromDetails()"
-                            :disabled="selectedMemberPackage?.member?.status === 'inactive' || selectedMemberPackage?.member?.is_active === false"
                             class="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50">
                         <span x-text="selectedMemberPackage?.package_id ? 'Update Package' : 'Assign Package'"></span>
                     </button>
@@ -585,8 +584,7 @@
                 if (!mp?.member_id) return;
 
                 if (mp?.member?.status === 'inactive' || mp?.member?.is_active === false) {
-                    window.showToast('Member is inactive and cannot be assigned a package', 'error');
-                    return;
+                    window.showToast('Member inactive akan diaktifkan otomatis saat package di-assign', 'info');
                 }
 
                 // Close details first to avoid stacked modals

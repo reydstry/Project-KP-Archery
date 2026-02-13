@@ -68,6 +68,7 @@ Route::middleware('auth')->group(function () {
 
     // Admin routes
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+        Route::get('/sessions', fn() => view('dashboards.admin.sessions'))->name('sessions.index');
         Route::get('/members', fn() => view('dashboards.admin.members'))->name('members');
         Route::get('/coaches', fn() => view('dashboards.admin.coaches'))->name('coaches');
         Route::get('/packages', fn() => view('dashboards.admin.packages'))->name('packages');

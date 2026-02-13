@@ -17,8 +17,8 @@
                         <span class="text-amber-600 font-medium" x-text="stats.pending_members || 0"></span> pending
                     </p>
                 </div>
-                <div class="p-3 bg-blue-50 rounded-xl">
-                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                <div class="p-3 bg-[#1a307b]/10 rounded-xl">
+                    <svg class="w-6 h-6 text-[#1a307b]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                 </div>
             </div>
         </div>
@@ -54,7 +54,7 @@
     <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm" style="animation-delay: 0.4s">
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 class="font-bold text-slate-800">Pending Member Approvals</h3>
-            <a href="{{ route('admin.members') }}" class="text-sm text-blue-500 hover:text-blue-600 font-medium">View All →</a>
+            <a href="{{ route('admin.members') }}" class="text-sm text-[#1a307b] hover:text-[#152866] font-medium">View All →</a>
         </div>
         <div class="p-6">
             <template x-if="recentPendingMembers.length === 0">
@@ -103,7 +103,7 @@
                             <!-- Main slot card - clickable to expand -->
                             <div @click="expanded = !expanded" class="flex items-center justify-between gap-4 p-4 hover:bg-slate-50 transition cursor-pointer">
                                 <div class="flex items-center gap-4 min-w-0">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shrink-0">
+                                    <div class="w-12 h-12 bg-[#1a307b] rounded-xl flex items-center justify-center text-white shrink-0">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                             <circle cx="12" cy="12" r="10"/>
                                             <circle cx="12" cy="12" r="6"/>
@@ -123,7 +123,7 @@
                                     <div class="text-right">
                                         <p class="text-xs text-slate-400">Kapasitas</p>
                                         <p class="font-bold text-slate-800">
-                                            <span class="text-blue-600" x-text="slot.total_bookings || 0"></span>
+                                            <span class="text-[#1a307b]" x-text="slot.total_bookings || 0"></span>
                                             <span class="text-slate-400">/</span>
                                             <span x-text="slot.capacity || 0"></span>
                                         </p>
@@ -178,8 +178,8 @@
                                         <div class="space-y-2 max-h-60 overflow-y-auto">
                                             <template x-for="member in slot.members" :key="member.id">
                                                 <div class="flex items-center gap-2 text-sm text-slate-700 bg-white px-3 py-2 rounded-lg border border-slate-100">
-                                                    <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
-                                                        <svg class="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                                    <div class="w-6 h-6 bg-[#1a307b]/10 rounded-full flex items-center justify-center shrink-0">
+                                                        <svg class="w-3 h-3 text-[#1a307b]" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                                                         </svg>
                                                     </div>
@@ -192,7 +192,7 @@
 
                                 <!-- Action buttons in expanded state -->
                                 <div class="p-4 bg-white border-t border-slate-100 flex items-center justify-end gap-3">
-                                    <a :href="`/admin/sessions/${slot.training_session_id}/edit`" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition">Edit Session</a>
+                                    <a :href="`/admin/sessions/${slot.training_session_id}/edit`" class="px-4 py-2 bg-[#1a307b] hover:bg-[#152866] text-white text-sm font-semibold rounded-lg transition">Edit Session</a>
                                 </div>
                             </div>
                         </div>

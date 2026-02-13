@@ -41,7 +41,7 @@
                     <p class="text-sm text-slate-500">Tidak ada slot tersedia</p>
                 </template>
                 <template x-if="!loadingSlots && slots.length > 0">
-                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         <template x-for="slot in slots" :key="slot.id">
                             <button type="button"
                                 @click="selectSlot(slot.id)"

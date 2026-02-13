@@ -108,7 +108,7 @@
                    @click="if(isMobile) sidebarOpen = false"
                    class="flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-[13px] lg:text-sm font-semibold transition-all {{ request()->routeIs('coach.sessions.*') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    <span class="truncate">Training Sessions</span>
+                    <span class="truncate">Training Session</span>
                 </a>
                 <a href="{{ route('coach.bookings.create') }}" 
                    @click="if(isMobile) sidebarOpen = false"
@@ -272,14 +272,21 @@
             },
             
             async request(method, url, data = null) {
+                const isFormData = data instanceof FormData;
+                const headers = { ...this.headers };
+
+                if (isFormData) {
+                    delete headers['Content-Type'];
+                }
+
                 const options = {
                     method,
-                    headers: this.headers,
+                    headers,
                     credentials: 'same-origin'
                 };
                 
                 if (data && ['POST', 'PUT', 'PATCH'].includes(method)) {
-                    options.body = JSON.stringify(data);
+                    options.body = isFormData ? data : JSON.stringify(data);
                 }
                 
                 const response = await fetch(this.baseUrl + url, options);
@@ -290,11 +297,20 @@
                 
                 if (!response.ok) {
                     let errorMessage = `HTTP ${response.status}`;
+
+                    if (response.status === 419) {
+                        throw new Error('CSRF token mismatch. Refresh halaman lalu coba lagi.');
+                    }
                     
                     if (isJson) {
                         try {
                             const error = await response.json();
-                            errorMessage = error.message || errorMessage;
+                            if (error.errors && typeof error.errors === 'object') {
+                                const firstError = Object.values(error.errors)?.[0];
+                                errorMessage = Array.isArray(firstError) ? firstError[0] : (error.message || errorMessage);
+                            } else {
+                                errorMessage = error.message || errorMessage;
+                            }
                         } catch (e) {
                             console.error('Failed to parse error response:', e);
                         }
@@ -308,7 +324,7 @@
                 }
                 
                 if (!isJson) {
-                    throw new Error('Response is not JSON. Check if the API endpoint is correct.');
+                    return {};
                 }
                 
                 return await response.json();
@@ -330,6 +346,21 @@
                 detail: { message, type }
             }));
         };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            @if(session('success'))
+                window.showToast(@json(session('success')), 'success');
+            @endif
+            @if(session('error'))
+                window.showToast(@json(session('error')), 'error');
+            @endif
+            @if(session('warning'))
+                window.showToast(@json(session('warning')), 'info');
+            @endif
+            @if(session('status'))
+                window.showToast(@json(session('status')), 'success');
+            @endif
+        });
     </script>
 
     @stack('scripts')
