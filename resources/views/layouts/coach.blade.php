@@ -122,12 +122,6 @@
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                     <span class="truncate">Attendance</span>
                 </a>
-                <a href="{{ route('coach.settings') }}" 
-                   @click="if(isMobile) sidebarOpen = false"
-                   class="flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-[13px] lg:text-sm font-semibold transition-all {{ request()->routeIs('coach.settings') ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}">
-                    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    <span class="truncate">Settings</span>
-                </a>
             </nav>
         </aside>
 
@@ -163,6 +157,10 @@
                                 <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-slate-500 mt-0.5">{{ auth()->user()->email }}</p>
                             </div>
+                            <a href="{{ route('coach.change-password') }}" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                Change Password
+                            </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition">
@@ -206,6 +204,10 @@
                                 <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-slate-500 mt-0.5">{{ auth()->user()->email }}</p>
                             </div>
+                            <a href="{{ route('coach.change-password') }}" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                Change Password
+                            </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition">
@@ -218,12 +220,12 @@
                 </div>
             </div>
 
-            <div class="p-4 sm:p-6 lg:p-8">
+            <div class="p-3 sm:p-6 lg:p-8">
                 <div class="max-w-7xl mx-auto">
                     <!-- Page Header -->
-                    <div class="mb-6 sm:mb-8">
-                        <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">@yield('title')</h2>
-                        <p class="text-slate-500 mt-1 text-sm sm:text-base">@yield('subtitle')</p>
+                    <div class="mb-3 sm:mb-6">
+                        <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-slate-800">@yield('title')</h2>
+                        <p class="text-slate-500 mt-0.5 text-xs sm:text-sm">@yield('subtitle')</p>
                     </div>
 
                     <!-- Content -->

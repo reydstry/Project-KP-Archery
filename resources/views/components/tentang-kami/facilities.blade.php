@@ -2,31 +2,31 @@
 <section class="py-16 bg-white">
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-3">Fasilitas Fox Archery Range</h2>
-            <p class="text-gray-600">Nikmati fasilitas berkelas dunia yang mendukung perkembangan kemampuan Anda</p>
+            <h2 class="text-3xl font-bold text-gray-900 mb-3">{{ __('about.facilities_main_title') }}</h2>
+            <p class="text-gray-600">{{ __('about.facilities_main_subtitle') }}</p>
         </div>
 
         @php
             $facilities = [
                 [
                     'image' => 'section.jpg',
-                    'title' => 'Lapangan Outdoor Utama',
-                    'description' => 'Lapangan outdoor seluas 2000m² dengan target jarak 10m hingga 70m untuk semua jenis busur'
+                    'title' => __('about.facility_1_title'),
+                    'description' => __('about.facility_1_desc')
                 ],
                 [
                     'image' => 'section.jpg',
-                    'title' => 'Area Latihan Jarak Pendek',
-                    'description' => 'Zona khusus untuk pemula dengan target jarak 10m-30m dilengkapi dengan sistem keamanan maksimal'
+                    'title' => __('about.facility_2_title'),
+                    'description' => __('about.facility_2_desc')
                 ],
                 [
                     'image' => 'section.jpg',
-                    'title' => 'Arena Kompetisi',
-                    'description' => 'Arena kompetisi standar Perpani untuk latihan turnamen dan simulasi kompetisi resmi'
+                    'title' => __('about.facility_3_title'),
+                    'description' => __('about.facility_3_desc')
                 ],
                 [
                     'image' => 'section.jpg',
-                    'title' => 'Arena Kompetisi',
-                    'description' => 'Arena kompetisi standar Perpani untuk latihan turnamen dan simulasi kompetisi resmi'
+                    'title' => __('about.facility_4_title'),
+                    'description' => __('about.facility_4_desc')
                 ]
             ];
         @endphp
@@ -51,15 +51,15 @@
         <div class="grid md:grid-cols-3 gap-6">
             <div class="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
                 <div class="text-4xl font-bold text-gray-900 mb-1">2000m²</div>
-                <div class="text-gray-600 text-sm">Total Luas Fasilitas</div>
+                <div class="text-gray-600 text-sm">{{ __('about.stats_total_area') }}</div>
             </div>
             <div class="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
                 <div class="text-4xl font-bold text-gray-900 mb-1">30+</div>
-                <div class="text-gray-600 text-sm">Target Panahan</div>
+                <div class="text-gray-600 text-sm">{{ __('about.stats_targets') }}</div>
             </div>
             <div class="bg-gray-50 rounded-lg p-6 text-center border border-gray-200">
                 <div class="text-4xl font-bold text-gray-900 mb-1">100+</div>
-                <div class="text-gray-600 text-sm">Peralatan Premium</div>
+                <div class="text-gray-600 text-sm">{{ __('about.stats_equipment') }}</div>
             </div>
         </div>
     </div>

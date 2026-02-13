@@ -9,9 +9,12 @@ use App\Http\Controllers\Auth\WebSetPasswordController;
 use App\Http\Controllers\Auth\GoogleRedirectController;
 use App\Http\Controllers\Auth\GoogleCallbackController;
 use App\Http\Controllers\WebDashboardController;
-use App\Models\Coach;
+use App\Http\Controllers\LanguageController;
 use App\Models\SessionTime;
 use Illuminate\Support\Facades\Route;
+
+// Language switching
+Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 
 Route::get('/', function () {
     return view('pages.beranda');
@@ -100,13 +103,12 @@ Route::middleware('auth')->group(function () {
         ]))->name('sessions.edit');
         Route::get('/attendance', fn() => view('dashboards.coach.attendance'))->name('attendance.index');
         Route::post('/attendance', fn() => redirect()->route('coach.attendance.index'))->name('attendance.store');
-        Route::get('/settings', function() {
+        Route::get('/change-password', function() {
             $user = auth()->user();
             $coach = $user->coach;
-            return view('dashboards.coach.settings', compact('user', 'coach'));
-        })->name('settings');
-        Route::post('/settings', [\App\Http\Controllers\Coach\ProfileController::class, 'updateProfile'])->name('settings.update');
-        Route::post('/settings/password', [\App\Http\Controllers\Coach\ProfileController::class, 'updatePassword'])->name('settings.password');
+            return view('dashboards.coach.change-password', compact('user', 'coach'));
+        })->name('change-password');
+        Route::post('/change-password', [\App\Http\Controllers\Coach\ProfileController::class, 'updatePassword'])->name('change-password.password');
     });
     // Member routes
      Route::prefix('member')->name('member.')->middleware('role:member')->group(function () {

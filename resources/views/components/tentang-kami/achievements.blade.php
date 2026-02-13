@@ -2,8 +2,8 @@
 <section class="py-12 sm:py-16 bg-gray-50">
     <div class="container mx-auto px-4">
         <div class="text-center mb-8 sm:mb-10 md:mb-12">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">Prestasi Member</h2>
-            <p class="text-sm sm:text-base text-gray-600 px-4">Bangga dengan Pencapaian luar biasa dari member yang telah berlatih di Focus One x Archery</p>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">{{ __('about.achievements_title') }}</h2>
+            <p class="text-sm sm:text-base text-gray-600 px-4">{{ __('about.achievements_subtitle') }}</p>
         </div>
 
         @php
