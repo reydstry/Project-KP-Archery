@@ -2,37 +2,37 @@
 <section class="py-16 bg-white">
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-3">Jadwal Latihan</h2>
+            <h2 class="text-3xl font-bold text-gray-900 mb-3">{{ __('program.schedule_section_title') }}</h2>
         </div>
 
         @php
             $schedules = [
                 [
-                    'time' => 'PAGI',
+                    'time' => __('program.schedule_morning'),
                     'color' => 'orange',
                     'bg' => 'bg-orange-500',
                     'sessions' => [
-                        ['name' => 'SESI 1', 'time' => '07:30 - 09:00'],
-                        ['name' => 'SESI 2', 'time' => '09:00 - 10:30'],
-                        ['name' => 'SESI 3', 'time' => '10:30 - 12:00']
+                        ['name' => __('program.schedule_session') . ' 1', 'time' => '07:30 - 09:00'],
+                        ['name' => __('program.schedule_session') . ' 2', 'time' => '09:00 - 10:30'],
+                        ['name' => __('program.schedule_session') . ' 3', 'time' => '10:30 - 12:00']
                     ]
                 ],
                 [
-                    'time' => 'SORE',
+                    'time' => __('program.schedule_afternoon'),
                     'color' => 'orange',
                     'bg' => 'bg-orange-500',
                     'sessions' => [
-                        ['name' => 'SESI 1', 'time' => '13:30 - 15:00'],
-                        ['name' => 'SESI 2', 'time' => '15:00 - 16:30'],
-                        ['name' => 'SESI 3', 'time' => '16:30 - 18:00']
+                        ['name' => __('program.schedule_session') . ' 1', 'time' => '13:30 - 15:00'],
+                        ['name' => __('program.schedule_session') . ' 2', 'time' => '15:00 - 16:30'],
+                        ['name' => __('program.schedule_session') . ' 3', 'time' => '16:30 - 18:00']
                     ]
                 ],
                 [
-                    'time' => 'MALAM',
+                    'time' => __('program.schedule_evening'),
                     'color' => 'blue',
                     'bg' => 'bg-blue-600',
                     'sessions' => [
-                        ['name' => 'SESI 1', 'time' => '19:30 - 21:00']
+                        ['name' => __('program.schedule_session') . ' 1', 'time' => '19:30 - 21:00']
                     ]
                 ]
             ];

@@ -162,6 +162,10 @@
                                 <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-slate-500 mt-0.5">{{ auth()->user()->email }}</p>
                             </div>
+                            <a href="{{ route('coach.change-password') }}" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                Change Password
+                            </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition">
@@ -205,6 +209,10 @@
                                 <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-slate-500 mt-0.5">{{ auth()->user()->email }}</p>
                             </div>
+                            <a href="{{ route('coach.change-password') }}" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                                Change Password
+                            </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition">
@@ -217,12 +225,12 @@
                 </div>
             </div>
 
-            <div class="p-4 sm:p-6 lg:p-8">
+            <div class="p-3 sm:p-6 lg:p-8">
                 <div class="max-w-7xl mx-auto">
                     <!-- Page Header -->
-                    <div class="mb-6 sm:mb-8">
-                        <h2 class="text-2xl sm:text-3xl font-bold text-slate-800">@yield('title')</h2>
-                        <p class="text-slate-500 mt-1 text-sm sm:text-base">@yield('subtitle')</p>
+                    <div class="mb-3 sm:mb-6">
+                        <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-slate-800">@yield('title')</h2>
+                        <p class="text-slate-500 mt-0.5 text-xs sm:text-sm">@yield('subtitle')</p>
                     </div>
 
                     <!-- Content -->

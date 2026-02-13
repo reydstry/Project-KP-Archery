@@ -4,20 +4,26 @@
 @section('subtitle', 'Booking slot sesi latihan untuk member (pilih member dari list)')
 
 @section('content')
-<div x-data="bookingPage()" x-init="init()" class="space-y-4 sm:space-y-6">
+<div x-data="bookingPage()" x-init="init()" class="space-y-2 sm:space-y-4 px-2 py-2 sm:px-8 sm:py-8">
 
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm card-animate" style="animation-delay: 0.1s">
-        <div class="p-4 sm:p-6 border-b border-slate-200">
-            <h3 class="text-lg font-bold text-slate-800">Form Booking</h3>
-            <p class="text-sm text-slate-500 mt-1">Pilih slot waktu latihan, lalu pilih member dari daftar.</p>
+    <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-lg card-animate" style="animation-delay: 0.1s">
+        <div class="p-2 sm:p-3 border-b border-slate-200">
+            <h3 class="text-sm sm:text-base font-bold text-slate-800 mb-0.5">Form Booking</h3>
+            <p class="text-xs text-slate-500">Pilih sesi, pilih jam (slot), lalu pilih member dari daftar.</p>
         </div>
 
-        <div class="p-4 sm:p-6">
-            <!-- Training Session Info -->
-            <div class="mb-6">
-                <div class="flex items-center justify-between mb-3">
-                    <label class="block text-sm font-semibold text-slate-700">Training Session</label>
-                    <span class="text-xs text-slate-500" x-show="loadingSessions" x-cloak>Memuat...</span>
+        <div class="p-2 sm:p-3">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 mb-2 sm:mb-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Training Session</label>
+                    <select x-model.number="form.training_session_id" @change="onSessionChange()"
+                            class="w-full px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-xs sm:text-sm">
+                        <option value="">-- Pilih sesi --</option>
+                        <template x-for="s in sessions" :key="s.id">
+                            <option :value="s.id" x-text="formatSessionLabel(s)"></option>
+                        </template>
+                    </select>
+                    <p class="text-xs text-slate-500 mt-1" x-show="loadingSessions" x-cloak>Memuat sesi...</p>
                 </div>
                 <template x-if="latestSession">
                     <div class="px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-xl">
@@ -31,17 +37,11 @@
                 </template>
             </div>
 
-            <!-- Slot Selection with Bubbles -->
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-slate-700 mb-3">Pilih Slot Waktu</label>
-                <template x-if="loadingSlots">
-                    <p class="text-sm text-slate-500">Memuat slot...</p>
-                </template>
-                <template x-if="!loadingSlots && slots.length === 0">
-                    <p class="text-sm text-slate-500">Tidak ada slot tersedia</p>
-                </template>
-                <template x-if="!loadingSlots && slots.length > 0">
-                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Slot (Jam)</label>
+                    <select x-model.number="form.training_session_slot_id" @change="onSlotChange()" :disabled="!slots.length || loadingSlots"
+                            class="w-full px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white disabled:bg-slate-50 disabled:text-slate-400 text-xs sm:text-sm">
+                        <option value="">-- Pilih slot --</option>
                         <template x-for="slot in slots" :key="slot.id">
                             <button type="button"
                                 @click="selectSlot(slot.id)"
@@ -57,39 +57,51 @@
                                 </div>
                             </button>
                         </template>
-                    </div>
-                </template>
+                    </select>
+                    <p class="text-xs text-slate-500 mt-1" x-show="loadingSlots" x-cloak>Memuat slot...</p>
+                </div>
             </div>
 
             <!-- Member Selection Section -->
             <div x-show="form.training_session_slot_id" x-cloak>
-                <div class="border-t border-slate-200 pt-6">
-                    <h4 class="text-base font-bold text-slate-800 mb-4">Pilih Member</h4>
+                <div class="border-t border-slate-200 pt-2 sm:pt-3">
+                    <h4 class="text-sm sm:text-base font-bold text-slate-800 mb-2 sm:mb-3">Pilih Member</h4>
                     
-                    <div class="mb-4">
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Cari Member</label>
-                        <input type="text" x-model="memberSearch" @input="filterMembers()" 
-                               placeholder="Cari nama member aktif..."
-                               class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-                        <p class="text-xs text-slate-500 mt-1">Hanya menampilkan member dengan status aktif</p>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-3 mb-2 sm:mb-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Cari Member</label>
+                            <input type="text" x-model="memberSearch" @input="filterMembers()" 
+                                   placeholder="Cari nama member..."
+                                   class="w-full px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Status Member</label>
+                            <select x-model="statusFilter" @change="filterMembers()"
+                                    class="w-full px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-xs sm:text-sm">
+                                <option value="">Semua Status</option>
+                                <option value="active">Active</option>
+                                <option value="pending">Pending</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="bg-slate-50 rounded-xl p-4 max-h-96 overflow-y-auto">
-                        <p class="text-sm text-slate-600 mb-3" x-show="loadingMembers" x-cloak>Memuat member...</p>
-                        <p class="text-sm text-slate-600 mb-3" x-show="!loadingMembers && filteredMembers.length === 0" x-cloak>Tidak ada member.</p>
+                    <div class="bg-slate-50 rounded-lg sm:rounded-xl p-2 sm:p-3 max-h-80 sm:max-h-96 overflow-y-auto">
+                        <p class="text-xs sm:text-sm text-slate-600 mb-2" x-show="loadingMembers" x-cloak>Memuat member...</p>
+                        <p class="text-xs sm:text-sm text-slate-600 mb-2" x-show="!loadingMembers && filteredMembers.length === 0" x-cloak>Tidak ada member.</p>
                         
-                        <div class="space-y-2">
+                        <div class="space-y-1.5 sm:space-y-2">
                             <template x-for="member in filteredMembers" :key="member.id">
-                                <label class="flex items-start gap-3 p-3 bg-white rounded-lg border border-slate-200 hover:border-blue-300 cursor-pointer transition-all">
+                                <label class="flex items-start gap-2 sm:gap-2.5 p-2 sm:p-2.5 bg-white rounded-lg border border-slate-200 hover:border-blue-300 cursor-pointer transition-all">
                                     <input type="checkbox" 
                                            :value="member.id"
                                            @change="toggleMemberSelection(member)"
                                            :checked="selectedMembers.some(m => m.id === member.id)"
-                                           class="mt-1 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                           class="mt-0.5 sm:mt-1 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
                                     <div class="flex items-center justify-between w-full">
                                         <!-- Kiri: Nama + Status -->
                                         <div>
-                                            <p class="font-semibold text-slate-900" x-text="member.name"></p>
+                                            <p class="text-xs sm:text-sm font-semibold text-slate-900" x-text="member.name"></p>
                                         </div>
 
                                         <!-- Kanan: Paket -->
@@ -114,21 +126,21 @@
                         </div>
                     </div>
 
-                    <div class="mt-3 text-sm text-slate-600" x-show="selectedMembers.length > 0" x-cloak>
+                    <div class="mt-2 text-xs sm:text-sm text-slate-600" x-show="selectedMembers.length > 0" x-cloak>
                         <span class="font-semibold" x-text="selectedMembers.length"></span> member dipilih
                     </div>
                 </div>
             </div>
 
-            <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div class="mt-2 sm:mt-3 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5">
                 <button @click="submit()" :disabled="submitting || selectedMembers.length === 0"
-                        class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/30 disabled:opacity-60 disabled:cursor-not-allowed">
+                        class="w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 shadow-lg shadow-blue-500/30 disabled:opacity-60 disabled:cursor-not-allowed">
                     <span x-show="!submitting">Booking (<span x-text="selectedMembers.length"></span> member)</span>
                     <span x-show="submitting" x-cloak>Memproses...</span>
                 </button>
 
                 <button @click="resetForm()" :disabled="submitting"
-                        class="w-full sm:w-auto px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
+                        class="w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 bg-white hover:bg-slate-50 text-slate-700 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium border border-slate-200 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
                     Reset
                 </button>
             </div>
