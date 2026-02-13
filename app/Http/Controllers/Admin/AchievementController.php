@@ -26,7 +26,7 @@ class AchievementController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'date' => 'required|date',
-            'photo_path' => 'nullable|string|max:255',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120',
         ]);
 
         if ($validated['type'] === 'member' && empty($validated['member_id'])) {
@@ -42,6 +42,13 @@ class AchievementController extends Controller
             $validated['member_id'] = null;
         }
 
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('achievements', 'public');
+            $validated['photo_path'] = $path;
+        }
+
+        unset($validated['photo']);
         $achievement = Achievement::create($validated);
 
         return response()->json([
@@ -65,7 +72,7 @@ class AchievementController extends Controller
             'title' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|required|string',
             'date' => 'sometimes|required|date',
-            'photo_path' => 'nullable|string|max:255',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120',
         ]);
 
         $type = $validated['type'] ?? $achievement->type;
@@ -84,6 +91,17 @@ class AchievementController extends Controller
             $validated['member_id'] = null;
         }
 
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($achievement->photo_path && \Storage::disk('public')->exists($achievement->photo_path)) {
+                \Storage::disk('public')->delete($achievement->photo_path);
+            }
+            $path = $request->file('photo')->store('achievements', 'public');
+            $validated['photo_path'] = $path;
+        }
+
+        unset($validated['photo']);
         $achievement->update($validated);
 
         return response()->json([
@@ -94,6 +112,11 @@ class AchievementController extends Controller
 
     public function destroy(Achievement $achievement)
     {
+        // Delete photo if exists
+        if ($achievement->photo_path && \Storage::disk('public')->exists($achievement->photo_path)) {
+            \Storage::disk('public')->delete($achievement->photo_path);
+        }
+
         $achievement->delete();
 
         return response()->json([

@@ -82,7 +82,7 @@
                             <label for="phone" class="block text-sm font-semibold text-slate-700 mb-2">
                                 Phone Number
                             </label>
-                            <input type="tel" id="phone" name="phone" placeholder="+62 812-3456-7890"
+                            <input type="tel" id="phone" name="phone" value="{{ $coach?->phone ?? '' }}" placeholder="+62 812-3456-7890"
                                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                         </div>
 
@@ -166,10 +166,10 @@
                             </div>
 
                             <div>
-                                <label for="confirm_password" class="block text-sm font-semibold text-slate-700 mb-2">
+                                <label for="new_password_confirmation" class="block text-sm font-semibold text-slate-700 mb-2">
                                     Confirm New Password <span class="text-red-500">*</span>
                                 </label>
-                                <input type="password" id="confirm_password" name="confirm_password" required
+                                <input type="password" id="new_password_confirmation" name="new_password_confirmation" required
                                     class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200">
                             </div>
                         </div>
@@ -216,7 +216,7 @@ document.getElementById('profileForm').addEventListener('submit', function(e) {
 
     const formData = new FormData(this);
 
-    fetch('{{ route("coach.settings") }}', {
+    fetch('{{ route("coach.settings.update") }}', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -224,7 +224,16 @@ document.getElementById('profileForm').addEventListener('submit', function(e) {
         },
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new TypeError('Response is not JSON');
+        }
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             alert('Profile updated successfully!');
@@ -232,7 +241,7 @@ document.getElementById('profileForm').addEventListener('submit', function(e) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Failed to update profile');
+        alert('Failed to update profile: ' + (error.message || 'Unknown error'));
     });
 });
 
@@ -241,7 +250,7 @@ document.getElementById('passwordForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const newPassword = document.getElementById('new_password').value;
-    const confirmPassword = document.getElementById('confirm_password').value;
+    const confirmPassword = document.getElementById('new_password_confirmation').value;
 
     if (newPassword !== confirmPassword) {
         alert('Passwords do not match!');
@@ -250,7 +259,7 @@ document.getElementById('passwordForm').addEventListener('submit', function(e) {
 
     const formData = new FormData(this);
 
-    fetch('{{ route("password.update") }}', {
+    fetch('{{ route("coach.settings.password") }}', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
@@ -258,7 +267,16 @@ document.getElementById('passwordForm').addEventListener('submit', function(e) {
         },
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new TypeError('Response is not JSON');
+        }
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             alert('Password updated successfully!');
@@ -267,7 +285,7 @@ document.getElementById('passwordForm').addEventListener('submit', function(e) {
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Failed to update password');
+        alert('Failed to update password: ' + (error.message || 'Unknown error'));
     });
 });
 </script>

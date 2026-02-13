@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Coach;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Member;
 use Illuminate\Http\Request;
 
-class MemberController extends Controller
+class MemberBookingController extends Controller
 {
     /**
-     * Get list of members with their active packages for coach booking
+     * List members with their active packages for booking.
      */
     public function index(Request $request)
     {
@@ -17,26 +17,22 @@ class MemberController extends Controller
             $q->active()->with('package');
         }]);
 
-        // Filter by name
         if ($request->has('search')) {
             $search = $request->search;
             $query->where('name', 'like', "%{$search}%");
         }
 
-        // Filter by status
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter by is_active
         if ($request->has('is_active')) {
             $query->where('is_active', $request->boolean('is_active'));
         }
 
         $members = $query->orderBy('name')->get();
 
-        // Transform to include only members with active packages
-        $membersWithPackages = $members->map(function ($member) {
+        $data = $members->map(function ($member) {
             $activePackages = $member->memberPackages->filter(function ($mp) {
                 $packageOk = true;
                 if ($mp->relationLoaded('package') && $mp->package) {
@@ -50,17 +46,11 @@ class MemberController extends Controller
                     && $mp->used_sessions < $mp->total_sessions;
             })->values();
 
-            // Set member status to inactive if no active packages
-            $effectiveStatus = $member->status;
-            if ($activePackages->isEmpty() && in_array($effectiveStatus, ['active', 'pending'])) {
-                $effectiveStatus = 'inactive';
-            }
-
             return [
                 'id' => $member->id,
                 'name' => $member->name,
                 'phone' => $member->phone,
-                'status' => $effectiveStatus,
+                'status' => $member->status,
                 'is_active' => $member->is_active,
                 'active_packages' => $activePackages->map(function ($mp) {
                     return [
@@ -69,22 +59,21 @@ class MemberController extends Controller
                         'total_sessions' => $mp->total_sessions,
                         'used_sessions' => $mp->used_sessions,
                         'remaining_sessions' => $mp->total_sessions - $mp->used_sessions,
-                        'start_date' => $mp->start_date->toDateString(),
-                        'end_date' => $mp->end_date->toDateString(),
+                        'start_date' => $mp->start_date?->toDateString(),
+                        'end_date' => $mp->end_date?->toDateString(),
                     ];
                 }),
             ];
-        });
+        })->values();
 
-        // Optionally filter to only members with active packages
         if ($request->boolean('has_active_package')) {
-            $membersWithPackages = $membersWithPackages->filter(function ($m) {
+            $data = $data->filter(function ($m) {
                 return count($m['active_packages']) > 0;
             })->values();
         }
 
         return response()->json([
-            'data' => $membersWithPackages,
+            'data' => $data,
         ]);
     }
 }

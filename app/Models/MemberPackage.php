@@ -60,9 +60,10 @@ class MemberPackage extends Model
      */
     public function hasRemainingSessions(): bool
     {
-        return $this->used_sessions < $this->total_sessions 
-            && $this->end_date->isFuture() 
-            && $this->is_active;
+        return (bool) $this->is_active
+            && $this->end_date
+            && $this->end_date->isFuture()
+            && $this->used_sessions < $this->total_sessions;
     }
 
     /**
@@ -79,6 +80,7 @@ class MemberPackage extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true)
+            ->whereNotNull('end_date')
             ->where('end_date', '>=', now());
     }
 }
