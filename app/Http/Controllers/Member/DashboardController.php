@@ -33,6 +33,9 @@ class DashboardController extends Controller
         $activePackage = $member->memberPackages()
             ->where('is_active', true)
             ->where('end_date', '>=', now())
+            ->whereHas('package', function ($q) {
+                $q->where('is_active', true);
+            })
             ->with('package')
             ->first();
 

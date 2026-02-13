@@ -18,11 +18,21 @@ class Achievement extends Model
         'photo_path',
     ];
 
+    protected $appends = ['photo_url'];
+
     protected function casts(): array
     {
         return [
             'date' => 'date',
         ];
+    }
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if (!$this->photo_path) {
+            return null;
+        }
+        return asset('storage/' . $this->photo_path);
     }
 
     /**

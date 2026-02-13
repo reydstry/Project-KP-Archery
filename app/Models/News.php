@@ -18,11 +18,21 @@ class News extends Model
         'publish_date',
     ];
 
+    protected $appends = ['photo_url'];
+
     protected function casts(): array
     {
         return [
             'publish_date' => 'date',
         ];
+    }
+
+    public function getPhotoUrlAttribute(): ?string
+    {
+        if (!$this->photo_path) {
+            return null;
+        }
+        return asset('storage/' . $this->photo_path);
     }
 
     public function scopePublished($query)

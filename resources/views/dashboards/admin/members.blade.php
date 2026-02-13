@@ -8,7 +8,7 @@
     
     <!-- Header Actions -->
     <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-        <div class="flex-1 w-full sm:max-w-md">
+        <div class="flex-1 w-full">
             <input type="search" x-model="search" placeholder="Search members..." 
                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
         </div>
@@ -48,14 +48,8 @@
                     <template x-for="member in filteredMembers" :key="member.id">
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0">
-                                        <span x-text="member.name.charAt(0).toUpperCase()"></span>
-                                    </div>
-                                    <div>
-                                        <p class="font-semibold text-slate-800" x-text="member.name"></p>
-                                        <p class="text-xs text-slate-500">ID: <span x-text="member.id"></span></p>
-                                    </div>
+                                <div class="flex items-center gap-3">                                    <div>
+                                        <p class="font-semibold text-slate-800" x-text="member.name"></p>                                    </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-slate-600" x-text="member.phone || '-'"></td>
@@ -71,13 +65,14 @@
                             <td class="px-6 py-4 text-slate-600" x-text="member.is_self ? 'Self' : 'Child'"></td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-end gap-2">
+                                    <button @click="viewMemberDetails(member)" 
+                                            class="p-2 text-green-500 hover:bg-green-50 rounded-lg transition"
+                                            title="View Details">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    </button>
                                     <button @click="openEditModal(member)" 
                                             class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
-                                    </button>
-                                    <button @click="confirmDelete(member)" 
-                                            class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
                                     </button>
                                 </div>
                             </td>
@@ -114,6 +109,13 @@
                            class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                 </div>
                 <div class="flex gap-4 pt-4">
+                    <template x-if="editingMember">
+                        <button type="button" @click="confirmToggle(editingMember)"
+                                class="flex-1 px-4 py-3 text-white rounded-xl font-semibold hover:shadow-lg transition"
+                                :class="(editingMember?.status === 'inactive' || editingMember?.is_active === false) ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-red-500 to-red-600'">
+                            <span x-text="(editingMember?.status === 'inactive' || editingMember?.is_active === false) ? 'Activate' : 'Deactivate'"></span>
+                        </button>
+                    </template>
                     <button type="button" @click="closeModal()" 
                             class="flex-1 px-4 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition">
                         Cancel
@@ -127,24 +129,138 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation -->
-    <div x-show="showDeleteConfirm" x-cloak @click.self="showDeleteConfirm = false"
+    <!-- Activate/Deactivate Confirmation -->
+    <div x-show="showToggleConfirm" x-cloak @click.self="showToggleConfirm = false"
          class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
-            <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                 :class="(memberToToggle?.status === 'inactive' || memberToToggle?.is_active === false) ? 'bg-green-50' : 'bg-red-50'">
+                <template x-if="memberToToggle?.status === 'inactive' || memberToToggle?.is_active === false">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </template>
+                <template x-if="memberToToggle?.status !== 'inactive' && memberToToggle?.is_active !== false">
+                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 12H6"/></svg>
+                </template>
             </div>
-            <h3 class="text-lg font-bold text-slate-800 mb-2">Delete Member?</h3>
-            <p class="text-slate-600 mb-6">This action cannot be undone. The member will be deactivated.</p>
+            <h3 class="text-lg font-bold text-slate-800 mb-2"
+                x-text="(memberToToggle?.status === 'inactive' || memberToToggle?.is_active === false) ? 'Activate Member?' : 'Deactivate Member?'"></h3>
+            <p class="text-slate-600 mb-6"
+               x-text="(memberToToggle?.status === 'inactive' || memberToToggle?.is_active === false) ? 'The member will be activated again.' : 'The member will be set to inactive.'"></p>
             <div class="flex gap-3">
-                <button @click="showDeleteConfirm = false" 
+                <button @click="showToggleConfirm = false" 
                         class="flex-1 px-4 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition">
                     Cancel
                 </button>
-                <button @click="deleteMember()" :disabled="deleting"
-                        class="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
-                    <span x-text="deleting ? 'Deleting...' : 'Delete'"></span>
+                <button @click="toggleMember()" :disabled="toggling"
+                        class="flex-1 px-4 py-3 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50"
+                        :class="(memberToToggle?.status === 'inactive' || memberToToggle?.is_active === false) ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-red-500 to-red-600'">
+                    <span x-text="(memberToToggle?.status === 'inactive' || memberToToggle?.is_active === false) ? (toggling ? 'Activating...' : 'Activate') : (toggling ? 'Deactivating...' : 'Deactivate')"></span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Details Modal -->
+    <div x-show="showDetailsModal" x-cloak @click.self="closeDetailsModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div @click.away="closeDetailsModal()" 
+             class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100">
+            <div class="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+                <h3 class="text-lg font-bold">Member Training Statistics</h3>
+                <button @click="closeDetailsModal()" class="text-white/80 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <template x-if="loadingDetails">
+                    <div class="text-center py-12">
+                        <div class="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
+                        <p class="text-slate-500 mt-4">Loading statistics...</p>
+                    </div>
+                </template>
+                
+                <template x-if="!loadingDetails && memberDetails">
+                    <div class="space-y-6">
+                        <!-- Member Info -->
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100">
+                            <h4 class="text-xl font-bold text-slate-800 mb-2" x-text="memberDetails.name"></h4>
+                            <div class="flex flex-wrap gap-4 text-sm">
+                                <div class="flex items-center gap-2 text-slate-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
+                                    <span x-text="memberDetails.phone || 'No phone'"></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-1 text-xs font-bold rounded-full"
+                                          :class="{
+                                              'bg-green-50 text-green-700 border border-green-200': memberDetails.status === 'active',
+                                              'bg-amber-50 text-amber-700 border border-amber-200': memberDetails.status === 'pending',
+                                              'bg-slate-50 text-slate-700 border border-slate-200': memberDetails.status !== 'active' && memberDetails.status !== 'pending'
+                                          }"
+                                          x-text="memberDetails.status"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- This Week -->
+                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h5 class="text-sm font-semibold text-slate-700">This Week</h5>
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                                </div>
+                                <p class="text-3xl font-bold text-green-700" x-text="statistics?.training_count_this_week || 0"></p>
+                                <p class="text-xs text-green-600 mt-1">training sessions</p>
+                            </div>
+
+                            <!-- This Month -->
+                            <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-5 border border-blue-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h5 class="text-sm font-semibold text-slate-700">This Month</h5>
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                                </div>
+                                <p class="text-3xl font-bold text-blue-700" x-text="statistics?.training_count_this_month || 0"></p>
+                                <p class="text-xs text-blue-600 mt-1">training sessions</p>
+                            </div>
+
+                            <!-- This Year -->
+                            <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 border border-purple-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h5 class="text-sm font-semibold text-slate-700">This Year</h5>
+                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+                                </div>
+                                <p class="text-3xl font-bold text-purple-700" x-text="statistics?.training_count_this_year || 0"></p>
+                                <p class="text-xs text-purple-600 mt-1">training sessions</p>
+                            </div>
+
+                            <!-- Week Streak -->
+                            <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-5 border border-orange-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h5 class="text-sm font-semibold text-slate-700">Week Streak</h5>
+                                    <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z"/></svg>
+                                </div>
+                                <p class="text-3xl font-bold text-orange-700" x-text="statistics?.week_streak || 0"></p>
+                                <p class="text-xs text-orange-600 mt-1">consecutive weeks</p>
+                            </div>
+                        </div>
+
+                        <!-- Total Trainings -->
+                        <div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h5 class="text-sm font-semibold text-slate-700 mb-1">Total Trainings</h5>
+                                    <p class="text-2xl font-bold text-slate-800" x-text="statistics?.total_trainings || 0"></p>
+                                </div>
+                                <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -158,11 +274,15 @@ function membersData() {
         search: '',
         loading: false,
         saving: false,
-        deleting: false,
+        toggling: false,
         showModal: false,
-        showDeleteConfirm: false,
+        showToggleConfirm: false,
+        showDetailsModal: false,
+        loadingDetails: false,
         editingMember: null,
-        memberToDelete: null,
+        memberToToggle: null,
+        memberDetails: null,
+        statistics: null,
         form: {
             name: '',
             phone: ''
@@ -210,6 +330,30 @@ function membersData() {
             this.editingMember = null;
             this.form = { name: '', phone: '' };
         },
+
+        async viewMemberDetails(member) {
+            this.memberDetails = member;
+            this.statistics = null;
+            this.showDetailsModal = true;
+            this.loadingDetails = true;
+            
+            try {
+                const response = await API.get(`/admin/members/${member.id}`);
+                this.memberDetails = response.data;
+                this.statistics = response.statistics || {};
+            } catch (error) {
+                console.error('Failed to load member details:', error);
+                showToast('Failed to load member details', 'error');
+            } finally {
+                this.loadingDetails = false;
+            }
+        },
+
+        closeDetailsModal() {
+            this.showDetailsModal = false;
+            this.memberDetails = null;
+            this.statistics = null;
+        },
         
         async saveMember() {
             this.saving = true;
@@ -233,26 +377,38 @@ function membersData() {
             }
         },
         
-        confirmDelete(member) {
-            this.memberToDelete = member;
-            this.showDeleteConfirm = true;
+        confirmToggle(member) {
+            this.memberToToggle = member;
+            this.showToggleConfirm = true;
         },
         
-        async deleteMember() {
-            if (!this.memberToDelete) return;
+        async toggleMember() {
+            if (!this.memberToToggle) return;
             
-            this.deleting = true;
+            this.toggling = true;
             try {
-                await API.delete(`/admin/members/${this.memberToDelete.id}`);
-                this.members = this.members.filter(m => m.id !== this.memberToDelete.id);
-                showToast('Member deleted successfully', 'success');
-                this.showDeleteConfirm = false;
-                this.memberToDelete = null;
+                const isInactive = this.memberToToggle.status === 'inactive' || this.memberToToggle.is_active === false;
+                if (isInactive) {
+                    await API.post(`/admin/members/${this.memberToToggle.id}/restore`);
+                    showToast('Member activated successfully', 'success');
+                } else {
+                    await API.delete(`/admin/members/${this.memberToToggle.id}`);
+                    showToast('Member deactivated successfully', 'success');
+                }
+
+                await this.loadMembers();
+
+                if (this.editingMember && this.memberToToggle && String(this.editingMember.id) === String(this.memberToToggle.id)) {
+                    this.editingMember = this.members.find(m => String(m.id) === String(this.memberToToggle.id)) || this.editingMember;
+                }
+
+                this.showToggleConfirm = false;
+                this.memberToToggle = null;
             } catch (error) {
-                console.error('Failed to delete member:', error);
-                showToast(error.message || 'Failed to delete member', 'error');
+                console.error('Failed to toggle member:', error);
+                showToast(error.message || 'Failed to update member status', 'error');
             } finally {
-                this.deleting = false;
+                this.toggling = false;
             }
         }
     }

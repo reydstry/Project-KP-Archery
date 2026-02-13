@@ -8,7 +8,7 @@
     
     <!-- Header Actions -->
     <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-        <div class="flex-1 w-full sm:max-w-md">
+        <div class="flex-1 w-full">
             <input type="search" x-model="search" placeholder="Search packages..." 
                    class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
         </div>
@@ -21,51 +21,66 @@
         </button>
     </div>
 
-    <!-- Packages Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="animation-delay: 0.1s">
-        <template x-if="loading">
-            <div class="col-span-full text-center py-12 text-slate-400">Loading...</div>
-        </template>
-        <template x-if="!loading && filteredPackages.length === 0">
-            <div class="col-span-full text-center py-12 text-slate-400">No packages found</div>
-        </template>
-        <template x-for="pkg in filteredPackages" :key="pkg.id">
-            <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all overflow-hidden">
-                <div class="p-6 space-y-4">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                            <h3 class="font-bold text-slate-800 text-xl" x-text="pkg.name"></h3>
-                            <p class="text-sm text-slate-500 mt-1" x-text="pkg.description"></p>
-                        </div>
-                        <div class="shrink-0 bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg font-bold text-lg">
-                            Rp <span x-text="Number(pkg.price).toLocaleString('id-ID')"></span>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
-                        <div>
-                            <p class="text-xs text-slate-500">Duration</p>
-                            <p class="font-bold text-slate-700" x-text="pkg.duration_days + ' days'"></p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500">Sessions</p>
-                            <p class="font-bold text-slate-700" x-text="pkg.session_count + ' sessions'"></p>
-                        </div>
-                    </div>
-                </div>
-                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
-                    <button @click="openEditModal(pkg)" 
-                            class="px-4 py-2 text-indigo-600 hover:bg-indigo-50 rounded-lg font-medium text-sm transition">
-                        Edit
-                    </button>
-                    <button @click="confirmDelete(pkg)" 
-                            class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg font-medium text-sm transition">
-                        Delete
-                    </button>
-                </div>
-            </div>
-        </template>
+    <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" style="animation-delay: 0.1s">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Nama</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Deskripsi</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Harga</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Durasi</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Sesi</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <template x-if="loading">
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-slate-400">Loading...</td>
+                        </tr>
+                    </template>
+                    <template x-if="!loading && filteredPackages.length === 0">
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-slate-400">No packages found</td>
+                        </tr>
+                    </template>
+                    <template x-for="package in filteredPackages" :key="package.id">
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div>
+                                        <p class="font-semibold text-slate-800" x-text="package.name"></p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600 text-sm" x-text="package.description || '-'"></td>
+                            <td class="px-6 py-4 text-slate-600 text-sm">
+                                Rp <span x-text="Number(package.price).toLocaleString('id-ID')"></span>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600 text-sm" x-text="package.duration_days + ' hari'"></td>
+                            <td class="px-6 py-4 text-slate-600 text-sm" x-text="package.session_count"></td>
+                            <td class="px-6 py-4">
+                                <span :class="package.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                      class="px-3 py-1 rounded-full text-xs font-semibold">
+                                    <span x-text="package.is_active ? 'Active' : 'Inactive'"></span>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button @click="openEditModal(package)" 
+                                            class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
     </div>
-
     <!-- Add/Edit Modal -->
     <div x-show="showModal" x-cloak @click.self="closeModal()"
          class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -107,6 +122,13 @@
                            class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none">
                 </div>
                 <div class="flex gap-4 pt-4">
+                    <template x-if="editingPackage">
+                        <button type="button" @click="togglePackageActive()" :disabled="togglingActive"
+                                class="flex-1 px-4 py-3 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50"
+                                :class="(editingPackage?.is_active === false) ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-red-500 to-red-600'">
+                            <span x-text="(editingPackage?.is_active === false) ? (togglingActive ? 'Activating...' : 'Activate') : (togglingActive ? 'Deactivating...' : 'Deactivate')"></span>
+                        </button>
+                    </template>
                     <button type="button" @click="closeModal()" 
                             class="flex-1 px-4 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition">
                         Cancel
@@ -151,6 +173,7 @@ function packagesData() {
         search: '',
         loading: false,
         saving: false,
+        togglingActive: false,
         deleting: false,
         showModal: false,
         showDeleteConfirm: false,
@@ -207,6 +230,30 @@ function packagesData() {
         closeModal() {
             this.showModal = false;
             this.editingPackage = null;
+        },
+
+        async togglePackageActive() {
+            if (!this.editingPackage || this.togglingActive) return;
+
+            this.togglingActive = true;
+            try {
+                const isInactive = this.editingPackage.is_active === false;
+                if (isInactive) {
+                    const response = await API.post(`/admin/packages/${this.editingPackage.id}/restore`);
+                    showToast(response.message || 'Package activated successfully', 'success');
+                } else {
+                    const response = await API.delete(`/admin/packages/${this.editingPackage.id}`);
+                    showToast(response.message || 'Package deactivated successfully', 'success');
+                }
+
+                await this.loadPackages();
+                this.editingPackage = this.packages.find(p => String(p.id) === String(this.editingPackage.id)) || this.editingPackage;
+            } catch (error) {
+                console.error('Failed to toggle package:', error);
+                showToast(error.message || 'Failed to update package status', 'error');
+            } finally {
+                this.togglingActive = false;
+            }
         },
         
         async savePackage() {

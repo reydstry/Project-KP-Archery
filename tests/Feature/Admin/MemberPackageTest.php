@@ -163,6 +163,30 @@ class MemberPackageTest extends TestCase
         $this->assertNotNull($memberPackage->validated_at);
     }
 
+    public function test_admin_cannot_assign_package_to_inactive_member()
+    {
+        $package = Package::factory()->create();
+        $member = Member::factory()->create([
+            'is_active' => false,
+            'status' => 'inactive',
+        ]);
+
+        $response = $this->actingAs($this->admin, 'sanctum')
+            ->postJson("/api/admin/members/{$member->id}/assign-package", [
+                'package_id' => $package->id,
+                'start_date' => now()->format('Y-m-d'),
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'Member is inactive',
+            ]);
+
+        $this->assertDatabaseMissing('member_packages', [
+            'member_id' => $member->id,
+        ]);
+    }
+
     public function test_admin_can_view_specific_member_package()
     {
         $memberPackage = MemberPackage::factory()->create();
@@ -184,21 +208,30 @@ class MemberPackageTest extends TestCase
         $package1 = Package::factory()->create();
         $package2 = Package::factory()->create();
 
-        MemberPackage::factory()->create([
-            'member_id' => $member->id,
-            'package_id' => $package1->id,
-        ]);
-        
-        MemberPackage::factory()->create([
-            'member_id' => $member->id,
-            'package_id' => $package2->id,
-        ]);
+        $this->actingAs($this->admin, 'sanctum')
+            ->postJson("/api/admin/members/{$member->id}/assign-package", [
+                'package_id' => $package1->id,
+                'start_date' => now()->format('Y-m-d'),
+            ])
+            ->assertStatus(201);
+
+        // Assigning a second time should update the existing record (no stacking)
+        $this->actingAs($this->admin, 'sanctum')
+            ->postJson("/api/admin/members/{$member->id}/assign-package", [
+                'package_id' => $package2->id,
+                'start_date' => now()->format('Y-m-d'),
+            ])
+            ->assertStatus(200);
+
+        $this->assertEquals(1, MemberPackage::where('member_id', $member->id)->count());
 
         $response = $this->actingAs($this->admin, 'sanctum')
             ->getJson("/api/admin/members/{$member->id}/packages");
 
         $response->assertStatus(200)
-            ->assertJsonCount(2);
+            ->assertJsonCount(1)
+            ->assertJsonPath('0.member_id', $member->id)
+            ->assertJsonPath('0.package_id', $package2->id);
     }
 
     public function test_member_cannot_assign_package()

@@ -1,13 +1,16 @@
-@extends('layouts.coach')
+@extends('layouts.admin')
+
+@section('title', 'Training Sessions')
+@section('subtitle', 'Buat training session seperti dashboard coach')
 
 @section('content')
-<div class="min-h-screen bg-white p-4 sm:p-8">
+<div class="p-4 sm:p-8">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6 sm:mb-8 card-animate" style="animation-delay: 0.1s">
         <div>
             <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Create Training Session</h1>
             <p class="text-slate-600 text-base sm:text-lg">Create a day session with one or more slots</p>
         </div>
-        <a href="{{ route('coach.sessions.index') }}" class="w-full sm:w-auto shrink-0 px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-center">Back</a>
+        <a href="{{ route('dashboard') }}" class="w-full sm:w-auto shrink-0 px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-center">Back</a>
     </div>
 
     <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 card-animate" style="animation-delay: 0.15s">
@@ -19,7 +22,7 @@
             </div>
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Slots</label>
-                <p class="text-sm text-slate-600">Pilih slot yang aktif, isi kuota, dan pilih coach per slot (Anda otomatis termasuk).</p>
+                <p class="text-sm text-slate-600">Pilih slot yang aktif, isi kuota, dan pilih coach per slot.</p>
             </div>
         </div>
 
@@ -31,7 +34,7 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Session Time</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Time</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Max Participants</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Additional Coaches</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Coaches</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-200" id="slotsTable">
@@ -54,7 +57,6 @@
 <script>
 const SESSION_TIMES = @json($sessionTimes ?? []);
 const COACHES = @json($coaches ?? []);
-const MY_COACH_ID = @json($myCoachId ?? null);
 
 document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('sessionDate');
@@ -81,8 +83,6 @@ function renderSlotsTable() {
         return;
     }
 
-    const myIdNum = Number(MY_COACH_ID || 0);
-
     tbody.innerHTML = SESSION_TIMES.map(st => {
         return `
             <tr>
@@ -101,10 +101,9 @@ function renderSlotsTable() {
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
-                        Additional Coaches
+                        Select Coaches
                         <span class="selected-count-badge ml-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold" data-slot-id="${st.id}">0</span>
                     </button>
-                    <p class="text-xs text-slate-500 mt-1">Anda otomatis termasuk</p>
                     <div class="hidden" data-selected-coaches="${st.id}"></div>
                     <div class="mt-2 text-xs text-slate-600" data-selected-coaches-names="${st.id}"></div>
                 </td>
@@ -114,7 +113,6 @@ function renderSlotsTable() {
 }
 
 let currentSlotId = null;
-const myIdNum = Number(MY_COACH_ID || 0);
 
 function openCoachModal(slotId) {
     currentSlotId = slotId;
@@ -137,13 +135,12 @@ function renderCoachList(slotId, searchTerm = '') {
     const selectedCoachesStr = document.querySelector(`[data-selected-coaches="${slotId}"]`)?.textContent || '';
     const selectedCoaches = selectedCoachesStr ? selectedCoachesStr.split(',').map(id => Number(id)) : [];
     
-    // Filter out current coach and apply search
     const filtered = COACHES.filter(c => 
-        Number(c.id) !== myIdNum && c.name.toLowerCase().includes(searchTerm.toLowerCase())
+        c.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     
     if (filtered.length === 0) {
-        container.innerHTML = '<p class="text-center py-8 text-slate-500">No additional coaches found</p>';
+        container.innerHTML = '<p class="text-center py-8 text-slate-500">No coaches found</p>';
         return;
     }
     
@@ -158,6 +155,7 @@ function renderCoachList(slotId, searchTerm = '') {
                     onchange="toggleCoachSelection(${slotId}, ${coach.id}, this.checked)">
                 <div class="flex-1">
                     <p class="font-medium text-slate-900">${coach.name}</p>
+                    ${coach.specialization ? `<p class="text-xs text-slate-500">${coach.specialization}</p>` : ''}
                 </div>
             </label>
         `;
@@ -199,7 +197,7 @@ function updateSelectedCount(slotId) {
                 .filter(c => selectedCoaches.includes(String(c.id)))
                 .map(c => c.name)
                 .join(', ');
-            namesContainer.textContent = '+ ' + coachNames;
+            namesContainer.textContent = '✓ ' + coachNames;
             namesContainer.classList.add('text-green-600', 'font-medium');
         } else {
             namesContainer.textContent = '';
@@ -229,16 +227,23 @@ async function submitCreate() {
             const maxInput = document.querySelector(`#slotsTable input[data-max-input-for="${sessionTimeId}"]`);
             const maxParticipants = Number(maxInput?.value || 0);
             const selectedCoachesStr = document.querySelector(`[data-selected-coaches="${sessionTimeId}"]`)?.textContent || '';
-            const additionalCoachIds = selectedCoachesStr ? selectedCoachesStr.split(',').map(id => Number(id)).filter(Boolean) : [];
+            const coachIds = selectedCoachesStr ? selectedCoachesStr.split(',').map(id => Number(id)).filter(Boolean) : [];
             return { 
                 session_time_id: sessionTimeId, 
                 max_participants: maxParticipants,
-                coach_ids: additionalCoachIds
+                coach_ids: coachIds
             };
         });
 
     if (selected.length === 0) {
         window.showToast('Select at least one slot', 'error');
+        return;
+    }
+
+    // Check if all selected slots have at least one coach
+    const slotWithoutCoach = selected.find(s => !s.coach_ids || s.coach_ids.length === 0);
+    if (slotWithoutCoach) {
+        window.showToast('Each slot must have at least one coach assigned', 'error');
         return;
     }
 
@@ -253,13 +258,13 @@ async function submitCreate() {
     btn.textContent = 'Creating...';
 
     try {
-        await window.API.post('/coach/training-sessions', {
+        await window.API.post('/admin/training-sessions', {
             date,
             slots: selected,
         });
 
         window.showToast('Training session created', 'success');
-        window.location.href = '{{ route('coach.sessions.index') }}';
+        window.location.href = '{{ route('dashboard') }}';
     } catch (e) {
         console.error(e);
         window.showToast(e?.message || 'Failed to create session', 'error');
@@ -276,14 +281,13 @@ async function submitCreate() {
         <!-- Header -->
         <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-blue-600 to-blue-700">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-bold text-white">Select Additional Coaches</h3>
+                <h3 class="text-lg font-bold text-white">Select Coaches</h3>
                 <button type="button" onclick="closeCoachModal()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-1 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
-            <p class="text-sm text-blue-100 mt-1">You are automatically included</p>
         </div>
         
         <!-- Search -->

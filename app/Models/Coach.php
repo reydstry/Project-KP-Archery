@@ -24,11 +24,12 @@ class Coach extends Model
     }
 
     /**
-     * Get training sessions
+     * Training session slots where this coach is assigned.
      */
-    public function trainingSessions()
+    public function trainingSessionSlots()
     {
-        return $this->hasMany(TrainingSession::class);
+        return $this->belongsToMany(TrainingSessionSlot::class, 'training_session_slot_coach')
+            ->withTimestamps();
     }
 
     /**

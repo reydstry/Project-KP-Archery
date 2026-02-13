@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Enums\StatusMember;
 use App\Models\Member;
 use App\Models\MemberPackage;
 use App\Models\SessionBooking;
@@ -72,9 +73,16 @@ class SessionBookingController extends Controller
             ], 404);
         }
 
+        if (!$member->is_active || $member->status === StatusMember::STATUS_INACTIVE->value) {
+            return response()->json([
+                'message' => 'Your membership is inactive',
+            ], 403);
+        }
+
         // Verify member package belongs to this member
         $memberPackage = MemberPackage::where('id', $validated['member_package_id'])
             ->where('member_id', $member->id)
+            ->with(['package', 'member'])
             ->first();
 
         if (!$memberPackage) {
@@ -87,6 +95,12 @@ class SessionBookingController extends Controller
         if (!$memberPackage->is_active) {
             return response()->json([
                 'message' => 'Your package is not active',
+            ], 422);
+        }
+
+        if (!$memberPackage->package?->is_active) {
+            return response()->json([
+                'message' => 'Your package is inactive',
             ], 422);
         }
 

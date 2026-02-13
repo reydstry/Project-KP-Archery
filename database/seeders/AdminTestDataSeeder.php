@@ -34,7 +34,9 @@ class AdminTestDataSeeder extends Seeder
             ]
         );
 
-        // Create Coach Users
+        // Create Coach Users (50 coaches)
+        $this->command->info('🎓 Creating 50 coaches...');
+        
         $coaches = [
             [
                 'name' => 'Budi Gunawan',
@@ -63,6 +65,21 @@ class AdminTestDataSeeder extends Seeder
             User::firstOrCreate(
                 ['email' => $coachData['email']],
                 $coachData
+            );
+        }
+
+        // Generate 47 more coaches using faker (total 50)
+        $faker = \Faker\Factory::create('id_ID');
+        for ($i = 4; $i <= 50; $i++) {
+            User::firstOrCreate(
+                ['email' => "coach{$i}@clubpanahan.com"],
+                [
+                    'name' => $faker->name(),
+                    'email' => "coach{$i}@clubpanahan.com",
+                    'phone' => $faker->unique()->numerify('08##########'),
+                    'role' => UserRoles::COACH->value,
+                    'password' => Hash::make('coach123'),
+                ]
             );
         }
 
@@ -105,7 +122,9 @@ class AdminTestDataSeeder extends Seeder
             );
         }
 
-        // Create Member Users and Members
+        // Create Member Users and Members (100 members)
+        $this->command->info('👥 Creating 100 members...');
+        
         $memberUsers = [
             [
                 'name' => 'Rudi Hartono',
@@ -169,6 +188,36 @@ class AdminTestDataSeeder extends Seeder
                     'is_self' => true,
                     'is_active' => true,
                     'status' => $index < 3 ? StatusMember::STATUS_ACTIVE->value : StatusMember::STATUS_PENDING->value,
+                ]
+            );
+        }
+
+        // Generate 94 more members using faker (total 100)
+        // 40% will be active with packages, 60% will be pending
+        for ($i = 7; $i <= 100; $i++) {
+            $user = User::firstOrCreate(
+                ['email' => "member{$i}@example.com"],
+                [
+                    'name' => $faker->name(),
+                    'email' => "member{$i}@example.com",
+                    'phone' => $faker->unique()->numerify('08##########'),
+                    'role' => UserRoles::MEMBER->value,
+                    'password' => Hash::make('member123'),
+                ]
+            );
+
+            // 40% active, 60% pending
+            $isActive = $i <= 40;
+            Member::firstOrCreate(
+                ['user_id' => $user->id, 'is_self' => true],
+                [
+                    'user_id' => $user->id,
+                    'registered_by' => $user->id,
+                    'name' => $user->name,
+                    'phone' => $user->phone,
+                    'is_self' => true,
+                    'is_active' => $isActive,
+                    'status' => $isActive ? StatusMember::STATUS_ACTIVE->value : StatusMember::STATUS_PENDING->value,
                 ]
             );
         }
@@ -295,8 +344,10 @@ class AdminTestDataSeeder extends Seeder
         }
 
         // Create Coaches
+        $this->command->info('🎓 Creating coach profiles...');
+        
         $coachUsers = User::where('role', UserRoles::COACH->value)->get();
-        foreach ($coachUsers as $coachUser) {
+        foreach ($coachUsers as $index => $coachUser) {
             Coach::firstOrCreate(
                 ['user_id' => $coachUser->id],
                 [
@@ -308,6 +359,8 @@ class AdminTestDataSeeder extends Seeder
         }
 
         // Create default Session Times (6 template sessions)
+        $this->command->info('⏰ Creating session times...');
+        
         $defaultSessionTimes = [
             ['name' => 'Sesi 1', 'start_time' => '07:30:00', 'end_time' => '09:00:00'],
             ['name' => 'Sesi 2', 'start_time' => '09:00:00', 'end_time' => '10:30:00'],
@@ -325,14 +378,16 @@ class AdminTestDataSeeder extends Seeder
         }
 
         // Create Member Packages
+        $this->command->info('📦 Creating member packages...');
+        
         $adminUser = User::where('role', UserRoles::ADMIN->value)->first();
         $activeMembers = Member::where('status', StatusMember::STATUS_ACTIVE->value)->get();
         $allPackages = Package::all();
 
         if ($adminUser && $activeMembers->isNotEmpty() && $allPackages->isNotEmpty()) {
-            // Assign packages to first 3 active members
-            foreach ($activeMembers->take(3) as $index => $member) {
-                $package = $allPackages->skip($index % $allPackages->count())->first();
+            // Assign packages to all active members
+            foreach ($activeMembers as $index => $member) {
+                $package = $allPackages->random();
                 
                 // Create different scenarios
                 if ($index === 0) {
@@ -392,35 +447,56 @@ class AdminTestDataSeeder extends Seeder
                             'validated_at' => Carbon::now()->subDays($package->duration_days + 10),
                         ]
                     );
+                } else {
+                    // For other active members, create random packages
+                    $usagePercent = mt_rand(10, 70) / 100; // 10-70% used
+                    $daysUsed = mt_rand(5, (int)($package->duration_days * 0.5)); // Used 5 to 50% of duration
+                    
+                    MemberPackage::firstOrCreate(
+                        [
+                            'member_id' => $member->id,
+                            'package_id' => $package->id,
+                        ],
+                        [
+                            'member_id' => $member->id,
+                            'package_id' => $package->id,
+                            'total_sessions' => $package->session_count,
+                            'used_sessions' => (int)($package->session_count * $usagePercent),
+                            'start_date' => Carbon::now()->subDays($daysUsed),
+                            'end_date' => Carbon::now()->addDays($package->duration_days - $daysUsed),
+                            'is_active' => true,
+                            'validated_by' => $adminUser->id,
+                            'validated_at' => Carbon::now()->subDays($daysUsed),
+                        ]
+                    );
                 }
             }
         }
 
         $this->command->info('✅ Admin test data seeded successfully!');
         $this->command->info('');
-        $this->command->info('📊 Test Accounts:');
+        $this->command->info('📊 Test Accounts (Sample):');
         $this->command->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         $this->command->info('👤 Admin: admin@clubpanahan.com / admin123');
         $this->command->info('👥 Coach: budi.coach@clubpanahan.com / coach123');
         $this->command->info('👥 Coach: siti.coach@clubpanahan.com / coach123');
-        $this->command->info('👥 Coach: andi.coach@clubpanahan.com / coach123');
+        $this->command->info('👥 Coach: coach4-coach50@clubpanahan.com / coach123');
         $this->command->info('🎯 Member: rudi@example.com / member123 (Active with package)');
         $this->command->info('🎯 Member: dewi@example.com / member123 (Active with package)');
-        $this->command->info('🎯 Member: agus@example.com / member123 (Active with expired package)');
+        $this->command->info('🎯 Member: member7-member40@example.com / member123 (Active)');
         $this->command->info('⏳ Member: linda@example.com / member123 (Pending - no package)');
-        $this->command->info('⏳ Member: bambang@example.com / member123 (Pending - no package)');
-        $this->command->info('⏳ Member: sari@example.com / member123 (Pending - no package)');
+        $this->command->info('⏳ Member: member41-member100@example.com / member123 (Pending)');
         $this->command->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         $this->command->info('');
         $this->command->info('📦 Packages created: ' . Package::count());
         $this->command->info('👥 Total Members: ' . Member::count());
         $this->command->info('   ✅ Active: ' . Member::where('status', StatusMember::STATUS_ACTIVE->value)->count());
         $this->command->info('   ⏳ Pending: ' . Member::where('status', StatusMember::STATUS_PENDING->value)->count());
-        $this->command->info('🎓 Coaches created: ' . Coach::count());
+        $this->command->info('🎓 Total Coaches: ' . Coach::count());
         $this->command->info('📰 News articles: ' . News::count());
         $this->command->info('🏆 Achievements: ' . Achievement::count());
         $this->command->info('📋 Member Packages: ' . MemberPackage::count());
-        $this->command->info('� Session Times: ' . SessionTime::count());
+        $this->command->info('⏰ Session Times: ' . SessionTime::count());
         $this->command->info('');
         $this->command->info('💡 Test assigning packages to pending members to see status change to active!');
     }

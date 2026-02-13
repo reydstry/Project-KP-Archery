@@ -1,18 +1,12 @@
-@extends('layouts.coach')
+@extends('layouts.admin')
 
 @section('title', 'Booking Sesi')
-@section('subtitle', 'Booking slot sesi latihan untuk member (pilih member dari list)')
+@section('subtitle', 'Pilih slot waktu latihan, lalu pilih member dari daftar.')
 
 @section('content')
-<div x-data="bookingPage()" x-init="init()" class="space-y-4 sm:space-y-6">
-
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm card-animate" style="animation-delay: 0.1s">
-        <div class="p-4 sm:p-6 border-b border-slate-200">
-            <h3 class="text-lg font-bold text-slate-800">Form Booking</h3>
-            <p class="text-sm text-slate-500 mt-1">Pilih slot waktu latihan, lalu pilih member dari daftar.</p>
-        </div>
-
-        <div class="p-4 sm:p-6">
+<div class="space-y-6">
+    <div x-data="adminBookingPage()" x-init="init()" class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div class="p-6">
             <!-- Training Session Info -->
             <div class="mb-6">
                 <div class="flex items-center justify-between mb-3">
@@ -61,15 +55,13 @@
                 </template>
             </div>
 
-            <!-- Member Selection Section -->
             <div x-show="form.training_session_slot_id" x-cloak>
                 <div class="border-t border-slate-200 pt-6">
                     <h4 class="text-base font-bold text-slate-800 mb-4">Pilih Member</h4>
-                    
+
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Cari Member</label>
-                        <input type="text" x-model="memberSearch" @input="filterMembers()" 
-                               placeholder="Cari nama member aktif..."
+                        <input type="text" x-model="memberSearch" @input="filterMembers()" placeholder="Cari nama member aktif..."
                                class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
                         <p class="text-xs text-slate-500 mt-1">Hanya menampilkan member dengan status aktif</p>
                     </div>
@@ -77,27 +69,22 @@
                     <div class="bg-slate-50 rounded-xl p-4 max-h-96 overflow-y-auto">
                         <p class="text-sm text-slate-600 mb-3" x-show="loadingMembers" x-cloak>Memuat member...</p>
                         <p class="text-sm text-slate-600 mb-3" x-show="!loadingMembers && filteredMembers.length === 0" x-cloak>Tidak ada member.</p>
-                        
+
                         <div class="space-y-2">
                             <template x-for="member in filteredMembers" :key="member.id">
                                 <label class="flex items-start gap-3 p-3 bg-white rounded-lg border border-slate-200 hover:border-blue-300 cursor-pointer transition-all">
-                                    <input type="checkbox" 
-                                           :value="member.id"
-                                           @change="toggleMemberSelection(member)"
+                                    <input type="checkbox" :value="member.id" @change="toggleMemberSelection(member)"
                                            :checked="selectedMembers.some(m => m.id === member.id)"
                                            class="mt-1 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
                                     <div class="flex items-center justify-between w-full">
-                                        <!-- Kiri: Nama + Status -->
                                         <div>
                                             <p class="font-semibold text-slate-900" x-text="member.name"></p>
                                         </div>
 
-                                        <!-- Kanan: Paket -->
                                         <div class="flex flex-wrap gap-1 justify-end text-right">
                                             <template x-if="member.active_packages && member.active_packages.length > 0">
                                                 <template x-for="pkg in member.active_packages" :key="pkg.id">
-                                                    <div
-                                                        class="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded whitespace-nowrap">
+                                                    <div class="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded whitespace-nowrap">
                                                         <span x-text="pkg.package_name"></span>:
                                                         <span x-text="`${pkg.remaining_sessions} sesi`"></span>
                                                     </div>
@@ -135,11 +122,10 @@
         </div>
     </div>
 </div>
-@endsection
 
 @push('scripts')
 <script>
-function bookingPage() {
+function adminBookingPage() {
     return {
         latestSession: null,
         slots: [],
@@ -163,7 +149,7 @@ function bookingPage() {
         async loadSessions() {
             this.loadingSessions = true;
             try {
-                const res = await window.API.get('/coach/training-sessions?status=open&start_date=' + this.today());
+                const res = await window.API.get('/admin/training-sessions?status=open&start_date=' + this.today());
                 const sessions = Array.isArray(res?.data) ? res.data : [];
                 
                 // Get the latest session (first one)
@@ -189,7 +175,7 @@ function bookingPage() {
 
             this.loadingSlots = true;
             try {
-                const session = await window.API.get(`/coach/training-sessions/${this.latestSession.id}`);
+                const session = await window.API.get(`/admin/training-sessions/${this.latestSession.id}`);
                 this.slots = session?.slots || [];
                 if (!Array.isArray(this.slots)) this.slots = [];
                 this.slots.sort((a, b) => (a?.session_time?.start_time || '').localeCompare(b?.session_time?.start_time || ''));
@@ -210,7 +196,7 @@ function bookingPage() {
         async loadMembers() {
             this.loadingMembers = true;
             try {
-                const res = await window.API.get('/coach/members');
+                const res = await window.API.get('/admin/booking-members');
                 this.members = Array.isArray(res?.data) ? res.data : [];
                 this.filterMembers();
             } catch (e) {
@@ -240,7 +226,6 @@ function bookingPage() {
             if (idx >= 0) {
                 this.selectedMembers.splice(idx, 1);
             } else {
-                // Choose first active package for booking
                 const firstPackage = (member.active_packages || [])[0];
                 if (!firstPackage) {
                     window.showToast(`Member ${member.name} tidak memiliki paket aktif`, 'error');
@@ -281,7 +266,7 @@ function bookingPage() {
                             notes: null,
                         };
 
-                        await window.API.post('/coach/bookings', payload);
+                        await window.API.post('/admin/bookings', payload);
                         successCount++;
                     } catch (e) {
                         console.error(`Failed booking for ${member.name}:`, e);
@@ -291,8 +276,6 @@ function bookingPage() {
 
                 const message = `Booking selesai: ${successCount} sukses${failCount > 0 ? `, ${failCount} gagal` : ''}`;
                 window.showToast(message, failCount === 0 ? 'success' : 'info');
-
-                // Reset selection
                 this.selectedMembers = [];
             } catch (e) {
                 console.error(e);
@@ -317,13 +300,14 @@ function bookingPage() {
         },
 
         formatSessionLabel(s) {
-          const date = new Date(s.date)
-          return date.toLocaleDateString('id-ID', {
-              weekday: 'long',
-              day: '2-digit',
-              month: 'long',
-              year: 'numeric'
-          });
+            const date = new Date(s.date);
+            const coachName = s?.coach?.name ? ` • ${s.coach.name}` : '';
+            return date.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            }) + coachName;
         },
 
         formatSlotLabel(slot) {
@@ -337,3 +321,4 @@ function bookingPage() {
 }
 </script>
 @endpush
+@endsection
