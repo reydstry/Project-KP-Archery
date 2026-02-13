@@ -34,45 +34,55 @@ class DashboardController extends Controller
             || ($now->hour === TrainingSession::AUTO_CLOSE_HOUR && $now->minute >= TrainingSession::AUTO_CLOSE_MINUTE);
 
         TrainingSession::query()
-            ->where('coach_id', $coach->id)
             ->where('status', 'open')
             ->where('date', $shouldCloseToday ? '<=' : '<', $today)
             ->update(['status' => 'closed']);
 
-        $todaySession = TrainingSession::query()
-            ->with(['slots.sessionTime', 'slots.confirmedBookings'])
-            ->where('coach_id', $coach->id)
+        $todaySessions = TrainingSession::query()
+            ->with(['slots.sessionTime', 'slots.confirmedBookings.memberPackage.member', 'slots.coaches'])
             ->whereDate('date', $today)
-            ->first();
+            ->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id))
+            ->get();
 
-        $todaySlots = $todaySession
-            ? $todaySession->slots
+        $todaySlots = $todaySessions
+            ->flatMap(fn (TrainingSession $session) => $session->slots
+                ->filter(fn ($slot) => $slot->coaches->contains('id', $coach->id)) // Only slots where this coach is assigned
                 ->sortBy('session_time_id')
                 ->values()
                 ->map(fn ($slot) => [
                     'id' => $slot->id,
                     'training_session_id' => $slot->training_session_id,
-                    'date' => $todaySession->date,
-                    'status' => $todaySession->status?->value,
+                    'date' => $session->date,
+                    'status' => $session->status?->value,
                     'max_participants' => $slot->max_participants,
                     'capacity' => $slot->max_participants,
                     'total_bookings' => $slot->confirmedBookings->count(),
+                    'coaches' => $slot->coaches->map(fn ($c) => [
+                        'id' => $c->id,
+                        'name' => $c->name,
+                    ])->values(),
+                    'members' => $slot->confirmedBookings
+                        ? $slot->confirmedBookings->map(fn ($booking) => [
+                            'id' => $booking->memberPackage?->member?->id,
+                            'name' => $booking->memberPackage?->member?->name,
+                        ])->filter(fn ($m) => $m['id'])->values()
+                        : [],
                     'session_time' => [
                         'id' => $slot->sessionTime?->id,
                         'session_name' => $slot->sessionTime?->name,
                         'start_time' => $slot->sessionTime?->start_time,
                         'end_time' => $slot->sessionTime?->end_time,
                     ],
-                ])
-            : collect();
+                ]))
+            ->values();
 
         $upcomingCount = TrainingSession::query()
-            ->where('coach_id', $coach->id)
             ->whereDate('date', '>=', $today)
+            ->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id))
             ->count();
 
         $totalCount = TrainingSession::query()
-            ->where('coach_id', $coach->id)
+            ->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id))
             ->count();
 
         return response()->json([

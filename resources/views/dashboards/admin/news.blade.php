@@ -33,11 +33,11 @@
             <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all overflow-hidden">
                 <div class="p-6">
                     <div class="flex items-start gap-6">
-                        <template x-if="article.photo_path">
-                            <img :src="article.photo_path" :alt="article.title" 
+                        <template x-if="article.photo_url">
+                            <img :src="article.photo_url" :alt="article.title" 
                                  class="w-32 h-24 object-cover rounded-xl shrink-0">
                         </template>
-                        <template x-if="!article.photo_path">
+                        <template x-if="!article.photo_url">
                             <div class="w-32 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl shrink-0 flex items-center justify-center">
                                 <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"/></svg>
                             </div>
@@ -94,10 +94,19 @@
                            class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Photo URL</label>
-                    <input type="url" x-model="form.photo_path" placeholder="https://..."
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Photo</label>
+                    <input type="file" @change="handlePhotoChange" accept="image/*" ref="photoInput"
                            class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
-                    <p class="text-xs text-slate-500 mt-1">Optional: Enter image URL</p>
+                    <p class="text-xs text-slate-500 mt-1">Optional: Upload an image (max 5MB, formats: jpg, png, gif, webp)</p>
+                    
+                    <!-- Image Preview -->
+                    <div x-show="photoPreview" class="mt-3">
+                        <img :src="photoPreview" class="w-full h-48 object-cover rounded-xl border border-slate-200">
+                        <button type="button" @click="removePhoto()" 
+                                class="mt-2 text-sm text-red-600 hover:text-red-700 font-medium">
+                            Remove photo
+                        </button>
+                    </div>
                 </div>
                 <div class="flex gap-4 pt-4">
                     <button type="button" @click="closeModal()" 
@@ -149,11 +158,12 @@ function newsData() {
         showDeleteConfirm: false,
         editingNews: null,
         newsToDelete: null,
+        photoFile: null,
+        photoPreview: null,
         form: {
             title: '',
             content: '',
-            publish_date: '',
-            photo_path: ''
+            publish_date: ''
         },
         
         get filteredNews() {
@@ -205,19 +215,80 @@ function newsData() {
         closeModal() {
             this.showModal = false;
             this.editingNews = null;
+            this.photoFile = null;
+            this.photoPreview = null;
+        },
+
+        handlePhotoChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.photoFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.photoPreview = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        },
+
+        removePhoto() {
+            this.photoFile = null;
+            this.photoPreview = null;
+            if (this.$refs.photoInput) {
+                this.$refs.photoInput.value = '';
+            }
         },
         
         async saveNews() {
             this.saving = true;
             try {
+                const formData = new FormData();
+                formData.append('title', this.form.title);
+                formData.append('content', this.form.content);
+                formData.append('publish_date', this.form.publish_date);
+                
+                if (this.photoFile) {
+                    formData.append('photo', this.photoFile);
+                }
+
                 if (this.editingNews) {
-                    const response = await API.put(`/admin/news/${this.editingNews.id}`, this.form);
+                    // Laravel doesn't support PUT with FormData directly, use POST with _method
+                    formData.append('_method', 'PUT');
+                    const response = await fetch(`/api/admin/news/${this.editingNews.id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                            'Accept': 'application/json',
+                        },
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to update news');
+                    }
+                    
+                    const result = await response.json();
                     const index = this.news.findIndex(n => n.id === this.editingNews.id);
-                    if (index > -1) this.news[index] = response.data;
+                    if (index > -1) this.news[index] = result.data;
                     showToast('News updated successfully', 'success');
                 } else {
-                    const response = await API.post('/admin/news', this.form);
-                    this.news.unshift(response.data);
+                    const response = await fetch('/api/admin/news', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                            'Accept': 'application/json',
+                        },
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || 'Failed to create news');
+                    }
+                    
+                    const result = await response.json();
+                    this.news.unshift(result.data);
                     showToast('News added successfully', 'success');
                 }
                 this.closeModal();

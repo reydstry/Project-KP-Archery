@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Coach;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Enums\StatusMember;
-use App\Models\Coach;
 use App\Models\MemberPackage;
 use App\Models\SessionBooking;
 use App\Models\TrainingSessionSlot;
@@ -13,21 +11,9 @@ use Illuminate\Support\Facades\DB;
 
 class SessionBookingController extends Controller
 {
-    private function isCoachAssignedToSlot(?Coach $coach, TrainingSessionSlot $slot): bool
-    {
-        if (!$coach) {
-            return false;
-        }
-
-        return $slot->coaches()
-            ->where('coaches.id', $coach->id)
-            ->exists();
-    }
-
     /**
-     * Coach books a session slot for a member (using member_package_id).
+     * Admin books a session slot for a member (using member_package_id).
      */
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -35,13 +21,6 @@ class SessionBookingController extends Controller
             'member_package_id' => 'required|exists:member_packages,id',
             'notes' => 'nullable|string|max:500',
         ]);
-
-        $coach = Coach::where('user_id', auth()->id())->first();
-        if (!$coach) {
-            return response()->json([
-                'message' => 'Coach profile not found',
-            ], 404);
-        }
 
         $memberPackage = MemberPackage::with(['member', 'package'])
             ->where('id', $validated['member_package_id'])
@@ -53,15 +32,15 @@ class SessionBookingController extends Controller
             ], 404);
         }
 
-        if (!$memberPackage->member?->is_active || $memberPackage->member?->status === StatusMember::STATUS_INACTIVE->value) {
-            return response()->json([
-                'message' => 'Member is inactive',
-            ], 422);
-        }
-
         if (!$memberPackage->is_active) {
             return response()->json([
                 'message' => 'Member package is not active',
+            ], 422);
+        }
+
+        if (!$memberPackage->member?->is_active || $memberPackage->member?->status === 'inactive') {
+            return response()->json([
+                'message' => 'Member is inactive',
             ], 422);
         }
 
@@ -96,15 +75,8 @@ class SessionBookingController extends Controller
             ], 404);
         }
 
-        if (!$this->isCoachAssignedToSlot($coach, $trainingSessionSlot)) {
-            return response()->json([
-                'message' => 'You can only book slots where you are assigned as a coach',
-            ], 403);
-        }
-
         $now = now();
 
-        // Auto-close if needed and enforce booking window
         $trainingSession->applyAutoClose($now);
 
         if ($trainingSession->date->isPast() && !$trainingSession->date->isToday()) {
@@ -120,12 +92,11 @@ class SessionBookingController extends Controller
             ], 422);
         }
 
-        // Check if slot time has already passed
         $sessionTime = $trainingSessionSlot->sessionTime;
         if ($sessionTime && $trainingSession->date->isToday()) {
-            $slotEndTime = $sessionTime->end_time; // Format: HH:mm:ss
+            $slotEndTime = $sessionTime->end_time;
             $currentTime = $now->format('H:i:s');
-            
+
             if ($currentTime >= $slotEndTime) {
                 return response()->json([
                     'message' => 'Cannot book this slot. The session time has already passed.',
@@ -181,7 +152,7 @@ class SessionBookingController extends Controller
                 'data' => $booking->load([
                     'memberPackage.member',
                     'trainingSessionSlot.sessionTime',
-                    'trainingSessionSlot.coaches',
+                    'trainingSessionSlot.trainingSession.coach',
                 ]),
                 'remaining_sessions' => $memberPackage->total_sessions - $memberPackage->used_sessions,
             ], 201);

@@ -19,9 +19,12 @@ class MemberPackageController extends Controller
     {
         $memberPackages = MemberPackage::with(['member', 'package', 'validator'])
             ->latest()
-            ->paginate(15);
+            ->get();
 
-        return response()->json($memberPackages);
+        return response()->json([
+            'message' => 'Data member packages berhasil diambil',
+            'data' => $memberPackages,
+        ]);
     }
 
     /**
@@ -29,6 +32,12 @@ class MemberPackageController extends Controller
      */
     public function assignPackage(Request $request, Member $member)
     {
+        if (!$member->is_active || $member->status === StatusMember::STATUS_INACTIVE->value) {
+            return response()->json([
+                'message' => 'Member is inactive',
+            ], 422);
+        }
+
         $validated = $request->validate([
             'package_id' => 'required|exists:packages,id',
             'start_date' => 'required|date',
@@ -37,24 +46,38 @@ class MemberPackageController extends Controller
         // Get package details
         $package = Package::findOrFail($validated['package_id']);
 
+        if (property_exists($package, 'is_active') && !$package->is_active) {
+            return response()->json([
+                'message' => 'Package is inactive',
+            ], 422);
+        }
+
         // Calculate end date
         $startDate = \Carbon\Carbon::parse($validated['start_date']);
         $endDate = $startDate->copy()->addDays($package->duration_days);
 
         DB::beginTransaction();
         try {
-            // Create member package
-            $memberPackage = MemberPackage::create([
-                'member_id' => $member->id,
-                'package_id' => $package->id,
-                'total_sessions' => $package->session_count,
-                'used_sessions' => 0,
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'is_active' => true,
-                'validated_by' => auth()->id(),
-                'validated_at' => now(),
-            ]);
+            $memberPackage = MemberPackage::where('member_id', $member->id)
+                ->latest('id')
+                ->first();
+
+            $isCreate = false;
+            if (!$memberPackage) {
+                $memberPackage = new MemberPackage();
+                $memberPackage->member_id = $member->id;
+                $isCreate = true;
+            }
+
+            $memberPackage->package_id = $package->id;
+            $memberPackage->total_sessions = $package->session_count;
+            $memberPackage->used_sessions = 0;
+            $memberPackage->start_date = $startDate;
+            $memberPackage->end_date = $endDate;
+            $memberPackage->is_active = true;
+            $memberPackage->validated_by = auth()->id();
+            $memberPackage->validated_at = now();
+            $memberPackage->save();
 
             // Update member status from pending to active
             if ($member->status === StatusMember::STATUS_PENDING->value) {
@@ -68,7 +91,7 @@ class MemberPackageController extends Controller
             return response()->json([
                 'message' => 'Package assigned successfully',
                 'data' => $memberPackage->load(['member', 'package', 'validator']),
-            ], 201);
+            ], $isCreate ? 201 : 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -83,7 +106,8 @@ class MemberPackageController extends Controller
      */
     public function show(MemberPackage $memberPackage)
     {
-        return response()->json($memberPackage->load(['member', 'package', 'validator']));
+        $memberPackage->load(['member', 'package', 'validator']);
+        return response()->json($memberPackage);
     }
 
     /**

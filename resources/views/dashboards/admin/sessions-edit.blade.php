@@ -1,16 +1,16 @@
-@extends('layouts.coach')
+@extends('layouts.admin')
+
+@section('title', 'Training Sessions')
+@section('subtitle', 'Edit training session (multiple coaches)')
 
 @section('content')
-<div class="min-h-screen bg-white p-4 sm:p-8">
+<div class="p-4 sm:p-8">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6 sm:mb-8 card-animate" style="animation-delay: 0.1s">
         <div>
             <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-900 mb-2">Edit Training Session</h1>
-            <p class="text-slate-600 text-base sm:text-lg">Update slot quotas for this day</p>
+            <p class="text-slate-600 text-base sm:text-lg">Update coaches assigned for this day</p>
         </div>
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-            <button type="button" id="deleteSessionBtn" onclick="deleteSession()" class="w-full sm:w-auto px-5 py-3 bg-white hover:bg-slate-50 text-red-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-center">Delete Session</button>
-            <a href="{{ route('coach.sessions.index') }}" class="w-full sm:w-auto px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-center">Back</a>
-        </div>
+        <a href="{{ route('dashboard') }}" class="w-full sm:w-auto shrink-0 px-5 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-center">Back</a>
     </div>
 
     <div class="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6 card-animate" style="animation-delay: 0.15s">
@@ -27,15 +27,18 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Time</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Max Participants</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Coaches</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-slate-200" id="slotsBody">
                     <tr>
-                        <td colspan="5" class="px-6 py-10 text-center text-slate-600">Loading slots...</td>
+                        <td colspan="4" class="px-6 py-10 text-center text-slate-600">Loading slots...</td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="mt-4 sm:mt-6 flex items-center justify-end gap-3">
+            <button type="button" onclick="updateAllSlots()" id="updateBtn" class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30">Update All Coaches</button>
         </div>
     </div>
 </div>
@@ -44,7 +47,6 @@
 const SESSION_ID = @json($id ?? null);
 let CURRENT_SESSION = null;
 const COACHES = @json($coaches ?? []);
-const MY_COACH_ID = @json($myCoachId ?? null);
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!SESSION_ID) {
@@ -53,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        const session = await window.API.get(`/coach/training-sessions/${SESSION_ID}`);
+        const session = await window.API.get(`/admin/training-sessions/${SESSION_ID}`);
         CURRENT_SESSION = session;
         const dateStr = (session.date || '').toString().slice(0, 10);
         document.getElementById('sessionHeader').textContent = `Training Session - ${dateStr}`;
@@ -63,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {
         console.error(e);
         document.getElementById('slotsBody').innerHTML = `
-            <tr><td colspan="5" class="px-6 py-10 text-center text-slate-600">Failed to load session: ${escapeHtml(e?.message || 'Unknown error')}</td></tr>
+            <tr><td colspan="4" class="px-6 py-10 text-center text-slate-600">Failed to load session: ${escapeHtml(e?.message || 'Unknown error')}</td></tr>
         `;
     }
 });
@@ -72,16 +74,13 @@ function renderSlots(slots) {
     const tbody = document.getElementById('slotsBody');
 
     if (!Array.isArray(slots) || slots.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-600">No slots found for this session.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-slate-600">No slots found for this session.</td></tr>`;
         return;
     }
-
-    const myIdNum = Number(MY_COACH_ID || 0);
 
     tbody.innerHTML = slots.map(slot => {
         const st = slot.session_time || slot.sessionTime || {};
         const slotCoaches = Array.isArray(slot.coaches) ? slot.coaches.map(c => Number(c.id)) : [];
-        const additionalCoaches = slotCoaches.filter(id => id !== myIdNum);
         
         return `
             <tr>
@@ -90,28 +89,18 @@ function renderSlots(slots) {
                 </td>
                 <td class="px-6 py-4 text-sm text-slate-600">${escapeHtml(st.start_time || '')}${st.start_time && st.end_time ? ' - ' : ''}${escapeHtml(st.end_time || '')}</td>
                 <td class="px-6 py-4">
-                    <input type="number" min="1" max="50" value="${slot.max_participants ?? 1}" class="w-28 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500" id="quota-${slot.id}">
+                    <span class="text-slate-800 font-semibold">${escapeHtml(String(slot.max_participants ?? ''))}</span>
                 </td>
                 <td class="px-6 py-4">
-                    <div class="flex flex-col gap-3">
-                        <button type="button" onclick="openCoachModal(${slot.id})" class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 hover:border-blue-500 rounded-lg text-sm font-medium text-slate-700 hover:text-blue-600 transition-all duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                            </svg>
-                            Additional Coaches
-                            <span class="selected-count-badge ml-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold" data-slot-id="${slot.id}">${additionalCoaches.length}</span>
-                        </button>
-                        <p class="text-xs text-slate-500">Anda otomatis termasuk</p>
-                        <div class="hidden" data-selected-coaches="${slot.id}">${additionalCoaches.join(',')}</div>
-                        <div class="text-xs text-green-600 font-medium" data-selected-coaches-names="${slot.id}">${additionalCoaches.length > 0 ? '+ ' + COACHES.filter(c => additionalCoaches.includes(Number(c.id))).map(c => c.name).join(', ') : ''}</div>
-                        <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 text-sm" onclick="updateSlotCoaches(${slot.id})">Update Coaches</button>
-                    </div>
-                </td>
-                <td class="px-6 py-4">
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <button type="button" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 text-sm" onclick="updateQuota(${slot.id})">Update Quota</button>
-                        <button type="button" class="w-full sm:w-auto px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-sm whitespace-nowrap" onclick="bookForMember(${slot.id})">Book for member</button>
-                    </div>
+                    <button type="button" onclick="openCoachModal(${slot.id}, '${escapeHtml(JSON.stringify(slotCoaches))}')" class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 hover:border-blue-500 rounded-lg text-sm font-medium text-slate-700 hover:text-blue-600 transition-all duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Select Coaches
+                        <span class="selected-count-badge ml-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold" data-slot-id="${slot.id}">${slotCoaches.length}</span>
+                    </button>
+                    <div class="hidden" data-selected-coaches="${slot.id}">${slotCoaches.join(',')}</div>
+                    <div class="mt-2 text-xs text-green-600 font-medium" data-selected-coaches-names="${slot.id}">✓ ${COACHES.filter(c => slotCoaches.includes(Number(c.id))).map(c => c.name).join(', ')}</div>
                 </td>
             </tr>
         `;
@@ -119,9 +108,8 @@ function renderSlots(slots) {
 }
 
 let currentSlotId = null;
-const myIdNum = Number(MY_COACH_ID || 0);
 
-function openCoachModal(slotId) {
+function openCoachModal(slotId, selectedCoachesJson = '[]') {
     currentSlotId = slotId;
     const modal = document.getElementById('coachModal');
     const searchInput = document.getElementById('coachSearch');
@@ -142,13 +130,12 @@ function renderCoachList(slotId, searchTerm = '') {
     const selectedCoachesStr = document.querySelector(`[data-selected-coaches="${slotId}"]`)?.textContent || '';
     const selectedCoaches = selectedCoachesStr ? selectedCoachesStr.split(',').map(id => Number(id)).filter(Boolean) : [];
     
-    // Filter out current coach and apply search
     const filtered = COACHES.filter(c => 
-        Number(c.id) !== myIdNum && c.name.toLowerCase().includes(searchTerm.toLowerCase())
+        c.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     
     if (filtered.length === 0) {
-        container.innerHTML = '<p class="text-center py-8 text-slate-500">No additional coaches found</p>';
+        container.innerHTML = '<p class="text-center py-8 text-slate-500">No coaches found</p>';
         return;
     }
     
@@ -204,7 +191,7 @@ function updateSelectedCount(slotId) {
                 .filter(c => selectedCoaches.includes(String(c.id)))
                 .map(c => c.name)
                 .join(', ');
-            namesContainer.textContent = '+ ' + coachNames;
+            namesContainer.textContent = '✓ ' + coachNames;
             namesContainer.classList.add('text-green-600', 'font-medium');
         } else {
             namesContainer.textContent = '';
@@ -236,95 +223,60 @@ function toggleCoachEdit(slotId, coachId, button) {
     }
 }
 
-async function updateSlotCoaches(slotId) {
-    const selectedCoachesStr = document.querySelector(`[data-selected-coaches="${slotId}"]`)?.textContent || '';
-    const additionalCoachIds = selectedCoachesStr ? selectedCoachesStr.split(',').map(id => Number(id)).filter(Boolean) : [];
-
-    try {
-        const res = await window.API.patch(`/coach/training-sessions/${SESSION_ID}/coaches`, {
-            slot_id: slotId,
-            coach_ids: additionalCoachIds,
-        });
-        CURRENT_SESSION = res?.data || CURRENT_SESSION;
-        window.showToast('Slot coaches updated', 'success');
-        if (res?.data) {
-            renderSlots(res.data.slots || []);
-        }
-    } catch (e) {
-        console.error(e);
-        window.showToast(e?.message || 'Failed to update slot coaches', 'error');
-    }
-}
-
-async function updateQuota(slotId) {
-    const input = document.getElementById(`quota-${slotId}`);
-    const max = Number(input?.value || 0);
-    if (!Number.isInteger(max) || max < 1 || max > 50) {
-        window.showToast('Max participants must be 1-50', 'error');
+async function updateAllSlots() {
+    if (!CURRENT_SESSION || !CURRENT_SESSION.slots) {
+        window.showToast('No session data available', 'error');
         return;
     }
 
-    try {
-        await window.API.patch(`/coach/training-sessions/${SESSION_ID}/quota`, {
-            slot_id: slotId,
-            max_participants: max,
-        });
-        window.showToast('Quota updated', 'success');
-    } catch (e) {
-        console.error(e);
-        window.showToast(e?.message || 'Failed to update quota', 'error');
+    const btn = document.getElementById('updateBtn');
+    const slots = CURRENT_SESSION.slots;
+
+    // Validate all slots have coaches
+    const slotsData = slots.map(slot => {
+        const selectedCoachesStr = document.querySelector(`[data-selected-coaches="${slot.id}"]`)?.textContent || '';
+        const coachIds = selectedCoachesStr ? selectedCoachesStr.split(',').map(id => Number(id)).filter(Boolean) : [];
+        return { slotId: slot.id, coachIds };
+    });
+
+    const slotWithoutCoach = slotsData.find(s => s.coachIds.length === 0);
+    if (slotWithoutCoach) {
+        window.showToast('Each slot must have at least one coach assigned', 'error');
+        return;
     }
-}
 
-async function deleteSession() {
-    const dateStr = (CURRENT_SESSION?.date || '').toString().slice(0, 10);
-    const ok = confirm(`Delete this training session ${dateStr || `#${SESSION_ID}` }?\n\nThis will remove all slots. (Not allowed if there are bookings.)`);
-    if (!ok) return;
-
-    const btn = document.getElementById('deleteSessionBtn');
     btn.disabled = true;
     const original = btn.textContent;
-    btn.textContent = 'Deleting...';
+    btn.textContent = 'Updating...';
 
     try {
-        await window.API.delete(`/coach/training-sessions/${SESSION_ID}`);
-        window.showToast('Training session deleted', 'success');
-        window.location.href = '{{ route('coach.sessions.index') }}';
+        // Update all slots in parallel
+        await Promise.all(
+            slotsData.map(({ slotId, coachIds }) =>
+                window.API.patch(`/admin/training-session-slots/${slotId}/coaches`, {
+                    coach_ids: coachIds,
+                })
+            )
+        );
+
+        window.showToast('All coaches updated successfully', 'success');
+        
+        // Reload session data
+        const session = await window.API.get(`/admin/training-sessions/${SESSION_ID}`);
+        CURRENT_SESSION = session;
+        renderSlots(session.slots || []);
     } catch (e) {
         console.error(e);
-        window.showToast(e?.message || 'Failed to delete session', 'error');
+        window.showToast(e?.message || 'Failed to update coaches', 'error');
     } finally {
         btn.disabled = false;
         btn.textContent = original;
     }
 }
 
-async function bookForMember(slotId) {
-    const memberPackageIdStr = prompt('Member Package ID to book (member_package_id):');
-    if (!memberPackageIdStr) return;
-    const memberPackageId = Number(memberPackageIdStr);
-    if (!Number.isInteger(memberPackageId) || memberPackageId <= 0) {
-        window.showToast('Invalid member_package_id', 'error');
-        return;
-    }
-
-    const notes = prompt('Notes (optional):') || null;
-
-    try {
-        await window.API.post('/coach/bookings', {
-            training_session_slot_id: slotId,
-            member_package_id: memberPackageId,
-            notes,
-        });
-        window.showToast('Booked successfully', 'success');
-    } catch (e) {
-        console.error(e);
-        window.showToast(e?.message || 'Failed to book', 'error');
-    }
-}
-
 function escapeHtml(str) {
     return (str || '')
+        .toString()
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;')
@@ -339,14 +291,13 @@ function escapeHtml(str) {
         <!-- Header -->
         <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-blue-600 to-blue-700">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-bold text-white">Select Additional Coaches</h3>
+                <h3 class="text-lg font-bold text-white">Select Coaches</h3>
                 <button type="button" onclick="closeCoachModal()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-1 transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
-            <p class="text-sm text-blue-100 mt-1">You are automatically included</p>
         </div>
         
         <!-- Search -->
