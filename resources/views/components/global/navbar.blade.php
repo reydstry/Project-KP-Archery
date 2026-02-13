@@ -1,10 +1,15 @@
 <nav class="fixed top-0 left-0 right-0 z-50 bg-white shadow-md backdrop-blur-sm bg-opacity-95 transition-all duration-300">
     <div class="container mx-auto px-4">
-        <div class="flex items-center justify-between h-20">
+        <div class="flex items-center justify-between h-20 relative">
 
-            <!-- Logo -->
-            <a href="/" class="flex items-center">
-                <img src="{{ asset('asset/img/logofocus.png') }}" alt="FocusOnex Archery" class="h-20 w-auto">
+            <!-- Logo Desktop -->
+            <a href="/" class="hidden md:flex items-center">
+                <img src="{{ asset('asset/img/logofocus.png') }}" alt="FocusOnex Archery" class="h-10 w-auto">
+            </a>
+
+            <!-- Logo Mobile - Centered -->
+            <a href="/" class="flex md:hidden items-center absolute left-1/2 transform -translate-x-1/2">
+                <img src="{{ asset('asset/img/logofocus.png') }}" alt="FocusOnex Archery" class="h-7 w-auto">
             </a>
 
             <!-- Desktop Menu -->
@@ -65,7 +70,6 @@
 <div id="mobile-menu" class="hidden fixed inset-0 bg-white z-50 p-6">
 
     <div class="flex justify-between items-center mb-8">
-        <img src="{{ asset('asset/img/logofocus.png') }}" alt="FocusOnex Archery" class="h-16 w-auto">
         <button id="close-menu" class="text-gray-700 hover:text-gray-900">
             <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
