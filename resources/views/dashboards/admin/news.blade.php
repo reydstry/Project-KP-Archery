@@ -9,11 +9,11 @@
     <!-- Header Actions -->
     <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
         <div class="flex-1 w-full sm:max-w-md">
-            <input type="search" x-model="search" placeholder="Search news..." 
-                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
+                 <input type="search" x-model="search" placeholder="Search news..." 
+                     class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none transition">
         </div>
         <button @click="openAddModal()" 
-                class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap shrink-0">
+            class="w-full sm:w-auto px-6 py-3 bg-[#1a307b] text-white rounded-xl font-semibold hover:bg-[#152866] transition-all whitespace-nowrap shrink-0">
             <span class="flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Add News
@@ -38,8 +38,8 @@
                                  class="w-32 h-24 object-cover rounded-xl shrink-0">
                         </template>
                         <template x-if="!article.photo_url">
-                            <div class="w-32 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl shrink-0 flex items-center justify-center">
-                                <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"/></svg>
+                            <div class="w-32 h-24 bg-[#1a307b]/10 rounded-xl shrink-0 flex items-center justify-center">
+                                <svg class="w-12 h-12 text-[#1a307b]/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"/></svg>
                             </div>
                         </template>
                         <div class="flex-1 min-w-0">
@@ -52,8 +52,8 @@
                     </div>
                 </div>
                 <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
-                    <button @click="openEditModal(article)" 
-                            class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg font-medium text-sm transition">
+                        <button @click="openEditModal(article)" 
+                            class="px-4 py-2 text-[#1a307b] hover:bg-[#1a307b]/10 rounded-lg font-medium text-sm transition">
                         Edit
                     </button>
                     <button @click="confirmDelete(article)" 
@@ -71,7 +71,7 @@
         <div @click.away="closeModal()" 
              class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8"
              x-transition>
-            <div class="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+            <div class="sticky top-0 bg-[#1a307b] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
                 <h3 class="text-lg font-bold" x-text="editingNews ? 'Edit News' : 'Add New News'"></h3>
                 <button @click="closeModal()" class="text-white/80 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -80,23 +80,23 @@
             <form @submit.prevent="saveNews()" class="p-6 space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Title *</label>
-                    <input type="text" x-model="form.title" required
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="text" x-model="form.title" required
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Content *</label>
                     <textarea x-model="form.content" required rows="6"
-                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"></textarea>
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none resize-none"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Publish Date *</label>
-                    <input type="date" x-model="form.publish_date" required
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="date" x-model="form.publish_date" required
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Photo</label>
-                    <input type="file" @change="handlePhotoChange" accept="image/*" ref="photoInput"
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="file" @change="handlePhotoChange" accept="image/*" ref="photoInput"
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                     <p class="text-xs text-slate-500 mt-1">Optional: Upload an image (max 5MB, formats: jpg, png, gif, webp)</p>
                     
                     <!-- Image Preview -->
@@ -113,8 +113,8 @@
                             class="flex-1 px-4 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition">
                         Cancel
                     </button>
-                    <button type="submit" :disabled="saving"
-                            class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
+                        <button type="submit" :disabled="saving"
+                            class="flex-1 px-4 py-3 bg-[#1a307b] text-white rounded-xl font-semibold hover:bg-[#152866] transition disabled:opacity-50">
                         <span x-text="saving ? 'Saving...' : 'Save'"></span>
                     </button>
                 </div>
@@ -137,7 +137,7 @@
                     Cancel
                 </button>
                 <button @click="deleteNews()" :disabled="deleting"
-                        class="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
+                    class="flex-1 px-4 py-3 bg-linear-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
                     <span x-text="deleting ? 'Deleting...' : 'Delete'"></span>
                 </button>
             </div>
@@ -252,42 +252,13 @@ function newsData() {
                 }
 
                 if (this.editingNews) {
-                    // Laravel doesn't support PUT with FormData directly, use POST with _method
                     formData.append('_method', 'PUT');
-                    const response = await fetch(`/api/admin/news/${this.editingNews.id}`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                            'Accept': 'application/json',
-                        },
-                        body: formData
-                    });
-                    
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Failed to update news');
-                    }
-                    
-                    const result = await response.json();
+                    const result = await API.post(`/admin/news/${this.editingNews.id}`, formData);
                     const index = this.news.findIndex(n => n.id === this.editingNews.id);
                     if (index > -1) this.news[index] = result.data;
                     showToast('News updated successfully', 'success');
                 } else {
-                    const response = await fetch('/api/admin/news', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                            'Accept': 'application/json',
-                        },
-                        body: formData
-                    });
-                    
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Failed to create news');
-                    }
-                    
-                    const result = await response.json();
+                    const result = await API.post('/admin/news', formData);
                     this.news.unshift(result.data);
                     showToast('News added successfully', 'success');
                 }

@@ -14,8 +14,8 @@
                     <span class="text-xs text-slate-500" x-show="loadingSessions" x-cloak>Memuat...</span>
                 </div>
                 <template x-if="latestSession">
-                    <div class="px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-xl">
-                        <p class="font-semibold text-blue-900" x-text="formatSessionLabel(latestSession)"></p>
+                    <div class="px-4 py-3 bg-[#1a307b]/10 border-2 border-[#1a307b]/20 rounded-xl">
+                        <p class="font-semibold text-[#1a307b]" x-text="formatSessionLabel(latestSession)"></p>
                     </div>
                 </template>
                 <template x-if="!loadingSessions && !latestSession">
@@ -35,13 +35,13 @@
                     <p class="text-sm text-slate-500">Tidak ada slot tersedia</p>
                 </template>
                 <template x-if="!loadingSlots && slots.length > 0">
-                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         <template x-for="slot in slots" :key="slot.id">
                             <button type="button"
                                 @click="selectSlot(slot.id)"
                                 :class="{
-                                    'bg-blue-600 text-white border-blue-700': form.training_session_slot_id === slot.id,
-                                    'bg-white text-slate-700 border-slate-200 hover:border-blue-500 hover:text-blue-600': form.training_session_slot_id !== slot.id
+                                    'bg-[#1a307b] text-white border-[#152866]': form.training_session_slot_id === slot.id,
+                                    'bg-white text-slate-700 border-slate-200 hover:border-[#1a307b] hover:text-[#1a307b]': form.training_session_slot_id !== slot.id
                                 }"
                                 class="px-4 py-3 border-2 rounded-xl font-medium transition-all duration-200 text-sm w-full">
                                 <div class="flex flex-col items-start">
@@ -62,7 +62,7 @@
                     <div class="mb-4">
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Cari Member</label>
                         <input type="text" x-model="memberSearch" @input="filterMembers()" placeholder="Cari nama member aktif..."
-                               class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                               class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-[#1a307b] text-sm">
                         <p class="text-xs text-slate-500 mt-1">Hanya menampilkan member dengan status aktif</p>
                     </div>
 
@@ -72,10 +72,10 @@
 
                         <div class="space-y-2">
                             <template x-for="member in filteredMembers" :key="member.id">
-                                <label class="flex items-start gap-3 p-3 bg-white rounded-lg border border-slate-200 hover:border-blue-300 cursor-pointer transition-all">
+                                <label class="flex items-start gap-3 p-3 bg-white rounded-lg border border-slate-200 hover:border-[#1a307b]/40 cursor-pointer transition-all">
                                     <input type="checkbox" :value="member.id" @change="toggleMemberSelection(member)"
                                            :checked="selectedMembers.some(m => m.id === member.id)"
-                                           class="mt-1 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                           class="mt-1 rounded border-slate-300 text-[#1a307b] focus:ring-[#1a307b]">
                                     <div class="flex items-center justify-between w-full">
                                         <div>
                                             <p class="font-semibold text-slate-900" x-text="member.name"></p>
@@ -109,7 +109,7 @@
 
             <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <button @click="submit()" :disabled="submitting || selectedMembers.length === 0"
-                        class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl font-medium transition-all duration-200 shadow-lg shadow-blue-500/30 disabled:opacity-60 disabled:cursor-not-allowed">
+                        class="w-full sm:w-auto px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-medium transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
                     <span x-show="!submitting">Booking (<span x-text="selectedMembers.length"></span> member)</span>
                     <span x-show="submitting" x-cloak>Memproses...</span>
                 </button>

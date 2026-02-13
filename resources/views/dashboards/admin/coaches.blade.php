@@ -9,11 +9,11 @@
     <!-- Header Actions -->
     <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
         <div class="flex-1 w-full">
-            <input type="search" x-model="search" placeholder="Search coaches..." 
-                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
+                 <input type="search" x-model="search" placeholder="Search coaches..." 
+                     class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none transition">
         </div>
         <button @click="openAddModal()" 
-                class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap shrink-0">
+            class="w-full sm:w-auto px-6 py-3 bg-[#1a307b] text-white rounded-xl font-semibold hover:bg-[#152866] transition-all whitespace-nowrap shrink-0">
             <span class="flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Add Coach
@@ -59,8 +59,8 @@
                                             title="View Details">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                     </button>
-                                    <button @click="openEditModal(coach)" 
-                                            class="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition">
+                                        <button @click="openEditModal(coach)" 
+                                            class="p-2 text-[#1a307b] hover:bg-[#1a307b]/10 rounded-lg transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
                                     </button>
                                 </div>
@@ -78,7 +78,7 @@
         <div @click.away="closeModal()" 
              class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
              x-transition>
-            <div class="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+            <div class="sticky top-0 bg-[#1a307b] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
                 <h3 class="text-lg font-bold" x-text="editingCoach ? 'Edit Coach' : 'Add New Coach'"></h3>
                 <button @click="closeModal()" class="text-white/80 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -87,36 +87,36 @@
             <form @submit.prevent="saveCoach()" class="p-6 space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Name *</label>
-                    <input type="text" x-model="form.name" required
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="text" x-model="form.name" required
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Email *</label>
-                    <input type="email" x-model="form.email" required
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="email" x-model="form.email" required
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Phone</label>
-                    <input type="tel" x-model="form.phone"
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="tel" x-model="form.phone"
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                 </div>
                 <div x-show="!editingCoach">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Password *</label>
-                    <input type="password" x-model="form.password" :required="!editingCoach"
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="password" x-model="form.password" :required="!editingCoach"
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                 </div>
                 <div x-show="!editingCoach">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Confirm Password *</label>
-                    <input type="password" x-model="form.password_confirmation" :required="!editingCoach"
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="password" x-model="form.password_confirmation" :required="!editingCoach"
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                 </div>
                 <div class="flex gap-4 pt-4">
                     <button type="button" @click="closeModal()" 
                             class="flex-1 px-4 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition">
                         Cancel
                     </button>
-                    <button type="submit" :disabled="saving"
-                            class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
+                        <button type="submit" :disabled="saving"
+                            class="flex-1 px-4 py-3 bg-[#1a307b] text-white rounded-xl font-semibold hover:bg-[#152866] transition disabled:opacity-50">
                         <span x-text="saving ? 'Saving...' : 'Save'"></span>
                     </button>
                 </div>
@@ -139,7 +139,7 @@
                     Cancel
                 </button>
                 <button @click="deleteCoach()" :disabled="deleting"
-                        class="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
+                        class="flex-1 px-4 py-3 bg-linear-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
                     <span x-text="deleting ? 'Deleting...' : 'Delete'"></span>
                 </button>
             </div>
@@ -154,7 +154,7 @@
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100">
-            <div class="sticky top-0 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+            <div class="sticky top-0 bg-linear-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
                 <h3 class="text-lg font-bold">Coach Teaching Statistics</h3>
                 <button @click="closeDetailsModal()" class="text-white/80 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -171,7 +171,7 @@
                 <template x-if="!loadingDetails && coachDetails">
                     <div class="space-y-6">
                         <!-- Coach Info -->
-                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
+                        <div class="bg-linear-to-r from-green-50 to-emerald-50 rounded-xl p-5 border border-green-100">
                             <h4 class="text-xl font-bold text-slate-800 mb-2" x-text="coachDetails.name"></h4>
                             <div class="flex flex-wrap gap-4 text-sm">
                                 <div class="flex items-center gap-2 text-slate-600">
@@ -188,7 +188,7 @@
                         <!-- Statistics Cards -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- This Week -->
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200">
+                            <div class="bg-linear-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200">
                                 <div class="flex items-center justify-between mb-2">
                                     <h5 class="text-sm font-semibold text-slate-700">This Week</h5>
                                     <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
@@ -198,7 +198,7 @@
                             </div>
 
                             <!-- This Month -->
-                            <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-5 border border-blue-200">
+                            <div class="bg-linear-to-br from-blue-50 to-cyan-50 rounded-xl p-5 border border-blue-200">
                                 <div class="flex items-center justify-between mb-2">
                                     <h5 class="text-sm font-semibold text-slate-700">This Month</h5>
                                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
@@ -208,7 +208,7 @@
                             </div>
 
                             <!-- This Year -->
-                            <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 border border-purple-200">
+                            <div class="bg-linear-to-br from-purple-50 to-pink-50 rounded-xl p-5 border border-purple-200">
                                 <div class="flex items-center justify-between mb-2">
                                     <h5 class="text-sm font-semibold text-slate-700">This Year</h5>
                                     <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
@@ -218,7 +218,7 @@
                             </div>
 
                             <!-- Week Streak -->
-                            <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-5 border border-orange-200">
+                            <div class="bg-linear-to-br from-orange-50 to-red-50 rounded-xl p-5 border border-orange-200">
                                 <div class="flex items-center justify-between mb-2">
                                     <h5 class="text-sm font-semibold text-slate-700">Week Streak</h5>
                                     <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z"/></svg>
@@ -229,7 +229,7 @@
                         </div>
 
                         <!-- Total Sessions Taught -->
-                        <div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200">
+                        <div class="bg-linear-to-r from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200">
                             <div class="flex items-center justify-between">
                                 <div>
                                     <h5 class="text-sm font-semibold text-slate-700 mb-1">Total Sessions Taught</h5>

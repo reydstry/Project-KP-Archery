@@ -88,6 +88,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Coach books for member
         Route::post('bookings', [CoachSessionBookingController::class, 'store']);
+        Route::patch('bookings/{sessionBooking}', [CoachSessionBookingController::class, 'update']);
+        Route::delete('bookings/{sessionBooking}', [CoachSessionBookingController::class, 'destroy']);
     });
 
     // Routes untuk ADMIN
@@ -124,8 +126,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('training-sessions', [AdminTrainingSessionController::class, 'index']);
         Route::post('training-sessions', [AdminTrainingSessionController::class, 'store']);
         Route::get('training-sessions/{trainingSession}', [AdminTrainingSessionController::class, 'show']);
+        Route::delete('training-sessions/{trainingSession}', [AdminTrainingSessionController::class, 'destroy']);
         Route::patch('training-session-slots/{trainingSessionSlot}/coaches', [AdminTrainingSessionController::class, 'updateSlotCoaches']);
         Route::get('booking-members', [AdminMemberBookingController::class, 'index']);
         Route::post('bookings', [AdminSessionBookingController::class, 'store']);
+        Route::patch('bookings/{sessionBooking}', [AdminSessionBookingController::class, 'update']);
+        Route::delete('bookings/{sessionBooking}', [AdminSessionBookingController::class, 'destroy']);
     });
 });

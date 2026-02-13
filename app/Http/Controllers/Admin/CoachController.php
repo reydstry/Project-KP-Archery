@@ -31,12 +31,24 @@ class CoachController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'phone' => ['nullable', 'string', 'max:20'],
-        ]);
+        $data = $request->validate(
+            [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'phone' => ['nullable', 'string', 'max:20'],
+            ],
+            [
+                'name.required' => 'Nama coach wajib diisi.',
+                'email.required' => 'Email wajib diisi.',
+                'email.email' => 'Format email tidak valid.',
+                'email.unique' => 'Email sudah terdaftar, gunakan email lain.',
+                'password.required' => 'Password wajib diisi.',
+                'password.min' => 'Password minimal 8 karakter.',
+                'password.confirmed' => 'Konfirmasi password tidak cocok.',
+                'phone.max' => 'Nomor telepon maksimal 20 karakter.',
+            ]
+        );
 
         $coach = User::create([
             'name' => $data['name'],
@@ -205,12 +217,23 @@ class CoachController extends Controller
             ], 404);
         }
 
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($coach->id)],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'phone' => ['nullable', 'string', 'max:20'],
-        ]);
+        $data = $request->validate(
+            [
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($coach->id)],
+                'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+                'phone' => ['nullable', 'string', 'max:20'],
+            ],
+            [
+                'name.required' => 'Nama coach wajib diisi.',
+                'email.required' => 'Email wajib diisi.',
+                'email.email' => 'Format email tidak valid.',
+                'email.unique' => 'Email sudah terdaftar, gunakan email lain.',
+                'password.min' => 'Password minimal 8 karakter.',
+                'password.confirmed' => 'Konfirmasi password tidak cocok.',
+                'phone.max' => 'Nomor telepon maksimal 20 karakter.',
+            ]
+        );
 
         $updateData = [
             'name' => $data['name'],

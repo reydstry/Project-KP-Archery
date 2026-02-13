@@ -37,11 +37,17 @@
                 </template>
             </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Slot (Jam)</label>
-                    <select x-model.number="form.training_session_slot_id" @change="onSlotChange()" :disabled="!slots.length || loadingSlots"
-                            class="w-full px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg sm:rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white disabled:bg-slate-50 disabled:text-slate-400 text-xs sm:text-sm">
-                        <option value="">-- Pilih slot --</option>
+            <!-- Slot Selection with Bubbles -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-slate-700 mb-3">Pilih Slot Waktu</label>
+                <template x-if="loadingSlots">
+                    <p class="text-sm text-slate-500">Memuat slot...</p>
+                </template>
+                <template x-if="!loadingSlots && slots.length === 0">
+                    <p class="text-sm text-slate-500">Tidak ada slot tersedia</p>
+                </template>
+                <template x-if="!loadingSlots && slots.length > 0">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         <template x-for="slot in slots" :key="slot.id">
                             <button type="button"
                                 @click="selectSlot(slot.id)"
