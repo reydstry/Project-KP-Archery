@@ -7,21 +7,22 @@
 <div x-data="coachesData()" x-init="loadCoaches()" class="space-y-6">
     
     <!-- Header Actions -->
-    <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+    <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
         <div class="flex-1 w-full">
                  <input type="search" x-model="search" placeholder="Search coaches..." 
-                     class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none transition">
+                     class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none transition">
         </div>
         <button @click="openAddModal()" 
-            class="w-full sm:w-auto px-6 py-3 bg-[#1a307b] text-white rounded-xl font-semibold hover:bg-[#152866] transition-all whitespace-nowrap shrink-0">
+            class="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 text-sm bg-[#1a307b] text-white rounded-xl font-semibold hover:bg-[#152866] transition-all whitespace-nowrap shrink-0">
             <span class="flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Add Coach
             </span>
         </button>
     </div>
 
-    <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" style="animation-delay: 0.1s">
+    <!-- Coaches Table - Desktop View -->
+    <div class="card-animate hidden md:block bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" style="animation-delay: 0.1s">
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-slate-50 border-b border-slate-200">
@@ -70,6 +71,65 @@
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="md:hidden space-y-3" style="animation-delay: 0.1s">
+        <template x-if="loading">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-center text-slate-400">
+                Loading...
+            </div>
+        </template>
+        <template x-if="!loading && filteredCoaches.length === 0">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 text-center text-slate-400">
+                No coaches found
+            </div>
+        </template>
+        <template x-for="coach in filteredCoaches" :key="coach.id">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                <div class="space-y-3">
+                    <!-- Coach Name -->
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <svg class="w-4 h-4 text-[#1a307b] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                                </svg>
+                                <h3 class="font-semibold text-slate-900 text-sm truncate" x-text="coach.name"></h3>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="flex items-center gap-2 text-xs text-slate-600 mb-1">
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
+                                </svg>
+                                <span class="truncate" x-text="coach.email"></span>
+                            </div>
+                            
+                            <!-- Phone -->
+                            <div class="flex items-center gap-2 text-xs text-slate-600">
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/>
+                                </svg>
+                                <span x-text="coach.phone || 'No phone'"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex gap-2 pt-2 border-t border-slate-100">
+                        <button @click="viewCoachDetails(coach)" 
+                            class="flex-1 px-3 py-2 bg-white border border-[#1a307b] text-[#1a307b] rounded-lg text-xs font-semibold hover:bg-[#1a307b]/5 transition-colors">
+                            Details
+                        </button>
+                        <button @click="openEditModal(coach)" 
+                            class="flex-1 px-3 py-2 bg-[#1a307b] text-white rounded-lg text-xs font-semibold hover:bg-[#152866] transition-colors">
+                            Edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
     </div>
 
     <!-- Add/Edit Modal -->
@@ -282,13 +342,28 @@ function coachesData() {
         },
         
         async loadCoaches() {
+            if (this.loading) return; // Prevent multiple simultaneous loads
+            
             this.loading = true;
             try {
                 const response = await API.get('/admin/coaches');
-                this.coaches = response.data || [];
+                
+                // Validate response
+                if (!response || typeof response !== 'object') {
+                    throw new Error('Invalid response from server');
+                }
+                
+                if (!Array.isArray(response.data)) {
+                    console.warn('Coaches data is not an array:', response.data);
+                    this.coaches = [];
+                } else {
+                    this.coaches = response.data;
+                }
             } catch (error) {
                 console.error('Failed to load coaches:', error);
-                showToast('Failed to load coaches', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load coaches data';
+                showToast(errorMsg, 'error');
+                this.coaches = [];
             } finally {
                 this.loading = false;
             }
@@ -297,18 +372,26 @@ function coachesData() {
         openAddModal() {
             this.editingCoach = null;
             this.form = { name: '', email: '', phone: '', password: '', password_confirmation: '' };
+            this.saving = false; // Reset saving state
             this.showModal = true;
         },
         
         openEditModal(coach) {
+            // Validate coach object
+            if (!coach || !coach.id) {
+                showToast('Invalid coach data', 'error');
+                return;
+            }
+            
             this.editingCoach = coach;
             this.form = {
-                name: coach.name,
-                email: coach.email,
+                name: coach.name || '',
+                email: coach.email || '',
                 phone: coach.phone || '',
                 password: '',
                 password_confirmation: ''
             };
+            this.saving = false; // Reset saving state
             this.showModal = true;
         },
         
@@ -318,6 +401,12 @@ function coachesData() {
         },
 
         async viewCoachDetails(coach) {
+            // Validate coach
+            if (!coach || !coach.id) {
+                showToast('Invalid coach data', 'error');
+                return;
+            }
+            
             this.coachDetails = coach;
             this.statistics = null;
             this.showDetailsModal = true;
@@ -325,11 +414,21 @@ function coachesData() {
             
             try {
                 const response = await API.get(`/admin/coaches/${coach.id}`);
+                
+                // Validate response
+                if (!response || !response.data) {
+                    throw new Error('Invalid response from server');
+                }
+                
                 this.coachDetails = response.data;
                 this.statistics = response.statistics || {};
             } catch (error) {
                 console.error('Failed to load coach details:', error);
-                showToast('Failed to load coach details', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load coach details';
+                showToast(errorMsg, 'error');
+                
+                // Close modal on error
+                this.showDetailsModal = false;
             } finally {
                 this.loadingDetails = false;
             }
@@ -342,45 +441,159 @@ function coachesData() {
         },
         
         async saveCoach() {
+            // Prevent double-submit
+            if (this.saving) {
+                showToast('Saving in progress...', 'warning');
+                return;
+            }
+            
+            // Validate form
+            if (!this.form.name || this.form.name.trim() === '') {
+                showToast('Name is required', 'error');
+                return;
+            }
+            
+            if (this.form.name.trim().length < 3) {
+                showToast('Name must be at least 3 characters', 'error');
+                return;
+            }
+            
+            if (!this.form.email || this.form.email.trim() === '') {
+                showToast('Email is required', 'error');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(this.form.email)) {
+                showToast('Invalid email format', 'error');
+                return;
+            }
+            
+            // Password validation for new coach
+            if (!this.editingCoach) {
+                if (!this.form.password || this.form.password.trim() === '') {
+                    showToast('Password is required for new coach', 'error');
+                    return;
+                }
+                
+                if (this.form.password.length < 8) {
+                    showToast('Password must be at least 8 characters', 'error');
+                    return;
+                }
+                
+                if (this.form.password !== this.form.password_confirmation) {
+                    showToast('Password confirmation does not match', 'error');
+                    return;
+                }
+            }
+            
+            // Password validation for edit (only if password is provided)
+            if (this.editingCoach && this.form.password && this.form.password.trim() !== '') {
+                if (this.form.password.length < 8) {
+                    showToast('Password must be at least 8 characters', 'error');
+                    return;
+                }
+                
+                if (this.form.password !== this.form.password_confirmation) {
+                    showToast('Password confirmation does not match', 'error');
+                    return;
+                }
+            }
+            
+            // Phone validation (optional)
+            if (this.form.phone && this.form.phone.trim() !== '') {
+                const phoneRegex = /^[0-9\s\-\+\(\)]+$/;
+                if (!phoneRegex.test(this.form.phone)) {
+                    showToast('Invalid phone number format', 'error');
+                    return;
+                }
+            }
+            
             this.saving = true;
             try {
+                let response;
+                
                 if (this.editingCoach) {
-                    const response = await API.put(`/admin/coaches/${this.editingCoach.id}`, this.form);
+                    // Validate editing coach
+                    if (!this.editingCoach.id) {
+                        throw new Error('Invalid coach ID');
+                    }
+                    
+                    response = await API.put(`/admin/coaches/${this.editingCoach.id}`, this.form);
+                    
+                    // Validate response
+                    if (!response || !response.data) {
+                        throw new Error('Invalid response from server');
+                    }
+                    
                     const index = this.coaches.findIndex(c => c.id === this.editingCoach.id);
-                    if (index > -1) this.coaches[index] = response.data;
-                    showToast('Coach updated successfully', 'success');
+                    if (index > -1) {
+                        this.coaches[index] = response.data;
+                    } else {
+                        console.warn('Coach not found in list, reloading...');
+                        await this.loadCoaches();
+                    }
+                    
+                    showToast('✓ Coach updated successfully', 'success');
                 } else {
-                    const response = await API.post('/admin/coaches', this.form);
+                    response = await API.post('/admin/coaches', this.form);
+                    
+                    // Validate response
+                    if (!response || !response.data) {
+                        throw new Error('Invalid response from server');
+                    }
+                    
                     this.coaches.unshift(response.data);
-                    showToast('Coach added successfully', 'success');
+                    showToast('✓ Coach added successfully', 'success');
                 }
+                
                 this.closeModal();
             } catch (error) {
                 console.error('Failed to save coach:', error);
-                showToast(error.message || 'Failed to save coach', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to save coach';
+                showToast(errorMsg, 'error');
             } finally {
                 this.saving = false;
             }
         },
         
         confirmDelete(coach) {
+            // Validate coach
+            if (!coach || !coach.id) {
+                showToast('Invalid coach data', 'error');
+                return;
+            }
+            
             this.coachToDelete = coach;
             this.showDeleteConfirm = true;
         },
         
         async deleteCoach() {
-            if (!this.coachToDelete) return;
+            // Validate coach
+            if (!this.coachToDelete || !this.coachToDelete.id) {
+                showToast('Invalid coach data', 'error');
+                this.showDeleteConfirm = false;
+                return;
+            }
+            
+            // Prevent double-submit
+            if (this.deleting) {
+                showToast('Deletion in progress...', 'warning');
+                return;
+            }
             
             this.deleting = true;
             try {
                 await API.delete(`/admin/coaches/${this.coachToDelete.id}`);
                 this.coaches = this.coaches.filter(c => c.id !== this.coachToDelete.id);
-                showToast('Coach deleted successfully', 'success');
+                showToast('✓ Coach deleted successfully', 'success');
                 this.showDeleteConfirm = false;
                 this.coachToDelete = null;
             } catch (error) {
                 console.error('Failed to delete coach:', error);
-                showToast(error.message || 'Failed to delete coach', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to delete coach';
+                showToast(errorMsg, 'error');
             } finally {
                 this.deleting = false;
             }

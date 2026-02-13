@@ -215,12 +215,28 @@ function dashboardData() {
         async loadData() {
             try {
                 const data = await API.get('/admin/dashboard');
+                
+                // Validate response
+                if (!data || typeof data !== 'object') {
+                    throw new Error('Invalid response from server');
+                }
+                
                 this.stats = data.statistics || {};
-                this.recentPendingMembers = data.recent?.pending_members || [];
-                this.todaySessions = Array.isArray(data.today_sessions) ? data.today_sessions : [];
+                this.recentPendingMembers = Array.isArray(data.recent?.pending_members) 
+                    ? data.recent.pending_members 
+                    : [];
+                this.todaySessions = Array.isArray(data.today_sessions) 
+                    ? data.today_sessions 
+                    : [];
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
-                showToast('Failed to load dashboard data', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load dashboard data';
+                showToast(errorMsg, 'error');
+                
+                // Set defaults on error
+                this.stats = {};
+                this.recentPendingMembers = [];
+                this.todaySessions = [];
             }
         }
     }

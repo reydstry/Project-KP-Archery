@@ -242,13 +242,28 @@ function achievementsData() {
         },
         
         async loadAchievements() {
+            if (this.loading) return; // Prevent multiple simultaneous loads
+            
             this.loading = true;
             try {
                 const response = await API.get('/admin/achievements');
-                this.achievements = response.data || [];
+                
+                // Validate response
+                if (!response || typeof response !== 'object') {
+                    throw new Error('Invalid response from server');
+                }
+                
+                if (!Array.isArray(response.data)) {
+                    console.warn('Achievements data is not an array:', response.data);
+                    this.achievements = [];
+                } else {
+                    this.achievements = response.data;
+                }
             } catch (error) {
                 console.error('Failed to load achievements:', error);
-                showToast('Failed to load achievements', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load achievements';
+                showToast(errorMsg, 'error');
+                this.achievements = [];
             } finally {
                 this.loading = false;
             }
@@ -257,9 +272,23 @@ function achievementsData() {
         async loadMembers() {
             try {
                 const response = await API.get('/admin/members');
-                this.members = response.data || [];
+                
+                // Validate response
+                if (!response || typeof response !== 'object') {
+                    throw new Error('Invalid response from server');
+                }
+                
+                if (!Array.isArray(response.data)) {
+                    console.warn('Members data is not an array:', response.data);
+                    this.members = [];
+                } else {
+                    this.members = response.data;
+                }
             } catch (error) {
                 console.error('Failed to load members:', error);
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load members';
+                showToast(errorMsg, 'error');
+                this.members = [];
             }
         },
         
@@ -269,20 +298,28 @@ function achievementsData() {
             this.form = { type: '', member_id: '', title: '', description: '', date: today };
             this.photoFile = null;
             this.photoPreview = null;
+            this.saving = false; // Reset saving state
             this.showModal = true;
         },
         
         openEditModal(achievement) {
+            // Validate achievement object
+            if (!achievement || !achievement.id) {
+                showToast('Invalid achievement data', 'error');
+                return;
+            }
+            
             this.editingAchievement = achievement;
             this.form = {
-                type: achievement.type,
+                type: achievement.type || '',
                 member_id: achievement.member_id || '',
-                title: achievement.title,
-                description: achievement.description,
-                date: achievement.date
+                title: achievement.title || '',
+                description: achievement.description || '',
+                date: achievement.date || ''
             };
             this.photoFile = null;
             this.photoPreview = achievement.photo_url || null;
+            this.saving = false; // Reset saving state
             this.showModal = true;
         },
         
@@ -294,15 +331,40 @@ function achievementsData() {
         },
 
         handlePhotoChange(event) {
-            const file = event.target.files[0];
-            if (file) {
-                this.photoFile = file;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.photoPreview = e.target.result;
-                };
-                reader.readAsDataURL(file);
+            const file = event.target.files?.[0];
+            if (!file) return;
+            
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                showToast('Only JPG, PNG, and GIF images are allowed', 'error');
+                if (this.$refs.photoInput) {
+                    this.$refs.photoInput.value = '';
+                }
+                return;
             }
+            
+            // Validate file size (max 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                showToast('Image size must be less than 5MB', 'error');
+                if (this.$refs.photoInput) {
+                    this.$refs.photoInput.value = '';
+                }
+                return;
+            }
+            
+            this.photoFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.photoPreview = e.target.result;
+            };
+            reader.onerror = () => {
+                showToast('Failed to read image file', 'error');
+                this.photoFile = null;
+                this.photoPreview = null;
+            };
+            reader.readAsDataURL(file);
         },
 
         removePhoto() {
@@ -314,12 +376,61 @@ function achievementsData() {
         },
         
         async saveAchievement() {
+            // Prevent double-submit
+            if (this.saving) {
+                showToast('Saving in progress...', 'warning');
+                return;
+            }
+            
+            // Validate form
+            if (!this.form.type || this.form.type === '') {
+                showToast('Achievement type is required', 'error');
+                return;
+            }
+            
+            if (this.form.type === 'member' && (!this.form.member_id || this.form.member_id === '')) {
+                showToast('Please select a member for member achievement', 'error');
+                return;
+            }
+            
+            if (!this.form.title || this.form.title.trim() === '') {
+                showToast('Title is required', 'error');
+                return;
+            }
+            
+            if (this.form.title.trim().length < 3) {
+                showToast('Title must be at least 3 characters', 'error');
+                return;
+            }
+            
+            if (!this.form.description || this.form.description.trim() === '') {
+                showToast('Description is required', 'error');
+                return;
+            }
+            
+            if (this.form.description.trim().length < 10) {
+                showToast('Description must be at least 10 characters', 'error');
+                return;
+            }
+            
+            if (!this.form.date || this.form.date === '') {
+                showToast('Date is required', 'error');
+                return;
+            }
+            
+            // Validate date format
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(this.form.date)) {
+                showToast('Invalid date format', 'error');
+                return;
+            }
+            
             this.saving = true;
             try {
                 const formData = new FormData();
                 formData.append('type', this.form.type);
-                formData.append('title', this.form.title);
-                formData.append('description', this.form.description);
+                formData.append('title', this.form.title.trim());
+                formData.append('description', this.form.description.trim());
                 formData.append('date', this.form.date);
                 
                 if (this.form.type === 'member' && this.form.member_id) {
@@ -330,44 +441,88 @@ function achievementsData() {
                     formData.append('photo', this.photoFile);
                 }
 
+                let result;
                 if (this.editingAchievement) {
+                    // Validate editing achievement
+                    if (!this.editingAchievement.id) {
+                        throw new Error('Invalid achievement ID');
+                    }
+                    
                     formData.append('_method', 'PUT');
-                    const result = await API.post(`/admin/achievements/${this.editingAchievement.id}`, formData);
+                    result = await API.post(`/admin/achievements/${this.editingAchievement.id}`, formData);
+                    
+                    // Validate response
+                    if (!result || !result.data) {
+                        throw new Error('Invalid response from server');
+                    }
+                    
                     const index = this.achievements.findIndex(a => a.id === this.editingAchievement.id);
-                    if (index > -1) this.achievements[index] = result.data;
-                    showToast('Achievement updated successfully', 'success');
+                    if (index > -1) {
+                        this.achievements[index] = result.data;
+                    } else {
+                        console.warn('Achievement not found in list, reloading...');
+                        await this.loadAchievements();
+                    }
+                    
+                    showToast('✓ Achievement updated successfully', 'success');
                 } else {
-                    const result = await API.post('/admin/achievements', formData);
+                    result = await API.post('/admin/achievements', formData);
+                    
+                    // Validate response
+                    if (!result || !result.data) {
+                        throw new Error('Invalid response from server');
+                    }
+                    
                     this.achievements.unshift(result.data);
-                    showToast('Achievement added successfully', 'success');
+                    showToast('✓ Achievement added successfully', 'success');
                 }
+                
                 this.closeModal();
             } catch (error) {
                 console.error('Failed to save achievement:', error);
-                showToast(error.message || 'Failed to save achievement', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to save achievement';
+                showToast(errorMsg, 'error');
             } finally {
                 this.saving = false;
             }
         },
         
         confirmDelete(achievement) {
+            // Validate achievement
+            if (!achievement || !achievement.id) {
+                showToast('Invalid achievement data', 'error');
+                return;
+            }
+            
             this.achievementToDelete = achievement;
             this.showDeleteConfirm = true;
         },
         
         async deleteAchievement() {
-            if (!this.achievementToDelete) return;
+            // Validate achievement
+            if (!this.achievementToDelete || !this.achievementToDelete.id) {
+                showToast('Invalid achievement data', 'error');
+                this.showDeleteConfirm = false;
+                return;
+            }
+            
+            // Prevent double-submit
+            if (this.deleting) {
+                showToast('Deletion in progress...', 'warning');
+                return;
+            }
             
             this.deleting = true;
             try {
                 await API.delete(`/admin/achievements/${this.achievementToDelete.id}`);
                 this.achievements = this.achievements.filter(a => a.id !== this.achievementToDelete.id);
-                showToast('Achievement deleted successfully', 'success');
+                showToast('✓ Achievement deleted successfully', 'success');
                 this.showDeleteConfirm = false;
                 this.achievementToDelete = null;
             } catch (error) {
                 console.error('Failed to delete achievement:', error);
-                showToast(error.message || 'Failed to delete achievement', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to delete achievement';
+                showToast(errorMsg, 'error');
             } finally {
                 this.deleting = false;
             }
