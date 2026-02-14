@@ -3,10 +3,10 @@
         <!-- Section Header -->
         <div class="text-center mb-8 sm:mb-10 md:mb-12">
             <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-3 sm:mb-4">
-                Di Dukung Oleh
+                {{ __('home.partners_title') }}
             </h2>
             <p class="text-base sm:text-lg text-gray-600 px-4">
-                Lebih dari 8 partner telah mempercayai kami untuk program pelatihan panahan mereka
+                {{ __('home.partners_subtitle') }}
             </p>
         </div>
 

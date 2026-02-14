@@ -38,8 +38,15 @@ class MemberController extends Controller
         // Transform to include only members with active packages
         $membersWithPackages = $members->map(function ($member) {
             $activePackages = $member->memberPackages->filter(function ($mp) {
-                return $mp->is_active 
-                    && $mp->end_date->isFuture() 
+                $packageOk = true;
+                if ($mp->relationLoaded('package') && $mp->package) {
+                    $packageOk = (bool) $mp->package->is_active;
+                }
+
+                return (bool) $mp->is_active
+                    && $packageOk
+                    && $mp->end_date
+                    && $mp->end_date->isFuture()
                     && $mp->used_sessions < $mp->total_sessions;
             })->values();
 

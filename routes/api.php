@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\Admin\CoachController;
+use App\Http\Controllers\Admin\MemberBookingController as AdminMemberBookingController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\MemberPackageController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\AchievementController as AdminAchievementController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PackageController;
+use App\Http\Controllers\Admin\SessionBookingController as AdminSessionBookingController;
+use App\Http\Controllers\Admin\TrainingSessionController as AdminTrainingSessionController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -70,10 +73,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Training Sessions
         Route::get('training-sessions', [TrainingSessionController::class, 'index']);
-        Route::post('training-sessions', [TrainingSessionController::class, 'store']);
         Route::get('training-sessions/{trainingSession}', [TrainingSessionController::class, 'show']);
         Route::delete('training-sessions/{trainingSession}', [TrainingSessionController::class, 'destroy']);
         Route::patch('training-sessions/{trainingSession}/quota', [TrainingSessionController::class, 'updateQuota']);
+        Route::patch('training-sessions/{trainingSession}/coaches', [TrainingSessionController::class, 'updateCoaches']);
         Route::post('training-sessions/{trainingSession}/open', [TrainingSessionController::class, 'open']);
         Route::post('training-sessions/{trainingSession}/close', [TrainingSessionController::class, 'close']);
         Route::post('training-sessions/{trainingSession}/cancel', [TrainingSessionController::class, 'cancel']);
@@ -85,6 +88,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Coach books for member
         Route::post('bookings', [CoachSessionBookingController::class, 'store']);
+        Route::patch('bookings/{sessionBooking}', [CoachSessionBookingController::class, 'update']);
+        Route::delete('bookings/{sessionBooking}', [CoachSessionBookingController::class, 'destroy']);
     });
 
     // Routes untuk ADMIN
@@ -93,6 +98,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Master Packages
         Route::apiResource('packages', PackageController::class);
+        Route::post('packages/{package}/restore', [PackageController::class, 'restore']);
 
         // News
         Route::apiResource('news', AdminNewsController::class);
@@ -115,5 +121,16 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Pending Members
         Route::get('pending-members', [RegistrationController::class, 'pendingMembers']);
+
+        // Booking (admin)
+        Route::get('training-sessions', [AdminTrainingSessionController::class, 'index']);
+        Route::post('training-sessions', [AdminTrainingSessionController::class, 'store']);
+        Route::get('training-sessions/{trainingSession}', [AdminTrainingSessionController::class, 'show']);
+        Route::delete('training-sessions/{trainingSession}', [AdminTrainingSessionController::class, 'destroy']);
+        Route::patch('training-session-slots/{trainingSessionSlot}/coaches', [AdminTrainingSessionController::class, 'updateSlotCoaches']);
+        Route::get('booking-members', [AdminMemberBookingController::class, 'index']);
+        Route::post('bookings', [AdminSessionBookingController::class, 'store']);
+        Route::patch('bookings/{sessionBooking}', [AdminSessionBookingController::class, 'update']);
+        Route::delete('bookings/{sessionBooking}', [AdminSessionBookingController::class, 'destroy']);
     });
 });

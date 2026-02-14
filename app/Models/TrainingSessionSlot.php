@@ -32,6 +32,15 @@ class TrainingSessionSlot extends Model
         return $this->belongsTo(SessionTime::class);
     }
 
+    /**
+     * Coaches assigned to this specific slot
+     */
+    public function coaches()
+    {
+        return $this->belongsToMany(Coach::class, 'training_session_slot_coach')
+            ->withTimestamps();
+    }
+
     public function bookings()
     {
         return $this->hasMany(SessionBooking::class);

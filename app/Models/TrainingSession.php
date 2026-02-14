@@ -19,8 +19,8 @@ class TrainingSession extends Model
 
     protected $fillable = [
         'date',
-        'coach_id',
         'status',
+        'created_by',
     ];
 
     protected function casts(): array
@@ -32,11 +32,11 @@ class TrainingSession extends Model
     }
 
     /**
-     * Get the coach
+     * User who created this session (for audit)
      */
-    public function coach()
+    public function createdBy()
     {
-        return $this->belongsTo(Coach::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 
     /**

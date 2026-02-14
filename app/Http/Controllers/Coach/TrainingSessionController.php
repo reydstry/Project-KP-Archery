@@ -20,10 +20,31 @@ class TrainingSessionController extends Controller
             || ($now->hour === TrainingSession::AUTO_CLOSE_HOUR && $now->minute >= TrainingSession::AUTO_CLOSE_MINUTE);
 
         TrainingSession::query()
-            ->where('coach_id', $coach->id)
             ->where('status', TrainingSessionStatus::OPEN->value)
             ->where('date', $shouldCloseToday ? '<=' : '<', today()->toDateString())
             ->update(['status' => TrainingSessionStatus::CLOSED->value]);
+    }
+
+    private function isCoachAssignedToSlot(?Coach $coach, TrainingSessionSlot $slot): bool
+    {
+        if (!$coach) {
+            return false;
+        }
+
+        return $slot->coaches()
+            ->where('coaches.id', $coach->id)
+            ->exists();
+    }
+
+    private function isCoachAssignedToAnySlot(?Coach $coach, TrainingSession $trainingSession): bool
+    {
+        if (!$coach) {
+            return false;
+        }
+
+        return $trainingSession->slots()
+            ->whereHas('coaches', fn ($q) => $q->where('coaches.id', $coach->id))
+            ->exists();
     }
 
     /**
@@ -42,8 +63,12 @@ class TrainingSessionController extends Controller
 
         $this->autoCloseCoachSessionsIfNeeded($coach);
 
-        $query = TrainingSession::with(['slots.sessionTime', 'coach'])
-            ->where('coach_id', $coach->id);
+        $query = TrainingSession::with(['slots.sessionTime', 'slots.coaches', 'slots.confirmedBookings.memberPackage.member']);
+
+        $forBooking = $request->boolean('for_booking', false);
+        if (!$forBooking) {
+            $query->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id));
+        }
 
         // Filter by status if provided
         if ($request->has('status')) {
@@ -69,100 +94,72 @@ class TrainingSessionController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'date' => 'required|date|after_or_equal:today',
+        $validated = $request->validate(
+            [
+                'date' => 'required|date|after_or_equal:today|unique:training_sessions,date',
 
-            // New format: create a day session with multiple slots
-            'slots' => 'sometimes|array|min:1',
-            'slots.*.session_time_id' => 'required_with:slots|exists:session_times,id',
-            'slots.*.max_participants' => 'required_with:slots|integer|min:1|max:50',
+                'slots' => 'required|array|min:1',
+                'slots.*.session_time_id' => 'required|exists:session_times,id',
+                'slots.*.max_participants' => 'required|integer|min:1|max:50',
+                'slots.*.coach_ids' => 'sometimes|array',
+                'slots.*.coach_ids.*' => 'required_with:slots.*.coach_ids|exists:coaches,id',
+            ],
+            [
+                'date.required' => 'Tanggal sesi wajib diisi.',
+                'date.after_or_equal' => 'Tanggal sesi tidak boleh sebelum hari ini.',
+                'date.unique' => 'Sesi untuk tanggal ini sudah ada. Pilih tanggal lain.',
+                'slots.required' => 'Minimal pilih satu slot sesi.',
+                'slots.min' => 'Minimal pilih satu slot sesi.',
+                'slots.*.session_time_id.required' => 'Waktu sesi wajib dipilih.',
+                'slots.*.max_participants.required' => 'Kuota peserta wajib diisi.',
+                'slots.*.max_participants.min' => 'Kuota minimal 1 peserta.',
+                'slots.*.max_participants.max' => 'Kuota maksimal 50 peserta.',
+            ]
+        );
 
-            // Backward compatible: create (or add) a single slot for that date
-            'session_time_id' => 'sometimes|exists:session_times,id',
-            'max_participants' => 'sometimes|integer|min:1|max:50',
-        ]);
-
-        // Get coach record
-        $coach = Coach::where('user_id', auth()->id())->first();
-        
-        if (!$coach) {
+        // Check for duplicate session times
+        $sessionTimeIds = collect($validated['slots'])->pluck('session_time_id');
+        if ($sessionTimeIds->count() !== $sessionTimeIds->unique()->count()) {
             return response()->json([
-                'message' => 'Coach profile not found',
-            ], 404);
-        }
-
-        $hasSlotsPayload = array_key_exists('slots', $validated);
-        $hasLegacyPayload = array_key_exists('session_time_id', $validated) || array_key_exists('max_participants', $validated);
-
-        if (!$hasSlotsPayload && !$hasLegacyPayload) {
-            return response()->json([
-                'message' => 'Invalid payload. Provide slots[] or session_time_id + max_participants.',
+                'message' => 'Ada slot waktu yang dipilih lebih dari sekali.',
             ], 422);
-        }
-
-        if ($hasLegacyPayload && (!isset($validated['session_time_id']) || !isset($validated['max_participants']))) {
-            return response()->json([
-                'message' => 'For legacy payload, session_time_id and max_participants are required.',
-            ], 422);
-        }
-
-        if ($hasSlotsPayload) {
-            $sessionTimeIds = collect($validated['slots'])->pluck('session_time_id');
-            if ($sessionTimeIds->count() !== $sessionTimeIds->unique()->count()) {
-                return response()->json([
-                    'message' => 'Duplicate session_time_id in slots payload.',
-                ], 422);
-            }
         }
 
         DB::beginTransaction();
         try {
-            $trainingSession = TrainingSession::firstOrCreate(
-                [
-                    'coach_id' => $coach->id,
-                    'date' => $validated['date'],
-                ],
-                [
-                    'status' => TrainingSessionStatus::OPEN->value,
-                ]
-            );
+            // Create training session
+            $trainingSession = TrainingSession::create([
+                'date' => $validated['date'],
+                'status' => TrainingSessionStatus::OPEN->value,
+                'created_by' => auth()->id(),
+            ]);
 
-            if ($hasSlotsPayload) {
-                foreach ($validated['slots'] as $slotPayload) {
-                    TrainingSessionSlot::updateOrCreate(
-                        [
-                            'training_session_id' => $trainingSession->id,
-                            'session_time_id' => $slotPayload['session_time_id'],
-                        ],
-                        [
-                            'max_participants' => $slotPayload['max_participants'],
-                        ]
-                    );
-                }
-            } else {
-                $slotExists = TrainingSessionSlot::where('training_session_id', $trainingSession->id)
-                    ->where('session_time_id', $validated['session_time_id'])
-                    ->exists();
-
-                if ($slotExists) {
-                    DB::rollBack();
-                    return response()->json([
-                        'message' => 'Training session slot already exists for this date and time',
-                    ], 422);
-                }
-
-                TrainingSessionSlot::create([
+            // Create slots and assign coaches
+            foreach ($validated['slots'] as $slotPayload) {
+                $slot = TrainingSessionSlot::create([
                     'training_session_id' => $trainingSession->id,
-                    'session_time_id' => $validated['session_time_id'],
-                    'max_participants' => $validated['max_participants'],
+                    'session_time_id' => $slotPayload['session_time_id'],
+                    'max_participants' => $slotPayload['max_participants'],
                 ]);
+
+                // Use only coaches explicitly selected from UI payload
+                $coachIds = collect($slotPayload['coach_ids'] ?? [])
+                    ->map(fn ($id) => (int) $id)
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->all();
+
+                if (!empty($coachIds)) {
+                    $slot->coaches()->attach($coachIds);
+                }
             }
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Training session created successfully',
-                'data' => $trainingSession->fresh()->load(['slots.sessionTime', 'coach']),
+                'data' => $trainingSession->fresh()->load(['slots.sessionTime', 'slots.coaches']),
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -180,8 +177,9 @@ class TrainingSessionController extends Controller
     {
         // Verify coach owns this session
         $coach = Coach::where('user_id', auth()->id())->first();
-        
-        if (!$coach || $trainingSession->coach_id !== $coach->id) {
+        $forBooking = request()->boolean('for_booking', false);
+
+        if (!$forBooking && !$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);
@@ -189,7 +187,11 @@ class TrainingSessionController extends Controller
 
         $trainingSession->applyAutoClose(now());
 
-        return response()->json($trainingSession->load(['slots.sessionTime', 'coach']));
+        return response()->json($trainingSession->load([
+            'slots.sessionTime',
+            'slots.coaches',
+            'slots.confirmedBookings.memberPackage.member',
+        ]));
     }
 
     /**
@@ -199,8 +201,8 @@ class TrainingSessionController extends Controller
     {
         // Verify coach owns this session
         $coach = Coach::where('user_id', auth()->id())->first();
-        
-        if (!$coach || $trainingSession->coach_id !== $coach->id) {
+
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);
@@ -227,7 +229,59 @@ class TrainingSessionController extends Controller
 
         return response()->json([
             'message' => 'Quota updated successfully',
-            'data' => $trainingSession->fresh()->load(['slots.sessionTime', 'coach']),
+            'data' => $trainingSession->fresh()->load([
+                'slots.sessionTime',
+                'slots.coaches',
+                'slots.confirmedBookings.memberPackage.member',
+            ]),
+        ]);
+    }
+
+    /**
+     * Update coaches assigned to a specific slot (must include the current coach).
+     */
+    public function updateCoaches(Request $request, TrainingSession $trainingSession)
+    {
+        $coach = Coach::where('user_id', auth()->id())->first();
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'slot_id' => 'required|exists:training_session_slots,id',
+            'coach_ids' => 'required|array|min:1',
+            'coach_ids.*' => 'required|exists:coaches,id',
+        ]);
+
+        $slot = TrainingSessionSlot::where('id', $validated['slot_id'])
+            ->where('training_session_id', $trainingSession->id)
+            ->first();
+
+        if (!$slot) {
+            return response()->json([
+                'message' => 'Slot not found for this training session',
+            ], 404);
+        }
+
+        $coachIds = collect($validated['coach_ids'])
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->push($coach->id)
+            ->unique()
+            ->values()
+            ->all();
+
+        $slot->coaches()->sync($coachIds);
+
+        return response()->json([
+            'message' => 'Coaches updated successfully',
+            'data' => $trainingSession->fresh()->load([
+                'slots.sessionTime',
+                'slots.coaches',
+                'slots.confirmedBookings.memberPackage.member',
+            ]),
         ]);
     }
 
@@ -238,8 +292,8 @@ class TrainingSessionController extends Controller
     {
         // Verify coach owns this session
         $coach = Coach::where('user_id', auth()->id())->first();
-        
-        if (!$coach || $trainingSession->coach_id !== $coach->id) {
+
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);
@@ -274,8 +328,8 @@ class TrainingSessionController extends Controller
     {
         // Verify coach owns this session
         $coach = Coach::where('user_id', auth()->id())->first();
-        
-        if (!$coach || $trainingSession->coach_id !== $coach->id) {
+
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);
@@ -302,8 +356,8 @@ class TrainingSessionController extends Controller
     {
         // Verify coach owns this session
         $coach = Coach::where('user_id', auth()->id())->first();
-        
-        if (!$coach || $trainingSession->coach_id !== $coach->id) {
+
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);
@@ -331,7 +385,7 @@ class TrainingSessionController extends Controller
     {
         $coach = Coach::where('user_id', auth()->id())->first();
 
-        if (!$coach || $trainingSession->coach_id !== $coach->id) {
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);

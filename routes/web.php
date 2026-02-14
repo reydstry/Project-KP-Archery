@@ -9,8 +9,13 @@ use App\Http\Controllers\Auth\WebSetPasswordController;
 use App\Http\Controllers\Auth\GoogleRedirectController;
 use App\Http\Controllers\Auth\GoogleCallbackController;
 use App\Http\Controllers\WebDashboardController;
+use App\Http\Controllers\LanguageController;
 use App\Models\SessionTime;
+use App\Models\Coach;
 use Illuminate\Support\Facades\Route;
+
+// Language switching
+Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 
 Route::get('/', function () {
     return view('pages.beranda');
@@ -67,10 +72,20 @@ Route::middleware('auth')->group(function () {
 
     // Admin routes
     Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
+        Route::get('/sessions', fn() => view('dashboards.admin.sessions'))->name('sessions.index');
         Route::get('/members', fn() => view('dashboards.admin.members'))->name('members');
         Route::get('/coaches', fn() => view('dashboards.admin.coaches'))->name('coaches');
         Route::get('/packages', fn() => view('dashboards.admin.packages'))->name('packages');
         Route::get('/member-packages', fn() => view('dashboards.admin.member-packages'))->name('member-packages');
+        Route::get('/sessions/create', fn() => view('dashboards.admin.sessions-create', [
+            'sessionTimes' => SessionTime::query()->active()->orderBy('start_time')->get(['id', 'name', 'start_time', 'end_time']),
+            'coaches' => Coach::query()->orderBy('name')->get(['id', 'name']),
+        ]))->name('sessions.create');
+        Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.admin.sessions-edit', [
+            'id' => $id,
+            'coaches' => Coach::query()->orderBy('name')->get(['id', 'name']),
+        ]))->name('sessions.edit');
+        Route::get('/bookings/create', fn() => view('dashboards.admin.bookings-create'))->name('bookings.create');
         Route::get('/news', fn() => view('dashboards.admin.news'))->name('news');
         Route::get('/achievements', fn() => view('dashboards.admin.achievements'))->name('achievements');
     });
@@ -78,19 +93,19 @@ Route::middleware('auth')->group(function () {
     Route::prefix('coach')->name('coach.')->middleware('role:coach')->group(function () {
         Route::get('/sessions', fn() => view('dashboards.coach.sessions'))->name('sessions.index');
         Route::get('/bookings/create', fn() => view('dashboards.coach.bookings-create'))->name('bookings.create');
-        Route::get('/sessions/create', fn() => view('dashboards.coach.sessions-create', [
-            'sessionTimes' => SessionTime::query()->active()->orderBy('start_time')->get(['id', 'name', 'start_time', 'end_time']),
-        ]))->name('sessions.create');
-        Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.coach.sessions-edit', ['id' => $id]))->name('sessions.edit');
+        Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.coach.sessions-edit', [
+            'id' => $id,
+            'coaches' => Coach::query()->orderBy('name')->get(['id', 'name']),
+            'myCoachId' => auth()->user()?->coach?->id,
+        ]))->name('sessions.edit');
         Route::get('/attendance', fn() => view('dashboards.coach.attendance'))->name('attendance.index');
         Route::post('/attendance', fn() => redirect()->route('coach.attendance.index'))->name('attendance.store');
-        Route::get('/settings', function() {
+        Route::get('/change-password', function() {
             $user = auth()->user();
             $coach = $user->coach;
-            return view('dashboards.coach.settings', compact('user', 'coach'));
-        })->name('settings');
-        Route::post('/settings', [\App\Http\Controllers\Coach\ProfileController::class, 'updateProfile'])->name('settings.update');
-        Route::post('/settings/password', [\App\Http\Controllers\Coach\ProfileController::class, 'updatePassword'])->name('settings.password');
+            return view('dashboards.coach.change-password', compact('user', 'coach'));
+        })->name('change-password');
+        Route::post('/change-password', [\App\Http\Controllers\Coach\ProfileController::class, 'updatePassword'])->name('change-password.password');
     });
     // Member routes
      Route::prefix('member')->name('member.')->middleware('role:member')->group(function () {

@@ -44,17 +44,11 @@ class CoachTestDataSeeder extends Seeder
 
         foreach ($dates as $date) {
             // Create a training session (day header)
-            $trainingSession = TrainingSession::firstOrCreate(
-                [
-                    'coach_id' => $firstCoach->id,
-                    'date' => $date->format('Y-m-d'),
-                ],
-                [
-                    'coach_id' => $firstCoach->id,
-                    'date' => $date->format('Y-m-d'),
-                    'status' => 'open',
-                ]
-            );
+            $trainingSession = TrainingSession::create([
+                'date' => $date->format('Y-m-d'),
+                'status' => 'open',
+                'created_by' => $firstCoach->user_id, // Creator for audit
+            ]);
 
             // Create 6 slots for this day (one for each session time)
             $capacities = [12, 15, 10, 14, 16, 12]; // Different capacities for each slot
@@ -71,6 +65,9 @@ class CoachTestDataSeeder extends Seeder
                         'max_participants' => $capacities[$index] ?? 12,
                     ]
                 );
+
+                // Assign coach to this slot
+                $slot->coaches()->syncWithoutDetaching([$firstCoach->id]);
 
                 // Create some bookings for past and today's slots
                 if ($date->lte(Carbon::now())) {

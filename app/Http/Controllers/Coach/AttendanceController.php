@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Coach;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\Coach;
 use App\Models\SessionBooking;
 use App\Models\TrainingSession;
 use App\Models\TrainingSessionSlot;
@@ -12,6 +13,28 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
+    private function isCoachAssignedToSlot(?Coach $coach, TrainingSessionSlot $slot): bool
+    {
+        if (!$coach) {
+            return false;
+        }
+
+        return $slot->coaches()
+            ->where('coaches.id', $coach->id)
+            ->exists();
+    }
+
+    private function isCoachAssignedToAnySlot(?Coach $coach, TrainingSession $trainingSession): bool
+    {
+        if (!$coach) {
+            return false;
+        }
+
+        return $trainingSession->slots()
+            ->whereHas('coaches', fn ($q) => $q->where('coaches.id', $coach->id))
+            ->exists();
+    }
+
     /**
      * Get all bookings for a training session with attendance status
      */
@@ -19,7 +42,8 @@ class AttendanceController extends Controller
     {
         // Verify coach owns this session
         $coach = auth()->user()->coach;
-        if (!$coach || $trainingSession->coach_id !== $coach->id) {
+        $forBooking = $request->boolean('for_booking', false);
+        if (!$forBooking && !$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'You can only view your own training sessions'
             ], 403);
@@ -95,7 +119,7 @@ class AttendanceController extends Controller
 
         // Verify coach owns this session
         $coach = auth()->user()->coach;
-        if (!$coach || $trainingSession->coach_id !== $coach->id) {
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'You can only validate attendance for your own training sessions'
             ], 403);
@@ -194,7 +218,7 @@ class AttendanceController extends Controller
 
         // Verify coach owns this session
         $coach = auth()->user()->coach;
-        if (!$coach || $trainingSession->coach_id !== $coach->id) {
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'You can only update attendance for your own training sessions'
             ], 403);
