@@ -125,7 +125,7 @@
         <!-- Save Button -->
         <div class="mt-2 sm:mt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2">
             <p class="text-xs sm:text-sm text-slate-600" id="lastSaved">Last saved: Never</p>
-            <button onclick="saveAttendance()" id="saveBtn" class="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30 flex items-center justify-center gap-1.5">
+            <button onclick="saveAttendance()" id="saveBtn" class="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-[#1a307b] hover:bg-[#162a69] text-white rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-1.5">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -154,7 +154,7 @@
             <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="bg-white px-6 pt-6 pb-4">
                     <div class="flex items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-red-100">
+                        <div class="mx-auto shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-red-100">
                             <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                             </svg>
@@ -229,6 +229,7 @@ function loadSessions() {
         .then(data => {
             const sessions = data?.data || [];
             if (sessions.length === 0) {
+                showNotification('Tidak ada sesi pada tanggal ini', 'info');
                 return;
             }
 
@@ -238,6 +239,7 @@ function loadSessions() {
         })
         .catch(error => {
             console.error('Error:', error);
+            showNotification(error?.message || 'Gagal memuat sesi', 'error');
         });
 }
 
@@ -447,6 +449,7 @@ function markAllPresent() {
     });
     renderParticipants();
     updateAttendanceSummaryLocal();
+    showNotification('Semua peserta ditandai hadir', 'success');
 }
 
 function markAllAbsent() {
@@ -506,6 +509,13 @@ function saveAttendance() {
         })
         .filter(Boolean);
 
+    if (tasks.length === 0) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalContent;
+        showNotification('Tidak ada perubahan attendance untuk disimpan', 'info');
+        return;
+    }
+
     (async () => {
         let successCount = 0;
         try {
@@ -542,15 +552,7 @@ function escapeHtml(str) {
 }
 
 function showNotification(message, type = 'success') {
-    const bgColor = type === 'success' ? 'bg-emerald-500' : 'bg-red-500';
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-4 rounded-xl shadow-lg z-50 animate-fade-in-down`;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
+    window.showToast(message, type);
 }
 </script>
 @endsection

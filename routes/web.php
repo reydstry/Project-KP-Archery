@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\GoogleCallbackController;
 use App\Http\Controllers\WebDashboardController;
 use App\Http\Controllers\LanguageController;
 use App\Models\SessionTime;
+use App\Models\Coach;
 use Illuminate\Support\Facades\Route;
 
 // Language switching
@@ -92,11 +93,6 @@ Route::middleware('auth')->group(function () {
     Route::prefix('coach')->name('coach.')->middleware('role:coach')->group(function () {
         Route::get('/sessions', fn() => view('dashboards.coach.sessions'))->name('sessions.index');
         Route::get('/bookings/create', fn() => view('dashboards.coach.bookings-create'))->name('bookings.create');
-        Route::get('/sessions/create', fn() => view('dashboards.coach.sessions-create', [
-            'sessionTimes' => SessionTime::query()->active()->orderBy('start_time')->get(['id', 'name', 'start_time', 'end_time']),
-            'coaches' => Coach::query()->orderBy('name')->get(['id', 'name']),
-            'myCoachId' => auth()->user()?->coach?->id,
-        ]))->name('sessions.create');
         Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.coach.sessions-edit', [
             'id' => $id,
             'coaches' => Coach::query()->orderBy('name')->get(['id', 'name']),

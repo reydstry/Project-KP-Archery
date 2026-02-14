@@ -63,8 +63,12 @@ class TrainingSessionController extends Controller
 
         $this->autoCloseCoachSessionsIfNeeded($coach);
 
-        $query = TrainingSession::with(['slots.sessionTime', 'slots.coaches', 'slots.confirmedBookings.memberPackage.member'])
-            ->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id));
+        $query = TrainingSession::with(['slots.sessionTime', 'slots.coaches', 'slots.confirmedBookings.memberPackage.member']);
+
+        $forBooking = $request->boolean('for_booking', false);
+        if (!$forBooking) {
+            $query->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id));
+        }
 
         // Filter by status if provided
         if ($request->has('status')) {
@@ -113,15 +117,6 @@ class TrainingSessionController extends Controller
             ]
         );
 
-        // Get coach record
-        $coach = Coach::where('user_id', auth()->id())->first();
-        
-        if (!$coach) {
-            return response()->json([
-                'message' => 'Coach profile not found',
-            ], 404);
-        }
-
         // Check for duplicate session times
         $sessionTimeIds = collect($validated['slots'])->pluck('session_time_id');
         if ($sessionTimeIds->count() !== $sessionTimeIds->unique()->count()) {
@@ -147,16 +142,17 @@ class TrainingSessionController extends Controller
                     'max_participants' => $slotPayload['max_participants'],
                 ]);
 
-                // Build coach list (always include current coach + any additional coaches)
+                // Use only coaches explicitly selected from UI payload
                 $coachIds = collect($slotPayload['coach_ids'] ?? [])
                     ->map(fn ($id) => (int) $id)
                     ->filter()
-                    ->push($coach->id)
                     ->unique()
                     ->values()
                     ->all();
 
-                $slot->coaches()->attach($coachIds);
+                if (!empty($coachIds)) {
+                    $slot->coaches()->attach($coachIds);
+                }
             }
 
             DB::commit();
@@ -181,8 +177,9 @@ class TrainingSessionController extends Controller
     {
         // Verify coach owns this session
         $coach = Coach::where('user_id', auth()->id())->first();
+        $forBooking = request()->boolean('for_booking', false);
 
-        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
+        if (!$forBooking && !$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);

@@ -78,7 +78,7 @@ class MemberController extends Controller
      */
     public function show(Member $member)
     {
-        $member->load(['user', 'registeredBy', 'memberPackages']);
+        $member->load(['user', 'registeredBy', 'memberPackages.package']);
 
         // Calculate training statistics
         $stats = $this->calculateMemberStats($member);

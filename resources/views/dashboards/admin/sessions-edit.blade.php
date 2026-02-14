@@ -57,16 +57,44 @@ const SESSION_ID = @json($id ?? null);
 let CURRENT_SESSION = null;
 const COACHES = @json($coaches ?? []);
 
+function notify(message, type = 'info') {
+    if (window.showToast) {
+        window.showToast(message, type);
+        return;
+    }
+    alert(message);
+}
+
+function notifyError(message) {
+    notify(message, 'error');
+}
+
+function notifySuccess(message) {
+    notify(message, 'success');
+}
+
+function confirmAction(title, message, onConfirm, options = {}) {
+    if (typeof showConfirm === 'function') {
+        showConfirm(title, message, onConfirm, options);
+        return;
+    }
+
+    const plain = `${title}\n\n${message}`;
+    if (confirm(plain)) {
+        onConfirm();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Validate session ID
     if (!SESSION_ID) {
-        window.showToast('❌ Missing session id', 'error');
+        notifyError('Session ID tidak ditemukan');
         return;
     }
 
     // Validate coaches data
     if (!Array.isArray(COACHES) || COACHES.length === 0) {
-        window.showToast('⚠️ No coaches available. Please add coaches first.', 'error');
+        notifyError('Belum ada coach aktif. Tambahkan coach terlebih dahulu.');
         console.error('COACHES data is invalid or empty');
     }
 
@@ -116,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
         `;
         
-        window.showToast('⚠️ Failed to load session data. Please try again.', 'error');
+        notifyError('Gagal memuat data training session. Silakan coba lagi.');
     }
 });
 
@@ -274,6 +302,11 @@ function renderSlots(slots) {
 let currentSlotId = null;
 
 function openCoachModal(slotId, selectedCoachesJson = '[]') {
+    if (!Array.isArray(COACHES) || COACHES.length === 0) {
+        notifyError('Belum ada coach aktif untuk dipilih');
+        return;
+    }
+
     currentSlotId = slotId;
     const modal = document.getElementById('coachModal');
     const searchInput = document.getElementById('coachSearch');
@@ -402,12 +435,12 @@ async function moveBooking(bookingId, isMobile = false) {
     const targetSlotId = Number(targetSelect?.value || 0);
 
     if (!Number.isInteger(targetSlotId) || targetSlotId <= 0) {
-        showError('Please select a valid target slot', 'Invalid Selection');
+        notifyError('Pilih slot tujuan yang valid');
         return;
     }
     
     // Confirm action with better message
-    showConfirm(
+    confirmAction(
         '📌 Move Member Booking',
         'Are you sure you want to move this member to the selected time slot?\n\nThis will update their booking immediately.',
         async () => {
@@ -415,7 +448,7 @@ async function moveBooking(bookingId, isMobile = false) {
                 await window.API.patch(`/admin/bookings/${bookingId}`, {
                     training_session_slot_id: targetSlotId,
                 });
-                showSuccess('Member has been moved to the new time slot successfully!', 'Moved Successfully');
+                notifySuccess('Member berhasil dipindahkan ke slot baru');
                 
                 // Reload session data
                 const session = await window.API.get(`/admin/training-sessions/${SESSION_ID}`);
@@ -430,7 +463,7 @@ async function moveBooking(bookingId, isMobile = false) {
             } catch (e) {
                 console.error('Move booking error:', e);
                 const errorMsg = e?.response?.data?.message || e?.message || 'Failed to move member';
-                showError(errorMsg, 'Move Failed');
+                notifyError(errorMsg);
             }
         },
         {
@@ -445,17 +478,17 @@ async function moveBooking(bookingId, isMobile = false) {
 async function removeBooking(bookingId) {
     // Validate booking ID
     if (!bookingId || !Number.isInteger(Number(bookingId))) {
-        showError('Invalid booking ID', 'Validation Error');
+        notifyError('Booking ID tidak valid');
         return;
     }
     
-    showConfirm(
+    confirmAction(
         '⚠️ Delete Booking',
         'Are you sure you want to permanently delete this booking?\n\nThis action cannot be undone.\nThe member will be removed from this session.',
         async () => {
             try {
                 await window.API.delete(`/admin/bookings/${bookingId}`);
-                showSuccess('Booking has been deleted successfully!', 'Deleted');
+                notifySuccess('Booking member berhasil dihapus');
                 
                 // Reload session data
                 const session = await window.API.get(`/admin/training-sessions/${SESSION_ID}`);
@@ -470,7 +503,7 @@ async function removeBooking(bookingId) {
             } catch (e) {
                 console.error('Delete booking error:', e);
                 const errorMsg = e?.response?.data?.message || e?.message || 'Failed to delete booking';
-                showError(errorMsg, 'Delete Failed');
+                notifyError(errorMsg);
             }
         },
         {
@@ -502,7 +535,7 @@ function toggleCoachEdit(slotId, coachId, button) {
 
 async function updateAllSlots() {
     if (!CURRENT_SESSION || !CURRENT_SESSION.slots) {
-        showError('No session data available. Please refresh the page.', 'Data Missing');
+        notifyError('Data sesi tidak tersedia. Silakan refresh halaman.');
         return;
     }
 
@@ -525,18 +558,21 @@ async function updateAllSlots() {
 
     const slotWithoutCoach = slotsData.find(s => s.coachIds.length === 0);
     if (slotWithoutCoach) {
-        showError('Each time slot must have at least one coach assigned before updating.', 'Validation Error');
+        const slotObj = (CURRENT_SESSION.slots || []).find(s => Number(s.id) === Number(slotWithoutCoach.slotId));
+        const st = slotObj?.session_time || slotObj?.sessionTime || {};
+        const slotLabel = st?.name || `ID ${slotWithoutCoach.slotId}`;
+        notifyError(`Slot ${slotLabel} belum memiliki coach. Pilih minimal 1 coach sebelum update.`);
         return;
     }
 
     const invalidQuota = slotsData.find(s => !Number.isInteger(s.maxParticipants) || s.maxParticipants < 1 || s.maxParticipants > 50);
     if (invalidQuota) {
-        showError('Max participants must be between 1-50 for all slots.', 'Validation Error');
+        notifyError('Kuota peserta harus 1-50 untuk semua slot');
         return;
     }
     
     // Confirm before updating
-    showConfirm(
+    confirmAction(
         '📌 Update All Slots',
         `You are about to update all training session slots.\n\nThis will update coaches and capacities for ${slots.length} time slot(s).\n\nContinue?`,
         async () => {
@@ -555,7 +591,7 @@ async function updateAllSlots() {
                     )
                 );
 
-                showSuccess(`All ${slots.length} slots have been updated successfully with new coaches and capacities!`, 'Update Complete');
+                notifySuccess(`Berhasil update ${slots.length} slot`);
                 
                 // Reload session data
                 const session = await window.API.get(`/admin/training-sessions/${SESSION_ID}`);
@@ -570,7 +606,7 @@ async function updateAllSlots() {
             } catch (e) {
                 console.error('Update slots error:', e);
                 const errorMsg = e?.response?.data?.message || e?.message || 'Failed to update coaches';
-                showError(errorMsg, 'Update Failed');
+                notifyError(errorMsg);
             } finally {
                 btn.disabled = false;
                 btn.textContent = original;

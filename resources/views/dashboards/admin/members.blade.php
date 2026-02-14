@@ -260,58 +260,56 @@
                             </div>
                         </div>
 
-                        <!-- Statistics Cards -->
+                        <div class="bg-indigo-50 rounded-xl p-4 border border-indigo-100">
+                            <h4 class="font-bold text-indigo-900 mb-3">Informasi Paket</h4>
+                            <template x-if="activeMemberPackage()">
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                    <div>
+                                        <p class="text-sm text-indigo-600">Nama Paket</p>
+                                        <p class="font-semibold text-indigo-900" x-text="activeMemberPackage()?.package?.name || '-'"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-indigo-600">Harga</p>
+                                        <p class="font-semibold text-indigo-900">Rp <span x-text="Number(activeMemberPackage()?.package?.price || 0).toLocaleString('id-ID')"></span></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-indigo-600">Durasi</p>
+                                        <p class="font-semibold text-indigo-900" x-text="activeMemberPackage()?.package?.duration_days ? (activeMemberPackage().package.duration_days + ' hari') : '-' "></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-green-600">Tanggal Mulai</p>
+                                        <p class="font-semibold text-green-900" x-text="activeMemberPackage()?.start_date ? new Date(activeMemberPackage().start_date).toLocaleDateString('id-ID') : '-' "></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-green-600">Tanggal Berakhir</p>
+                                        <p class="font-semibold text-green-900" x-text="activeMemberPackage()?.end_date ? new Date(activeMemberPackage().end_date).toLocaleDateString('id-ID') : '-' "></p>
+                                    </div>
+                                </div>
+                            </template>
+                            <template x-if="!activeMemberPackage()">
+                                <p class="text-sm text-slate-500">Member belum memiliki paket aktif.</p>
+                            </template>
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- This Week -->
-                            <div class="bg-linear-to-br from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h5 class="text-sm font-semibold text-slate-700">This Week</h5>
-                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                                </div>
-                                <p class="text-3xl font-bold text-green-700" x-text="statistics?.training_count_this_week || 0"></p>
-                                <p class="text-xs text-green-600 mt-1">training sessions</p>
+                            <div class="bg-white rounded-xl p-5 border border-slate-200">
+                                <p class="text-sm font-semibold text-slate-600 mb-2">Slot Terpakai</p>
+                                <p class="text-3xl font-bold text-[#1a307b]" x-text="activeMemberPackage()?.used_sessions || 0"></p>
                             </div>
-
-                            <!-- This Month -->
-                            <div class="bg-linear-to-br from-blue-50 to-cyan-50 rounded-xl p-5 border border-blue-200">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h5 class="text-sm font-semibold text-slate-700">This Month</h5>
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                                </div>
-                                <p class="text-3xl font-bold text-blue-700" x-text="statistics?.training_count_this_month || 0"></p>
-                                <p class="text-xs text-blue-600 mt-1">training sessions</p>
-                            </div>
-
-                            <!-- This Year -->
-                            <div class="bg-linear-to-br from-purple-50 to-pink-50 rounded-xl p-5 border border-purple-200">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h5 class="text-sm font-semibold text-slate-700">This Year</h5>
-                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                                </div>
-                                <p class="text-3xl font-bold text-purple-700" x-text="statistics?.training_count_this_year || 0"></p>
-                                <p class="text-xs text-purple-600 mt-1">training sessions</p>
-                            </div>
-
-                            <!-- Week Streak -->
-                            <div class="bg-linear-to-br from-orange-50 to-red-50 rounded-xl p-5 border border-orange-200">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h5 class="text-sm font-semibold text-slate-700">Week Streak</h5>
-                                    <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z"/></svg>
-                                </div>
-                                <p class="text-3xl font-bold text-orange-700" x-text="statistics?.week_streak || 0"></p>
-                                <p class="text-xs text-orange-600 mt-1">consecutive weeks</p>
+                            <div class="bg-white rounded-xl p-5 border border-slate-200">
+                                <p class="text-sm font-semibold text-slate-600 mb-2">Sisa Slot</p>
+                                <p class="text-3xl font-bold text-[#1a307b]" x-text="remainingSlots()"></p>
                             </div>
                         </div>
 
-                        <!-- Total Trainings -->
-                        <div class="bg-linear-to-r from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h5 class="text-sm font-semibold text-slate-700 mb-1">Total Trainings</h5>
-                                    <p class="text-2xl font-bold text-slate-800" x-text="statistics?.total_trainings || 0"></p>
-                                </div>
-                                <div class="w-12 h-12 bg-slate-200 rounded-full flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        <div class="bg-white rounded-xl p-5 border border-slate-200" x-show="activeMemberPackage()">
+                            <div class="flex justify-between mb-2">
+                                <span class="text-sm text-slate-600">Penggunaan Slot</span>
+                                <span class="text-sm font-bold text-slate-800" x-text="`${activeMemberPackage()?.used_sessions || 0} / ${activeMemberPackage()?.total_sessions || 0}`"></span>
+                            </div>
+                            <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                                <div class="bg-[#1a307b] h-full transition-all" 
+                                     :style="'width: ' + ((activeMemberPackage()?.total_sessions || 0) > 0 ? (((activeMemberPackage()?.used_sessions || 0) / activeMemberPackage().total_sessions) * 100) : 0) + '%'">
                                 </div>
                             </div>
                         </div>
@@ -448,6 +446,31 @@ function membersData() {
             this.showDetailsModal = false;
             this.memberDetails = null;
             this.statistics = null;
+        },
+
+        activeMemberPackage() {
+            const packages = this.memberDetails?.member_packages || [];
+            if (!Array.isArray(packages) || packages.length === 0) {
+                return null;
+            }
+
+            const now = new Date();
+            const active = packages.find((pkg) => {
+                const isActive = Boolean(pkg?.is_active);
+                if (!isActive) return false;
+                if (!pkg?.end_date) return true;
+                return new Date(pkg.end_date) >= now;
+            });
+
+            return active || packages[0] || null;
+        },
+
+        remainingSlots() {
+            const pkg = this.activeMemberPackage();
+            if (!pkg) return 0;
+            const total = Number(pkg.total_sessions || 0);
+            const used = Number(pkg.used_sessions || 0);
+            return Math.max(0, total - used);
         },
         
         async saveMember() {

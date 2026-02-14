@@ -13,16 +13,6 @@ use Illuminate\Support\Facades\DB;
 
 class SessionBookingController extends Controller
 {
-    private function isCoachAssignedToSlot(?Coach $coach, TrainingSessionSlot $slot): bool
-    {
-        if (!$coach) {
-            return false;
-        }
-
-        return $slot->coaches()
-            ->where('coaches.id', $coach->id)
-            ->exists();
-    }
 
     private function validateSlotBookable(TrainingSessionSlot $slot): ?array
     {
@@ -146,12 +136,6 @@ class SessionBookingController extends Controller
             ], 404);
         }
 
-        if (!$this->isCoachAssignedToSlot($coach, $trainingSessionSlot)) {
-            return response()->json([
-                'message' => 'You can only book slots where you are assigned as a coach',
-            ], 403);
-        }
-
         $now = now();
 
         // Auto-close if needed and enforce booking window
@@ -260,10 +244,10 @@ class SessionBookingController extends Controller
 
         $sessionBooking->load(['trainingSessionSlot.trainingSession', 'memberPackage']);
         $sourceSlot = $sessionBooking->trainingSessionSlot;
-        if (!$sourceSlot || !$this->isCoachAssignedToSlot($coach, $sourceSlot)) {
+        if (!$sourceSlot) {
             return response()->json([
-                'message' => 'You can only update bookings in your assigned slots',
-            ], 403);
+                'message' => 'Source slot not found',
+            ], 404);
         }
 
         if ($sessionBooking->status !== 'confirmed') {
@@ -274,12 +258,6 @@ class SessionBookingController extends Controller
 
         $targetSlot = TrainingSessionSlot::with(['trainingSession', 'sessionTime'])
             ->findOrFail($validated['training_session_slot_id']);
-
-        if (!$this->isCoachAssignedToSlot($coach, $targetSlot)) {
-            return response()->json([
-                'message' => 'You can only move bookings to slots where you are assigned as a coach',
-            ], 403);
-        }
 
         if ((int) $sourceSlot->id === (int) $targetSlot->id) {
             return response()->json([
@@ -339,10 +317,10 @@ class SessionBookingController extends Controller
         $sessionBooking->load('trainingSessionSlot');
         $slot = $sessionBooking->trainingSessionSlot;
 
-        if (!$slot || !$this->isCoachAssignedToSlot($coach, $slot)) {
+        if (!$slot) {
             return response()->json([
-                'message' => 'You can only remove bookings in your assigned slots',
-            ], 403);
+                'message' => 'Slot not found',
+            ], 404);
         }
 
         if ($sessionBooking->status !== 'confirmed') {

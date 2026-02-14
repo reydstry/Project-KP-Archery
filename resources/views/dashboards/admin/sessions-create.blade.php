@@ -64,6 +64,34 @@
 const SESSION_TIMES = @json($sessionTimes ?? []);
 const COACHES = @json($coaches ?? []);
 
+function notify(message, type = 'info') {
+    if (window.showToast) {
+        window.showToast(message, type);
+        return;
+    }
+    alert(message);
+}
+
+function notifyError(message) {
+    notify(message, 'error');
+}
+
+function notifySuccess(message) {
+    notify(message, 'success');
+}
+
+function confirmAction(title, message, onConfirm, options = {}) {
+    if (typeof showConfirm === 'function') {
+        showConfirm(title, message, onConfirm, options);
+        return;
+    }
+
+    const plain = `${title}\n\n${message}`;
+    if (confirm(plain)) {
+        onConfirm();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('sessionDate');
     const today = new Date();
@@ -167,6 +195,12 @@ let currentSlotId = null;
 
 function openCoachModal(slotId) {
     currentSlotId = slotId;
+
+    if (!Array.isArray(COACHES) || COACHES.length === 0) {
+        notifyError('Belum ada coach aktif. Tambahkan coach terlebih dahulu.');
+        return;
+    }
+
     const modal = document.getElementById('coachModal');
     const searchInput = document.getElementById('coachSearch');
     searchInput.value = '';
@@ -300,7 +334,7 @@ async function submitCreate() {
     const date = document.getElementById('sessionDate').value;
 
     if (!date) {
-        window.showToast('❌ Date is required', 'error');
+        notifyError('Tanggal wajib diisi');
         return;
     }
     
@@ -311,7 +345,7 @@ async function submitCreate() {
     selectedDate.setHours(0, 0, 0, 0);
     
     if (selectedDate < today) {
-        window.showToast('❌ Cannot create session for past dates', 'error');
+        notifyError('Tidak bisa membuat sesi untuk tanggal yang sudah lewat');
         return;
     }
 
@@ -354,25 +388,26 @@ async function submitCreate() {
     }
 
     if (selected.length === 0) {
-        window.showToast('❌ Please select at least one time slot', 'error');
+        notifyError('Pilih minimal satu slot waktu');
         return;
     }
 
     // Check if all selected slots have at least one coach
     const slotWithoutCoach = selected.find(s => !s.coach_ids || s.coach_ids.length === 0);
     if (slotWithoutCoach) {
-        window.showToast('❌ Each slot must have at least one coach assigned', 'error');
+        const slotName = SESSION_TIMES.find(st => Number(st.id) === Number(slotWithoutCoach.session_time_id))?.name || `ID ${slotWithoutCoach.session_time_id}`;
+        notifyError(`Slot ${slotName} belum memiliki coach. Pilih minimal 1 coach di tiap slot.`);
         return;
     }
 
     const invalid = selected.find(s => !Number.isInteger(s.max_participants) || s.max_participants < 1 || s.max_participants > 50);
     if (invalid) {
-        window.showToast('❌ Max participants must be between 1-50 for all slots', 'error');
+        notifyError('Kuota peserta harus 1-50 untuk semua slot');
         return;
     }
     
     // Confirm before creating
-    showConfirm(
+    confirmAction(
         '📅 Create Training Session',
         `Date: ${date}\nSlots: ${selected.length} time slot(s)\n\nAre you sure you want to create this training session?`,
         async () => {
@@ -391,16 +426,15 @@ async function submitCreate() {
                     throw new Error('Invalid response from server');
                 }
 
-                showSuccess('Training session has been created successfully! Redirecting...', 'Success!');
+                notifySuccess('Training session berhasil dibuat. Mengarahkan ke dashboard...');
                 
                 // Redirect after short delay to show modal
                 setTimeout(() => {
                     window.location.href = '{{ route('dashboard') }}';
                 }, 1500);
             } catch (e) {
-                console.error('Create session error:', e);
                 const errorMsg = e?.response?.data?.message || e?.message || 'Failed to create session';
-                showError(errorMsg, 'Creation Failed');
+                notifyError(errorMsg);
                 
                 btn.disabled = false;
                 btn.textContent = original;

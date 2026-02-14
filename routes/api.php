@@ -72,7 +72,6 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // Training Sessions
         Route::get('training-sessions', [TrainingSessionController::class, 'index']);
-        Route::post('training-sessions', [TrainingSessionController::class, 'store']);
         Route::get('training-sessions/{trainingSession}', [TrainingSessionController::class, 'show']);
         Route::delete('training-sessions/{trainingSession}', [TrainingSessionController::class, 'destroy']);
         Route::patch('training-sessions/{trainingSession}/quota', [TrainingSessionController::class, 'updateQuota']);

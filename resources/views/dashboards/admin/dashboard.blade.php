@@ -14,7 +14,7 @@
                     <p class="text-sm font-medium text-slate-500">Total Members</p>
                     <h3 class="text-3xl font-bold text-slate-800 mt-2" x-text="stats.total_members || 0"></h3>
                     <p class="text-xs text-slate-400 mt-1">
-                        <span class="text-amber-600 font-medium" x-text="stats.pending_members || 0"></span> pending
+                        <span class="text-[#d12823] font-medium" x-text="stats.pending_members || 0"></span> pending
                     </p>
                 </div>
                 <div class="p-3 bg-[#1a307b]/10 rounded-xl">
@@ -30,8 +30,8 @@
                     <h3 class="text-3xl font-bold text-slate-800 mt-2" x-text="stats.total_coaches || 0"></h3>
                     <p class="text-xs text-slate-400 mt-1">Active trainers</p>
                 </div>
-                <div class="p-3 bg-green-50 rounded-xl">
-                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                <div class="p-3 bg-[#1a307b]/10 rounded-xl">
+                    <svg class="w-6 h-6 text-[#1a307b]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                 </div>
             </div>
         </div>
@@ -43,8 +43,8 @@
                     <h3 class="text-3xl font-bold text-slate-800 mt-2" x-text="stats.total_packages || 0"></h3>
                     <p class="text-xs text-slate-400 mt-1">Available plans</p>
                 </div>
-                <div class="p-3 bg-purple-50 rounded-xl">
-                    <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                <div class="p-3 bg-[#d12823]/10 rounded-xl">
+                    <svg class="w-6 h-6 text-[#d12823]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
             </div>
         </div>
@@ -70,7 +70,7 @@
                             <p class="font-semibold text-slate-800 truncate" x-text="member.name"></p>
                             <p class="text-sm text-slate-500" x-text="member.phone || 'No phone'"></p>
                         </div>
-                        <span class="px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 rounded-full border border-amber-200">Pending</span>
+                        <span class="px-3 py-1 text-xs font-bold text-[#d12823] bg-[#d12823]/10 rounded-full border border-[#d12823]/20">Pending</span>
                     </div>
                 </template>
             </div>
@@ -103,13 +103,6 @@
                             <!-- Main slot card - clickable to expand -->
                             <div @click="expanded = !expanded" class="flex items-center justify-between gap-4 p-4 hover:bg-slate-50 transition cursor-pointer">
                                 <div class="flex items-center gap-4 min-w-0">
-                                    <div class="w-12 h-12 bg-[#1a307b] rounded-xl flex items-center justify-center text-white shrink-0">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10"/>
-                                            <circle cx="12" cy="12" r="6"/>
-                                            <circle cx="12" cy="12" r="2"/>
-                                        </svg>
-                                    </div>
                                     <div class="min-w-0">
                                         <p class="font-semibold text-slate-800 truncate" x-text="slot.session_time?.session_name || 'Training Session'"></p>
                                         <p class="text-sm text-slate-500">

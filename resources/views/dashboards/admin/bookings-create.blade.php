@@ -1,38 +1,49 @@
 @extends('layouts.admin')
 
 @section('title', 'Booking Sesi')
-@section('subtitle', 'Pilih slot waktu latihan, lalu pilih member dari daftar.')
+@section('subtitle', 'Pilih sesi, cari member, dan kelola member yang berlatih di sesi terpilih.')
 
 @section('content')
 <div class="space-y-6">
     <div x-data="adminBookingPage()" x-init="init()" class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm">
-        <div class="p-6">
-            <!-- Training Session Info -->
-            <div class="mb-6">
+        <div class="p-6 space-y-6">
+            <div>
                 <div class="flex items-center justify-between mb-3">
-                    <label class="block text-sm font-semibold text-slate-700">Training Session</label>
+                    <label class="block text-sm font-semibold text-slate-700">Pilih Training Session</label>
                     <span class="text-xs text-slate-500" x-show="loadingSessions" x-cloak>Memuat...</span>
                 </div>
-                <template x-if="latestSession">
-                    <div class="px-4 py-3 bg-[#1a307b]/10 border-2 border-[#1a307b]/20 rounded-xl">
-                        <p class="font-semibold text-[#1a307b]" x-text="formatSessionLabel(latestSession)"></p>
+
+                <template x-if="!loadingSessions && sessions.length === 0">
+                    <div class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 text-sm">
+                        Tidak ada training session tersedia
                     </div>
                 </template>
-                <template x-if="!loadingSessions && !latestSession">
-                    <div class="px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-slate-500 text-sm">
-                        Tidak ada training session tersedia
+
+                <template x-if="sessions.length > 0">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <template x-for="session in sessions" :key="session.id">
+                            <button type="button"
+                                @click="selectSession(session.id)"
+                                :class="{
+                                    'bg-[#1a307b] text-white border-[#152866]': form.training_session_id === session.id,
+                                    'bg-white text-slate-700 border-slate-200 hover:border-[#1a307b] hover:text-[#1a307b]': form.training_session_id !== session.id
+                                }"
+                                class="px-4 py-3 border-2 rounded-xl font-medium transition-all duration-200 text-sm text-left">
+                                <p class="font-semibold" x-text="formatSessionLabel(session)"></p>
+                                <p class="text-xs opacity-80 mt-1" x-text="`Status: ${(session.status || '').toUpperCase()}`"></p>
+                            </button>
+                        </template>
                     </div>
                 </template>
             </div>
 
-            <!-- Slot Selection with Bubbles -->
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-slate-700 mb-3">Pilih Slot Waktu</label>
+            <div x-show="form.training_session_id" x-cloak>
+                <label class="block text-sm font-semibold text-slate-700 mb-3">Pilih Sesi</label>
                 <template x-if="loadingSlots">
-                    <p class="text-sm text-slate-500">Memuat slot...</p>
+                    <p class="text-sm text-slate-500">Memuat sesi...</p>
                 </template>
                 <template x-if="!loadingSlots && slots.length === 0">
-                    <p class="text-sm text-slate-500">Tidak ada slot tersedia</p>
+                    <p class="text-sm text-slate-500">Tidak ada sesi tersedia di training session ini.</p>
                 </template>
                 <template x-if="!loadingSlots && slots.length > 0">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -43,79 +54,99 @@
                                     'bg-[#1a307b] text-white border-[#152866]': form.training_session_slot_id === slot.id,
                                     'bg-white text-slate-700 border-slate-200 hover:border-[#1a307b] hover:text-[#1a307b]': form.training_session_slot_id !== slot.id
                                 }"
-                                class="px-4 py-3 border-2 rounded-xl font-medium transition-all duration-200 text-sm w-full">
-                                <div class="flex flex-col items-start">
-                                    <span class="font-bold" x-text="slot.session_time?.name || 'Slot'"></span>
-                                    <span class="text-xs opacity-90" x-text="`${slot.session_time?.start_time || ''} - ${slot.session_time?.end_time || ''}`"></span>
-                                    <span class="text-xs opacity-75 mt-1" x-text="`Kuota: ${slot.max_participants || 0}`"></span>
-                                </div>
+                                class="px-4 py-3 border-2 rounded-xl font-medium transition-all duration-200 text-sm w-full text-left">
+                                <p class="font-bold" x-text="slot.session_time?.name || 'Sesi'"></p>
+                                <p class="text-xs opacity-90" x-text="`${slot.session_time?.start_time || ''} - ${slot.session_time?.end_time || ''}`"></p>
+                                <p class="text-xs opacity-80 mt-1" x-text="`Kuota: ${slot.max_participants || 0}`"></p>
                             </button>
                         </template>
                     </div>
                 </template>
             </div>
 
-            <div x-show="form.training_session_slot_id" x-cloak>
-                <div class="border-t border-slate-200 pt-6">
-                    <h4 class="text-base font-bold text-slate-800 mb-4">Pilih Member</h4>
+            <div x-show="form.training_session_slot_id" x-cloak class="border-t border-slate-200 pt-6 space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Cari Member</label>
+                    <input type="text" x-model="memberSearch" @input="filterMembers()" placeholder="Cari nama member aktif..."
+                           class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-[#1a307b] text-sm">
+                    <p class="text-xs text-slate-500 mt-1">Digunakan untuk cari member baru dan filter member yang sudah berlatih.</p>
+                </div>
 
-                    <div class="mb-4">
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Cari Member</label>
-                        <input type="text" x-model="memberSearch" @input="filterMembers()" placeholder="Cari nama member aktif..."
-                               class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-[#1a307b] text-sm">
-                        <p class="text-xs text-slate-500 mt-1">Hanya menampilkan member dengan status aktif</p>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-sm font-bold text-slate-800">Tambahkan Member ke Sesi Ini</h4>
+                        <span class="text-xs text-slate-500" x-show="loadingMembers" x-cloak>Memuat member...</span>
                     </div>
 
-                    <div class="bg-slate-50 rounded-xl p-4 max-h-96 overflow-y-auto">
-                        <p class="text-sm text-slate-600 mb-3" x-show="loadingMembers" x-cloak>Memuat member...</p>
-                        <p class="text-sm text-slate-600 mb-3" x-show="!loadingMembers && filteredMembers.length === 0" x-cloak>Tidak ada member.</p>
+                    <template x-if="!loadingMembers && filteredMembers.length === 0">
+                        <p class="text-sm text-slate-500">Member aktif tidak ditemukan.</p>
+                    </template>
 
-                        <div class="space-y-2">
-                            <template x-for="member in filteredMembers" :key="member.id">
-                                <label class="flex items-start gap-3 p-3 bg-white rounded-lg border border-slate-200 hover:border-[#1a307b]/40 cursor-pointer transition-all">
-                                    <input type="checkbox" :value="member.id" @change="toggleMemberSelection(member)"
-                                           :checked="selectedMembers.some(m => m.id === member.id)"
-                                           class="mt-1 rounded border-slate-300 text-[#1a307b] focus:ring-[#1a307b]">
-                                    <div class="flex items-center justify-between w-full">
-                                        <div>
-                                            <p class="font-semibold text-slate-900" x-text="member.name"></p>
-                                        </div>
+                    <div class="space-y-2 max-h-64 overflow-y-auto" x-show="filteredMembers.length > 0">
+                        <template x-for="member in filteredMembers" :key="member.id">
+                            <div class="flex items-start justify-between gap-3 p-3 bg-white rounded-lg border border-slate-200">
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-slate-900" x-text="member.name"></p>
+                                    <template x-if="member.active_packages && member.active_packages.length > 0">
+                                        <p class="text-xs text-slate-500 mt-1">
+                                            <span x-text="member.active_packages[0].package_name"></span>
+                                            •
+                                            <span x-text="`${member.active_packages[0].remaining_sessions} sesi`"></span>
+                                        </p>
+                                    </template>
+                                    <template x-if="!member.active_packages || member.active_packages.length === 0">
+                                        <p class="text-xs text-[#d12823] mt-1">Tidak ada paket aktif</p>
+                                    </template>
+                                </div>
 
-                                        <div class="flex flex-wrap gap-1 justify-end text-right">
-                                            <template x-if="member.active_packages && member.active_packages.length > 0">
-                                                <template x-for="pkg in member.active_packages" :key="pkg.id">
-                                                    <div class="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded whitespace-nowrap">
-                                                        <span x-text="pkg.package_name"></span>:
-                                                        <span x-text="`${pkg.remaining_sessions} sesi`"></span>
-                                                    </div>
-                                                </template>
-                                            </template>
+                                <button type="button"
+                                    @click="addMemberToSession(member)"
+                                    :disabled="submitting || isMemberAlreadyInSession(member.id)"
+                                    class="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all"
+                                    :class="isMemberAlreadyInSession(member.id)
+                                        ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                                        : 'bg-[#1a307b] text-white border-[#1a307b] hover:bg-[#152866]'">
+                                    <span x-show="!isMemberAlreadyInSession(member.id)">Tambah</span>
+                                    <span x-show="isMemberAlreadyInSession(member.id)">Sudah Ada</span>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
 
-                                            <template x-if="!member.active_packages || member.active_packages.length === 0">
-                                                <p class="text-xs text-red-500">Tidak ada paket aktif</p>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </label>
-                            </template>
-                        </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-sm font-bold text-slate-800">Member Berlatih di Sesi Terpilih</h4>
+                        <span class="text-xs text-slate-500" x-show="loadingSessionBookings" x-cloak>Memuat...</span>
                     </div>
 
-                    <div class="mt-3 text-sm text-slate-600" x-show="selectedMembers.length > 0" x-cloak>
-                        <span class="font-semibold" x-text="selectedMembers.length"></span> member dipilih
+                    <template x-if="!loadingSessionBookings && filteredSessionBookings.length === 0">
+                        <p class="text-sm text-slate-500">Belum ada member pada sesi ini.</p>
+                    </template>
+
+                    <div class="space-y-2 max-h-80 overflow-y-auto" x-show="filteredSessionBookings.length > 0">
+                        <template x-for="booking in filteredSessionBookings" :key="booking.id">
+                            <div class="p-3 bg-white rounded-lg border border-slate-200 space-y-2">
+                                <p class="text-sm font-semibold text-slate-900" x-text="booking.member_name"></p>
+                                <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-2 items-center">
+                                    <select :id="`move-booking-${booking.id}`" class="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#1a307b]/30">
+                                        <option value="">Pilih Sesi</option>
+                                        <template x-for="target in moveTargets(booking.slot_id)" :key="target.id">
+                                            <option :value="target.id" x-text="target.session_time?.name || 'Sesi'"></option>
+                                        </template>
+                                    </select>
+                                    <button type="button" @click="moveBooking(booking.id)" class="px-3 py-2 rounded-lg text-xs font-semibold bg-[#1a307b] text-white hover:bg-[#162a69]">Pindah</button>
+                                    <button type="button" @click="removeBooking(booking.id, booking.member_name)" class="px-3 py-2 rounded-lg text-xs font-semibold bg-[#d12823] text-white hover:bg-[#b8231f]">Hapus</button>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-4 sm:mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <button @click="submit()" :disabled="submitting || selectedMembers.length === 0"
-                        class="w-full sm:w-auto px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-medium transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
-                    <span x-show="!submitting">Booking (<span x-text="selectedMembers.length"></span> member)</span>
-                    <span x-show="submitting" x-cloak>Memproses...</span>
-                </button>
-
+            <div class="flex justify-end">
                 <button @click="resetForm()" :disabled="submitting"
-                        class="w-full sm:w-auto px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
+                        class="px-6 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
                     Reset
                 </button>
             </div>
@@ -127,17 +158,21 @@
 <script>
 function adminBookingPage() {
     return {
-        latestSession: null,
+        sessions: [],
+        selectedSession: null,
         slots: [],
         members: [],
         filteredMembers: [],
-        selectedMembers: [],
+        sessionBookings: [],
+        filteredSessionBookings: [],
         memberSearch: '',
         loadingSessions: false,
         loadingSlots: false,
         loadingMembers: false,
+        loadingSessionBookings: false,
         submitting: false,
         form: {
+            training_session_id: '',
             training_session_slot_id: '',
         },
 
@@ -147,90 +182,64 @@ function adminBookingPage() {
         },
 
         async loadSessions() {
-            if (this.loadingSessions) return; // Prevent multiple simultaneous loads
-            
             this.loadingSessions = true;
             try {
                 const res = await window.API.get('/admin/training-sessions?status=open&start_date=' + this.today());
-                
-                // Validate response
-                if (!res || typeof res !== 'object') {
-                    throw new Error('Invalid response from server');
+                this.sessions = Array.isArray(res?.data) ? res.data : [];
+
+                if (this.sessions.length > 0) {
+                    await this.selectSession(this.sessions[0].id);
                 }
-                
-                const sessions = Array.isArray(res?.data) ? res.data : [];
-                
-                // Get the latest session (first one)
-                if (sessions.length > 0) {
-                    this.latestSession = sessions[0];
-                    await this.loadSlotsForLatestSession();
-                } else {
-                    this.latestSession = null;
-                    this.slots = [];
-                }
-            } catch (error) {
-                console.error('Failed to load sessions:', error);
-                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal memuat training sessions';
-                window.showToast(errorMsg, 'error');
-                this.latestSession = null;
-                this.slots = [];
+            } catch (e) {
+                window.showToast(e?.message || 'Gagal memuat training sessions', 'error');
+                this.sessions = [];
             } finally {
                 this.loadingSessions = false;
             }
         },
 
-        async loadSlotsForLatestSession() {
-            if (!this.latestSession || !this.latestSession.id) {
-                this.slots = [];
-                return;
-            }
-            
-            if (this.loadingSlots) return; // Prevent multiple simultaneous loads
+        async selectSession(sessionId) {
+            this.form.training_session_id = sessionId;
+            this.form.training_session_slot_id = '';
+            this.sessionBookings = [];
+            this.filteredSessionBookings = [];
+            this.selectedSession = this.sessions.find(s => Number(s.id) === Number(sessionId)) || null;
+            await this.loadSlotsForSession(sessionId);
+        },
+
+        async loadSlotsForSession(sessionId) {
+            if (!sessionId) return;
 
             this.loadingSlots = true;
             try {
-                const session = await window.API.get(`/admin/training-sessions/${this.latestSession.id}`);
-                
-                // Validate response
-                if (!session || typeof session !== 'object') {
-                    throw new Error('Invalid response from server');
-                }
-                
+                const session = await window.API.get(`/admin/training-sessions/${sessionId}`);
                 this.slots = Array.isArray(session?.slots) ? session.slots : [];
                 this.slots.sort((a, b) => (a?.session_time?.start_time || '').localeCompare(b?.session_time?.start_time || ''));
-            } catch (error) {
-                console.error('Failed to load slots:', error);
-                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal memuat slot sesi';
-                window.showToast(errorMsg, 'error');
+
+                if (this.slots.length > 0) {
+                    await this.selectSlot(this.slots[0].id);
+                }
+            } catch (e) {
+                window.showToast(e?.message || 'Gagal memuat sesi', 'error');
                 this.slots = [];
             } finally {
                 this.loadingSlots = false;
             }
         },
 
-        selectSlot(slotId) {
+        async selectSlot(slotId) {
             this.form.training_session_slot_id = slotId;
-            this.selectedMembers = [];
+            this.loadSessionBookingsFromCurrentSession();
         },
 
         async loadMembers() {
-            if (this.loadingMembers) return; // Prevent multiple simultaneous loads
-            
             this.loadingMembers = true;
             try {
                 const res = await window.API.get('/admin/booking-members');
-                
-                // Validate response
-                if (!res || typeof res !== 'object') {
-                    throw new Error('Invalid response from server');
-                }
-                
                 this.members = Array.isArray(res?.data) ? res.data : [];
                 this.filterMembers();
-            } catch (error) {
-                console.error('Failed to load members:', error);
-                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal memuat members';
-                window.showToast(errorMsg, 'error');
+            } catch (e) {
+                window.showToast(e?.message || 'Gagal memuat members', 'error');
                 this.members = [];
                 this.filteredMembers = [];
             } finally {
@@ -238,86 +247,136 @@ function adminBookingPage() {
             }
         },
 
-        filterMembers() {
-            // Only show active members
-            let filtered = this.members.filter(m => (m.status || '').toLowerCase() === 'active');
-
-            if (this.memberSearch.trim()) {
-                const search = this.memberSearch.toLowerCase();
-                filtered = filtered.filter(m => (m.name || '').toLowerCase().includes(search));
-            }
-
-            this.filteredMembers = filtered;
-        },
-
-        toggleMemberSelection(member) {
-            const idx = this.selectedMembers.findIndex(m => m.id === member.id);
-            if (idx >= 0) {
-                this.selectedMembers.splice(idx, 1);
-            } else {
-                const firstPackage = (member.active_packages || [])[0];
-                if (!firstPackage) {
-                    window.showToast(`Member ${member.name} tidak memiliki paket aktif`, 'error');
-                    return;
-                }
-                this.selectedMembers.push({
-                    id: member.id,
-                    name: member.name,
-                    member_package_id: firstPackage.id,
-                    package_name: firstPackage.package_name,
-                });
-            }
-        },
-
-        async submit() {
-            const slotId = Number(this.form.training_session_slot_id);
-
-            if (!Number.isInteger(slotId) || slotId <= 0) {
-                window.showToast('Pilih slot terlebih dahulu', 'error');
+        loadSessionBookingsFromCurrentSession() {
+            const slotId = Number(this.form.training_session_slot_id || 0);
+            if (!slotId) {
+                this.sessionBookings = [];
+                this.filteredSessionBookings = [];
                 return;
             }
 
-            if (this.selectedMembers.length === 0) {
-                window.showToast('Pilih minimal 1 member', 'error');
+            this.loadingSessionBookings = true;
+            const selectedSlot = this.slots.find((slot) => Number(slot.id) === slotId);
+            const rawBookings = Array.isArray(selectedSlot?.confirmed_bookings)
+                ? selectedSlot.confirmed_bookings
+                : (Array.isArray(selectedSlot?.confirmedBookings) ? selectedSlot.confirmedBookings : []);
+
+            this.sessionBookings = rawBookings.map((booking) => ({
+                id: booking.id,
+                member_id: booking?.member_package?.member?.id || booking?.memberPackage?.member?.id,
+                member_name: booking?.member_package?.member?.name || booking?.memberPackage?.member?.name || '-',
+                slot_id: slotId,
+            }));
+
+            this.filterMembers();
+            this.loadingSessionBookings = false;
+        },
+
+        filterMembers() {
+            let memberFiltered = this.members.filter(m => (m.status || '').toLowerCase() === 'active');
+            const search = this.memberSearch.trim().toLowerCase();
+
+            if (search) {
+                memberFiltered = memberFiltered.filter(m => (m.name || '').toLowerCase().includes(search));
+            }
+
+            this.filteredMembers = memberFiltered;
+
+            let slotFiltered = [...this.sessionBookings];
+            if (search) {
+                slotFiltered = slotFiltered.filter(b => (b.member_name || '').toLowerCase().includes(search));
+            }
+            this.filteredSessionBookings = slotFiltered;
+        },
+
+        isMemberAlreadyInSession(memberId) {
+            return this.sessionBookings.some(b => Number(b.member_id) === Number(memberId));
+        },
+
+        moveTargets(currentSlotId) {
+            return this.slots.filter(slot => Number(slot.id) !== Number(currentSlotId));
+        },
+
+        async addMemberToSession(member) {
+            const slotId = Number(this.form.training_session_slot_id);
+            if (!slotId) {
+                window.showToast('Pilih sesi terlebih dahulu', 'error');
+                return;
+            }
+
+            if (this.isMemberAlreadyInSession(member.id)) {
+                window.showToast('Member sudah ada pada sesi ini', 'info');
+                return;
+            }
+
+            const firstPackage = (member.active_packages || [])[0];
+            if (!firstPackage) {
+                window.showToast(`Member ${member.name} tidak memiliki paket aktif`, 'error');
                 return;
             }
 
             this.submitting = true;
-            let successCount = 0;
-            let failCount = 0;
-
             try {
-                for (const member of this.selectedMembers) {
-                    try {
-                        const payload = {
-                            training_session_slot_id: slotId,
-                            member_package_id: member.member_package_id,
-                            notes: null,
-                        };
-
-                        await window.API.post('/admin/bookings', payload);
-                        successCount++;
-                    } catch (e) {
-                        console.error(`Failed booking for ${member.name}:`, e);
-                        failCount++;
-                    }
-                }
-
-                const message = `Booking selesai: ${successCount} sukses${failCount > 0 ? `, ${failCount} gagal` : ''}`;
-                window.showToast(message, failCount === 0 ? 'success' : 'info');
-                this.selectedMembers = [];
+                await window.API.post('/admin/bookings', {
+                    training_session_slot_id: slotId,
+                    member_package_id: firstPackage.id,
+                    notes: null,
+                });
+                window.showToast(`Member ${member.name} berhasil ditambahkan`, 'success');
+                await this.loadSlotsForSession(this.form.training_session_id);
             } catch (e) {
-                console.error(e);
-                window.showToast(e?.message || 'Gagal booking sesi', 'error');
+                window.showToast(e?.message || 'Gagal menambahkan member ke sesi', 'error');
             } finally {
                 this.submitting = false;
             }
         },
 
-        resetForm() {
-            this.form.training_session_slot_id = '';
-            this.selectedMembers = [];
+        async moveBooking(bookingId) {
+            const select = document.getElementById(`move-booking-${bookingId}`);
+            const targetSlotId = Number(select?.value || 0);
+
+            if (!targetSlotId) {
+                window.showToast('Pilih sesi tujuan terlebih dahulu', 'error');
+                return;
+            }
+
+            this.submitting = true;
+            try {
+                await window.API.patch(`/admin/bookings/${bookingId}`, {
+                    training_session_slot_id: targetSlotId,
+                });
+                window.showToast('Member berhasil dipindahkan', 'success');
+                await this.loadSlotsForSession(this.form.training_session_id);
+            } catch (e) {
+                window.showToast(e?.message || 'Gagal memindahkan member', 'error');
+            } finally {
+                this.submitting = false;
+            }
+        },
+
+        async removeBooking(bookingId, memberName) {
+            if (!confirm(`Hapus member ${memberName} dari sesi ini?`)) {
+                return;
+            }
+
+            this.submitting = true;
+            try {
+                await window.API.delete(`/admin/bookings/${bookingId}`);
+                window.showToast(`Member ${memberName} berhasil dihapus`, 'success');
+                await this.loadSlotsForSession(this.form.training_session_id);
+            } catch (e) {
+                window.showToast(e?.message || 'Gagal menghapus member dari sesi', 'error');
+            } finally {
+                this.submitting = false;
+            }
+        },
+
+        async resetForm() {
             this.memberSearch = '';
+            this.filterMembers();
+            if (this.sessions.length > 0) {
+                await this.selectSession(this.sessions[0].id);
+            }
         },
 
         today() {
@@ -330,23 +389,14 @@ function adminBookingPage() {
 
         formatSessionLabel(s) {
             const date = new Date(s.date);
-            const coachName = s?.coach?.name ? ` • ${s.coach.name}` : '';
             return date.toLocaleDateString('id-ID', {
                 weekday: 'long',
                 day: '2-digit',
                 month: 'long',
                 year: 'numeric'
-            }) + coachName;
-        },
-
-        formatSlotLabel(slot) {
-            const st = slot?.session_time;
-            const name = st?.name ? `${st.name}` : 'Slot';
-            const time = (st?.start_time && st?.end_time) ? `${st.start_time} - ${st.end_time}` : '';
-            const cap = slot?.max_participants ? `Kuota: ${slot.max_participants}` : '';
-            return [name, time, cap].filter(Boolean).join(' • ');
+            });
         }
-    }
+    };
 }
 </script>
 @endpush

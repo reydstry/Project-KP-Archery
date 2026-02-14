@@ -17,7 +17,7 @@
         </div>
 
         <div class="overflow-x-auto -mx-3 sm:mx-0">
-            <table class="w-full min-w-[580px]">
+            <table class="w-full min-w-145">
                 <thead>
                     <tr class="bg-slate-50 border-b border-slate-200">
                         <th class="px-2 py-2 sm:px-3 sm:py-2.5 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider">Session Time</th>
@@ -45,7 +45,7 @@
             <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="bg-white px-6 pt-6 pb-4">
                     <div class="flex items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-blue-100">
+                        <div class="mx-auto shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-blue-100">
                             <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
@@ -98,7 +98,7 @@
             <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="bg-white px-6 pt-6 pb-4">
                     <div class="flex items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-red-100">
+                        <div class="mx-auto shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-red-100">
                             <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                             </svg>
@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderSlots(session.slots || []);
     } catch (e) {
         console.error(e);
+        window.showToast(e?.message || 'Failed to load session', 'error');
         document.getElementById('slotsBody').innerHTML = `
             <tr><td colspan="5" class="px-6 py-10 text-center text-slate-600">Failed to load session: ${escapeHtml(e?.message || 'Unknown error')}</td></tr>
         `;
@@ -248,11 +249,14 @@ function openCoachModal(slotId) {
     
     renderCoachList(slotId, '');
     modal.classList.remove('hidden');
+    modal.classList.add('flex');
     setTimeout(() => searchInput.focus(), 100);
 }
 
 function closeCoachModal() {
-    document.getElementById('coachModal').classList.add('hidden');
+    const modal = document.getElementById('coachModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
     currentSlotId = null;
 }
 
@@ -320,7 +324,7 @@ function updateSelectedCount(slotId) {
     if (namesContainer) {
         if (selectedCoaches.length > 0) {
             const coachNames = COACHES
-                .filter(c => selectedCoaches.includes(String(c.id)))
+                .filter(c => selectedCoaches.includes(Number(c.id)))
                 .map(c => c.name)
                 .join(', ');
             namesContainer.textContent = '+ ' + coachNames;
@@ -525,10 +529,10 @@ function escapeHtml(str) {
 </script>
 
 <!-- Coach Selection Modal -->
-<div id="coachModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="if(event.target === this) closeCoachModal()">
+<div id="coachModal" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50" onclick="if(event.target === this) closeCoachModal()">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden" onclick="event.stopPropagation()">
         <!-- Header -->
-        <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-blue-600 to-blue-700">
+        <div class="px-6 py-4 border-b border-slate-200 bg-[#1a307b]">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-bold text-white">Select Additional Coaches</h3>
                 <button type="button" onclick="closeCoachModal()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-1 transition-colors">
@@ -547,7 +551,7 @@ function escapeHtml(str) {
                     id="coachSearch" 
                     placeholder="Search coaches..." 
                     oninput="searchCoaches()"
-                    class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-[#1a307b]/30 focus:border-[#1a307b]">
                 <svg class="w-5 h-5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
@@ -561,7 +565,7 @@ function escapeHtml(str) {
         
         <!-- Footer -->
         <div class="px-6 py-4 border-t border-slate-200 bg-slate-50">
-            <button type="button" onclick="closeCoachModal()" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+            <button type="button" onclick="closeCoachModal()" class="w-full px-4 py-2 bg-[#1a307b] hover:bg-[#162a69] text-white rounded-lg font-medium transition-colors">
                 Done
             </button>
         </div>
