@@ -14,11 +14,11 @@
                     <p class="text-sm font-medium text-slate-500">Total Members</p>
                     <h3 class="text-3xl font-bold text-slate-800 mt-2" x-text="stats.total_members || 0"></h3>
                     <p class="text-xs text-slate-400 mt-1">
-                        <span class="text-amber-600 font-medium" x-text="stats.pending_members || 0"></span> pending
+                        <span class="text-[#d12823] font-medium" x-text="stats.pending_members || 0"></span> pending
                     </p>
                 </div>
-                <div class="p-3 bg-blue-50 rounded-xl">
-                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                <div class="p-3 bg-[#1a307b]/10 rounded-xl">
+                    <svg class="w-6 h-6 text-[#1a307b]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                 </div>
             </div>
         </div>
@@ -30,8 +30,8 @@
                     <h3 class="text-3xl font-bold text-slate-800 mt-2" x-text="stats.total_coaches || 0"></h3>
                     <p class="text-xs text-slate-400 mt-1">Active trainers</p>
                 </div>
-                <div class="p-3 bg-green-50 rounded-xl">
-                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                <div class="p-3 bg-[#1a307b]/10 rounded-xl">
+                    <svg class="w-6 h-6 text-[#1a307b]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                 </div>
             </div>
         </div>
@@ -43,8 +43,8 @@
                     <h3 class="text-3xl font-bold text-slate-800 mt-2" x-text="stats.total_packages || 0"></h3>
                     <p class="text-xs text-slate-400 mt-1">Available plans</p>
                 </div>
-                <div class="p-3 bg-purple-50 rounded-xl">
-                    <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                <div class="p-3 bg-[#d12823]/10 rounded-xl">
+                    <svg class="w-6 h-6 text-[#d12823]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                 </div>
             </div>
         </div>
@@ -54,7 +54,7 @@
     <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm" style="animation-delay: 0.4s">
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h3 class="font-bold text-slate-800">Pending Member Approvals</h3>
-            <a href="{{ route('admin.members') }}" class="text-sm text-blue-500 hover:text-blue-600 font-medium">View All →</a>
+            <a href="{{ route('admin.members') }}" class="text-sm text-[#1a307b] hover:text-[#152866] font-medium">View All →</a>
         </div>
         <div class="p-6">
             <template x-if="recentPendingMembers.length === 0">
@@ -70,7 +70,7 @@
                             <p class="font-semibold text-slate-800 truncate" x-text="member.name"></p>
                             <p class="text-sm text-slate-500" x-text="member.phone || 'No phone'"></p>
                         </div>
-                        <span class="px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 rounded-full border border-amber-200">Pending</span>
+                        <span class="px-3 py-1 text-xs font-bold text-[#d12823] bg-[#d12823]/10 rounded-full border border-[#d12823]/20">Pending</span>
                     </div>
                 </template>
             </div>
@@ -103,13 +103,6 @@
                             <!-- Main slot card - clickable to expand -->
                             <div @click="expanded = !expanded" class="flex items-center justify-between gap-4 p-4 hover:bg-slate-50 transition cursor-pointer">
                                 <div class="flex items-center gap-4 min-w-0">
-                                    <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shrink-0">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                            <circle cx="12" cy="12" r="10"/>
-                                            <circle cx="12" cy="12" r="6"/>
-                                            <circle cx="12" cy="12" r="2"/>
-                                        </svg>
-                                    </div>
                                     <div class="min-w-0">
                                         <p class="font-semibold text-slate-800 truncate" x-text="slot.session_time?.session_name || 'Training Session'"></p>
                                         <p class="text-sm text-slate-500">
@@ -123,7 +116,7 @@
                                     <div class="text-right">
                                         <p class="text-xs text-slate-400">Kapasitas</p>
                                         <p class="font-bold text-slate-800">
-                                            <span class="text-blue-600" x-text="slot.total_bookings || 0"></span>
+                                            <span class="text-[#1a307b]" x-text="slot.total_bookings || 0"></span>
                                             <span class="text-slate-400">/</span>
                                             <span x-text="slot.capacity || 0"></span>
                                         </p>
@@ -178,8 +171,8 @@
                                         <div class="space-y-2 max-h-60 overflow-y-auto">
                                             <template x-for="member in slot.members" :key="member.id">
                                                 <div class="flex items-center gap-2 text-sm text-slate-700 bg-white px-3 py-2 rounded-lg border border-slate-100">
-                                                    <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
-                                                        <svg class="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                                    <div class="w-6 h-6 bg-[#1a307b]/10 rounded-full flex items-center justify-center shrink-0">
+                                                        <svg class="w-3 h-3 text-[#1a307b]" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
                                                         </svg>
                                                     </div>
@@ -192,7 +185,7 @@
 
                                 <!-- Action buttons in expanded state -->
                                 <div class="p-4 bg-white border-t border-slate-100 flex items-center justify-end gap-3">
-                                    <a :href="`/admin/sessions/${slot.training_session_id}/edit`" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition">Edit Session</a>
+                                    <a :href="`/admin/sessions/${slot.training_session_id}/edit`" class="px-4 py-2 bg-[#1a307b] hover:bg-[#152866] text-white text-sm font-semibold rounded-lg transition">Edit Session</a>
                                 </div>
                             </div>
                         </div>
@@ -215,12 +208,28 @@ function dashboardData() {
         async loadData() {
             try {
                 const data = await API.get('/admin/dashboard');
+                
+                // Validate response
+                if (!data || typeof data !== 'object') {
+                    throw new Error('Invalid response from server');
+                }
+                
                 this.stats = data.statistics || {};
-                this.recentPendingMembers = data.recent?.pending_members || [];
-                this.todaySessions = Array.isArray(data.today_sessions) ? data.today_sessions : [];
+                this.recentPendingMembers = Array.isArray(data.recent?.pending_members) 
+                    ? data.recent.pending_members 
+                    : [];
+                this.todaySessions = Array.isArray(data.today_sessions) 
+                    ? data.today_sessions 
+                    : [];
             } catch (error) {
                 console.error('Failed to load dashboard data:', error);
-                showToast('Failed to load dashboard data', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load dashboard data';
+                showToast(errorMsg, 'error');
+                
+                // Set defaults on error
+                this.stats = {};
+                this.recentPendingMembers = [];
+                this.todaySessions = [];
             }
         }
     }

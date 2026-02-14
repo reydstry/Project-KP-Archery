@@ -8,6 +8,8 @@ use App\Enums\UserRoles;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class MemberController extends Controller
 {
@@ -32,7 +34,7 @@ class MemberController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'user_id' => ['required', 'exists:users,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
             'registered_by' => ['nullable', 'exists:users,id'],
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20'],
@@ -40,7 +42,30 @@ class MemberController extends Controller
             'is_active' => ['boolean'],
         ]);
 
-        $member = Member::create($data);
+        $member = DB::transaction(function () use ($data) {
+            $userId = $data['user_id'] ?? null;
+
+            if (!$userId) {
+                $user = User::create([
+                    'name' => $data['name'],
+                    'role' => UserRoles::MEMBER->value,
+                    'email' => 'member+' . Str::uuid() . '@focusonex.local',
+                    'phone' => $data['phone'] ?? null,
+                    'password' => null,
+                ]);
+
+                $userId = $user->id;
+            }
+
+            return Member::create([
+                'user_id' => $userId,
+                'registered_by' => $data['registered_by'] ?? auth()->id(),
+                'name' => $data['name'],
+                'phone' => $data['phone'] ?? null,
+                'is_self' => $data['is_self'] ?? true,
+                'is_active' => $data['is_active'] ?? true,
+            ]);
+        });
 
         return response()->json([
             'message' => 'Member berhasil dibuat',
@@ -53,7 +78,7 @@ class MemberController extends Controller
      */
     public function show(Member $member)
     {
-        $member->load(['user', 'registeredBy', 'memberPackages']);
+        $member->load(['user', 'registeredBy', 'memberPackages.package']);
 
         // Calculate training statistics
         $stats = $this->calculateMemberStats($member);

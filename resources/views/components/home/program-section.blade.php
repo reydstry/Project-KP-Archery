@@ -3,10 +3,10 @@
         <!-- Section Header -->
         <div class="text-center mb-10 sm:mb-12 md:mb-16">
             <h2 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-3 sm:mb-4">
-                Program Pelatihan Kami
+                {{ __('home.program_title') }}
             </h2>
             <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
-                Temukan program yang sesuai dengan tujuan Anda, dari pemula hingga atlet kompetitif
+                {{ __('home.program_subtitle') }}
             </p>
         </div>
 
@@ -21,24 +21,24 @@
                         </svg>
                     </div>
                     <h3 class="text-lg sm:text-xl font-bold text-gray-800 leading-tight">
-                        Program Klub & Eksul
+                        {{ __('home.program_1_title') }}
                     </h3>
                 </div>
                 <p class="text-sm sm:text-base text-gray-600 mb-4">
-                    Pelatihan terstruktur untuk pemula hingga atlet, untuk atlit individumaupun institusi dengan sistem bertanding.
+                    {{ __('home.program_1_desc') }}
                 </p>
                 <ul class="text-xs sm:text-sm text-gray-600 space-y-2">
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Latihan dan target lagu
+                        {{ __('home.program_1_feature_1') }}
                     </li>
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Sistem pertanding
+                        {{ __('home.program_1_feature_2') }}
                     </li>
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Fokus & ketelitian
+                        {{ __('home.program_1_feature_3') }}
                     </li>
                 </ul>
             </div>
@@ -52,24 +52,24 @@
                         </svg>
                     </div>
                     <h3 class="text-lg sm:text-xl font-bold text-gray-800 leading-tight">
-                        Program Kompetensi
+                        {{ __('home.program_2_title') }}
                     </h3>
                 </div>
                 <p class="text-sm sm:text-base text-gray-600 mb-4">
-                    Program peningkatan keterampilan dengan Uji Kompetensi Pemanah (UKP) dengan evaluasi berkala versi 3 bulan.
+                    {{ __('home.program_2_desc') }}
                 </p>
                 <ul class="text-xs sm:text-sm text-gray-600 space-y-2">
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Uji Kompetensi Pemanah
+                        {{ __('home.program_2_feature_1') }}
                     </li>
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Sertifikat di pin level
+                        {{ __('home.program_2_feature_2') }}
                     </li>
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Monitoring perkembangan
+                        {{ __('home.program_2_feature_3') }}
                     </li>
                 </ul>
             </div>
@@ -83,24 +83,24 @@
                         </svg>
                     </div>
                     <h3 class="text-lg sm:text-xl font-bold text-gray-800 leading-tight">
-                        Program Coaching
+                        {{ __('home.program_3_title') }}
                     </h3>
                 </div>
                 <p class="text-sm sm:text-base text-gray-600 mb-4">
-                    Pelatihan khusus untuk atlet dengan dukungan teknis untuk Perpani dengan coaching profesional dan mentor
+                    {{ __('home.program_3_desc') }}
                 </p>
                 <ul class="text-xs sm:text-sm text-gray-600 space-y-2">
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Coaching profesional
+                        {{ __('home.program_3_feature_1') }}
                     </li>
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Persiapan atlet & event
+                        {{ __('home.program_3_feature_2') }}
                     </li>
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Program bersisa
+                        {{ __('home.program_3_feature_3') }}
                     </li>
                 </ul>
             </div>
@@ -114,24 +114,24 @@
                         </svg>
                     </div>
                     <h3 class="text-lg sm:text-xl font-bold text-gray-800 leading-tight">
-                        Program Outbound
+                        {{ __('home.program_4_title') }}
                     </h3>
                 </div>
                 <p class="text-sm sm:text-base text-gray-600 mb-4">
-                    Pelatihan panahan diperpanjang dengan kegiatan outbound edukatif untuk ada team building dan gathering
+                    {{ __('home.program_4_desc') }}
                 </p>
                 <ul class="text-xs sm:text-sm text-gray-600 space-y-2">
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Archery Outbound Training
+                        {{ __('home.program_4_feature_1') }}
                     </li>
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Games & team building
+                        {{ __('home.program_4_feature_2') }}
                     </li>
                     <li class="flex items-start">
                         <span class="text-blue-600 mr-2">•</span>
-                        Privat & komunitas
+                        {{ __('home.program_4_feature_3') }}
                     </li>
                 </ul>
             </div>

@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Galeri - FocusOneX Archery')
+@section('title', __('gallery.page_title') . ' - FocusOneX Archery')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-10 sm:py-12 mt-20">

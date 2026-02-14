@@ -7,15 +7,15 @@
 <div x-data="newsData()" x-init="loadNews()" class="space-y-6">
     
     <!-- Header Actions -->
-    <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+    <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
         <div class="flex-1 w-full sm:max-w-md">
-            <input type="search" x-model="search" placeholder="Search news..." 
-                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition">
+                 <input type="search" x-model="search" placeholder="Search news..." 
+                     class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none transition">
         </div>
         <button @click="openAddModal()" 
-                class="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap shrink-0">
+            class="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 text-sm bg-[#1a307b] text-white rounded-xl font-semibold hover:bg-[#152866] transition-all whitespace-nowrap shrink-0">
             <span class="flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Add News
             </span>
         </button>
@@ -31,33 +31,33 @@
         </template>
         <template x-for="article in filteredNews" :key="article.id">
             <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all overflow-hidden">
-                <div class="p-6">
-                    <div class="flex items-start gap-6">
+                <div class="p-4 sm:p-6">
+                    <div class="flex items-start gap-3 sm:gap-6">
                         <template x-if="article.photo_url">
                             <img :src="article.photo_url" :alt="article.title" 
-                                 class="w-32 h-24 object-cover rounded-xl shrink-0">
+                                 class="w-20 h-16 sm:w-32 sm:h-24 object-cover rounded-xl shrink-0">
                         </template>
                         <template x-if="!article.photo_url">
-                            <div class="w-32 h-24 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl shrink-0 flex items-center justify-center">
-                                <svg class="w-12 h-12 text-blue-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"/></svg>
+                            <div class="w-20 h-16 sm:w-32 sm:h-24 bg-[#1a307b]/10 rounded-xl shrink-0 flex items-center justify-center">
+                                <svg class="w-8 h-8 sm:w-12 sm:h-12 text-[#1a307b]/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"/></svg>
                             </div>
                         </template>
                         <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between gap-4 mb-2">
-                                <h3 class="font-bold text-slate-800 text-lg" x-text="article.title"></h3>
-                                <div class="text-xs text-slate-500 shrink-0" x-text="formatDate(article.publish_date)"></div>
+                            <div class="flex items-start justify-between gap-2 sm:gap-4 mb-1 sm:mb-2">
+                                <h3 class="font-bold text-slate-800 text-sm sm:text-lg" x-text="article.title"></h3>
+                                <div class="text-[10px] sm:text-xs text-slate-500 shrink-0" x-text="formatDate(article.publish_date)"></div>
                             </div>
-                            <p class="text-sm text-slate-600 line-clamp-2" x-text="article.content"></p>
+                            <p class="text-xs sm:text-sm text-slate-600 line-clamp-2" x-text="article.content"></p>
                         </div>
                     </div>
                 </div>
-                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
-                    <button @click="openEditModal(article)" 
-                            class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg font-medium text-sm transition">
+                <div class="px-4 py-3 sm:px-6 sm:py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
+                        <button @click="openEditModal(article)" 
+                            class="px-3 py-1.5 sm:px-4 sm:py-2 text-[#1a307b] hover:bg-[#1a307b]/10 rounded-lg font-medium text-xs sm:text-sm transition">
                         Edit
                     </button>
                     <button @click="confirmDelete(article)" 
-                            class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg font-medium text-sm transition">
+                            class="px-3 py-1.5 sm:px-4 sm:py-2 text-red-600 hover:bg-red-50 rounded-lg font-medium text-xs sm:text-sm transition">
                         Delete
                     </button>
                 </div>
@@ -71,7 +71,7 @@
         <div @click.away="closeModal()" 
              class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8"
              x-transition>
-            <div class="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+            <div class="sticky top-0 bg-[#1a307b] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
                 <h3 class="text-lg font-bold" x-text="editingNews ? 'Edit News' : 'Add New News'"></h3>
                 <button @click="closeModal()" class="text-white/80 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -80,23 +80,23 @@
             <form @submit.prevent="saveNews()" class="p-6 space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Title *</label>
-                    <input type="text" x-model="form.title" required
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="text" x-model="form.title" required
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Content *</label>
                     <textarea x-model="form.content" required rows="6"
-                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none"></textarea>
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none resize-none"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Publish Date *</label>
-                    <input type="date" x-model="form.publish_date" required
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="date" x-model="form.publish_date" required
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Photo</label>
-                    <input type="file" @change="handlePhotoChange" accept="image/*" ref="photoInput"
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none">
+                          <input type="file" @change="handlePhotoChange" accept="image/*" ref="photoInput"
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
                     <p class="text-xs text-slate-500 mt-1">Optional: Upload an image (max 5MB, formats: jpg, png, gif, webp)</p>
                     
                     <!-- Image Preview -->
@@ -113,8 +113,8 @@
                             class="flex-1 px-4 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition">
                         Cancel
                     </button>
-                    <button type="submit" :disabled="saving"
-                            class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
+                        <button type="submit" :disabled="saving"
+                            class="flex-1 px-4 py-3 bg-[#1a307b] text-white rounded-xl font-semibold hover:bg-[#152866] transition disabled:opacity-50">
                         <span x-text="saving ? 'Saving...' : 'Save'"></span>
                     </button>
                 </div>
@@ -137,7 +137,7 @@
                     Cancel
                 </button>
                 <button @click="deleteNews()" :disabled="deleting"
-                        class="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
+                    class="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
                     <span x-text="deleting ? 'Deleting...' : 'Delete'"></span>
                 </button>
             </div>
@@ -182,13 +182,28 @@ function newsData() {
         },
         
         async loadNews() {
+            if (this.loading) return; // Prevent multiple simultaneous loads
+            
             this.loading = true;
             try {
                 const response = await API.get('/admin/news');
-                this.news = response.data || [];
+                
+                // Validate response
+                if (!response || typeof response !== 'object') {
+                    throw new Error('Invalid response from server');
+                }
+                
+                if (!Array.isArray(response.data)) {
+                    console.warn('News data is not an array:', response.data);
+                    this.news = [];
+                } else {
+                    this.news = response.data;
+                }
             } catch (error) {
                 console.error('Failed to load news:', error);
-                showToast('Failed to load news', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load news data';
+                showToast(errorMsg, 'error');
+                this.news = [];
             } finally {
                 this.loading = false;
             }
@@ -198,17 +213,29 @@ function newsData() {
             this.editingNews = null;
             const today = new Date().toISOString().split('T')[0];
             this.form = { title: '', content: '', publish_date: today, photo_path: '' };
+            this.photoFile = null;
+            this.photoPreview = null;
+            this.saving = false; // Reset saving state
             this.showModal = true;
         },
         
         openEditModal(article) {
+            // Validate article object
+            if (!article || !article.id) {
+                showToast('Invalid article data', 'error');
+                return;
+            }
+            
             this.editingNews = article;
             this.form = {
-                title: article.title,
-                content: article.content,
-                publish_date: article.publish_date,
+                title: article.title || '',
+                content: article.content || '',
+                publish_date: article.publish_date || '',
                 photo_path: article.photo_path || ''
             };
+            this.photoFile = null;
+            this.photoPreview = null;
+            this.saving = false; // Reset saving state
             this.showModal = true;
         },
         
@@ -220,15 +247,40 @@ function newsData() {
         },
 
         handlePhotoChange(event) {
-            const file = event.target.files[0];
-            if (file) {
-                this.photoFile = file;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.photoPreview = e.target.result;
-                };
-                reader.readAsDataURL(file);
+            const file = event.target.files?.[0];
+            if (!file) return;
+            
+            // Validate file type
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                showToast('Only JPG, PNG, and GIF images are allowed', 'error');
+                if (this.$refs.photoInput) {
+                    this.$refs.photoInput.value = '';
+                }
+                return;
             }
+            
+            // Validate file size (max 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                showToast('Image size must be less than 5MB', 'error');
+                if (this.$refs.photoInput) {
+                    this.$refs.photoInput.value = '';
+                }
+                return;
+            }
+            
+            this.photoFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.photoPreview = e.target.result;
+            };
+            reader.onerror = () => {
+                showToast('Failed to read image file', 'error');
+                this.photoFile = null;
+                this.photoPreview = null;
+            };
+            reader.readAsDataURL(file);
         },
 
         removePhoto() {
@@ -240,84 +292,138 @@ function newsData() {
         },
         
         async saveNews() {
+            // Prevent double-submit
+            if (this.saving) {
+                showToast('Saving in progress...', 'warning');
+                return;
+            }
+            
+            // Validate form
+            if (!this.form.title || this.form.title.trim() === '') {
+                showToast('Title is required', 'error');
+                return;
+            }
+            
+            if (this.form.title.trim().length < 5) {
+                showToast('Title must be at least 5 characters', 'error');
+                return;
+            }
+            
+            if (!this.form.content || this.form.content.trim() === '') {
+                showToast('Content is required', 'error');
+                return;
+            }
+            
+            if (this.form.content.trim().length < 10) {
+                showToast('Content must be at least 10 characters', 'error');
+                return;
+            }
+            
+            if (!this.form.publish_date || this.form.publish_date.trim() === '') {
+                showToast('Publish date is required', 'error');
+                return;
+            }
+            
+            // Validate date format
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(this.form.publish_date)) {
+                showToast('Invalid date format', 'error');
+                return;
+            }
+            
             this.saving = true;
             try {
                 const formData = new FormData();
-                formData.append('title', this.form.title);
-                formData.append('content', this.form.content);
+                formData.append('title', this.form.title.trim());
+                formData.append('content', this.form.content.trim());
                 formData.append('publish_date', this.form.publish_date);
                 
                 if (this.photoFile) {
                     formData.append('photo', this.photoFile);
                 }
 
+                let result;
                 if (this.editingNews) {
-                    // Laravel doesn't support PUT with FormData directly, use POST with _method
+                    // Validate editing news
+                    if (!this.editingNews.id) {
+                        throw new Error('Invalid news ID');
+                    }
+                    
                     formData.append('_method', 'PUT');
-                    const response = await fetch(`/api/admin/news/${this.editingNews.id}`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                            'Accept': 'application/json',
-                        },
-                        body: formData
-                    });
+                    result = await API.post(`/admin/news/${this.editingNews.id}`, formData);
                     
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Failed to update news');
+                    // Validate response
+                    if (!result || !result.data) {
+                        throw new Error('Invalid response from server');
                     }
                     
-                    const result = await response.json();
                     const index = this.news.findIndex(n => n.id === this.editingNews.id);
-                    if (index > -1) this.news[index] = result.data;
-                    showToast('News updated successfully', 'success');
-                } else {
-                    const response = await fetch('/api/admin/news', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                            'Accept': 'application/json',
-                        },
-                        body: formData
-                    });
-                    
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || 'Failed to create news');
+                    if (index > -1) {
+                        this.news[index] = result.data;
+                    } else {
+                        console.warn('News not found in list, reloading...');
+                        await this.loadNews();
                     }
                     
-                    const result = await response.json();
+                    showToast('✓ News updated successfully', 'success');
+                } else {
+                    result = await API.post('/admin/news', formData);
+                    
+                    // Validate response
+                    if (!result || !result.data) {
+                        throw new Error('Invalid response from server');
+                    }
+                    
                     this.news.unshift(result.data);
-                    showToast('News added successfully', 'success');
+                    showToast('✓ News added successfully', 'success');
                 }
+                
                 this.closeModal();
             } catch (error) {
                 console.error('Failed to save news:', error);
-                showToast(error.message || 'Failed to save news', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to save news';
+                showToast(errorMsg, 'error');
             } finally {
                 this.saving = false;
             }
         },
         
         confirmDelete(article) {
+            // Validate article
+            if (!article || !article.id) {
+                showToast('Invalid article data', 'error');
+                return;
+            }
+            
             this.newsToDelete = article;
             this.showDeleteConfirm = true;
         },
         
         async deleteNews() {
-            if (!this.newsToDelete) return;
+            // Validate news
+            if (!this.newsToDelete || !this.newsToDelete.id) {
+                showToast('Invalid article data', 'error');
+                this.showDeleteConfirm = false;
+                return;
+            }
+            
+            // Prevent double-submit
+            if (this.deleting) {
+                showToast('Deletion in progress...', 'warning');
+                return;
+            }
             
             this.deleting = true;
             try {
                 await API.delete(`/admin/news/${this.newsToDelete.id}`);
                 this.news = this.news.filter(n => n.id !== this.newsToDelete.id);
-                showToast('News deleted successfully', 'success');
+                showToast('✓ News deleted successfully', 'success');
                 this.showDeleteConfirm = false;
                 this.newsToDelete = null;
             } catch (error) {
                 console.error('Failed to delete news:', error);
-                showToast(error.message || 'Failed to delete news', 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to delete news';
+                showToast(errorMsg, 'error');
             } finally {
                 this.deleting = false;
             }

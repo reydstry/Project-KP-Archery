@@ -6,8 +6,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
             </svg>
         </div>
-        <h2 class="text-3xl font-bold text-gray-800 mb-2">Lokasi</h2>
-        <p class="text-gray-600">Gunung Bahagia, Balikpapan Selatan, Balikpapan City, East Kalimantan 76114</p>
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ __('contact.location_title') }}</h2>
+        <p class="text-gray-600">{{ __('contact.location_address') }}</p>
     </div>
 
     <!-- Google Maps Embed -->

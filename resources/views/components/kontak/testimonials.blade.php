@@ -1,9 +1,9 @@
 <div class="py-16 bg-gray-50">
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Testimoni Peserta</h2>
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">{{ __('contact.testimonials_title') }}</h2>
             <p class="text-gray-600 max-w-2xl mx-auto">
-                Kepuasan peserta adalah prioritas utama kami. Berikut testimoni dari beberapa peserta yang telah bergabung dengan Panhanan.
+                {{ __('contact.testimonials_subtitle') }}
             </p>
         </div>
 

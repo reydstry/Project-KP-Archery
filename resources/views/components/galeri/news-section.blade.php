@@ -4,8 +4,8 @@
         
         <!-- Berita Header -->
         <div class="mb-8 sm:mb-10 md:mb-12 text-center">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">Berita & Prestasi</h2>
-            <p class="text-sm sm:text-base md:text-lg text-gray-600 px-4">Update terkini tentang prestasi dan kegiatan FocusOneX Archery</p>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">{{ __('gallery.news_title') }}</h2>
+            <p class="text-sm sm:text-base md:text-lg text-gray-600 px-4">{{ __('gallery.news_subtitle') }}</p>
         </div>
 
         <!-- Berita Content -->

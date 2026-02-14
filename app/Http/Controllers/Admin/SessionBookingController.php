@@ -11,6 +11,56 @@ use Illuminate\Support\Facades\DB;
 
 class SessionBookingController extends Controller
 {
+    private function validateSlotBookable(TrainingSessionSlot $slot): ?array
+    {
+        $trainingSession = $slot->trainingSession;
+        if (!$trainingSession) {
+            return [
+                'message' => 'Training session not found for this slot',
+                'code' => 404,
+            ];
+        }
+
+        $now = now();
+        $trainingSession->applyAutoClose($now);
+
+        if ($trainingSession->date->isPast() && !$trainingSession->date->isToday()) {
+            return [
+                'message' => 'Cannot book past sessions',
+                'code' => 422,
+            ];
+        }
+
+        if ($trainingSession->date->isToday() && !$trainingSession->isBookableAt($now)) {
+            return [
+                'message' => 'Training session can no longer be booked (past or after 18:00).',
+                'code' => 422,
+            ];
+        }
+
+        if ($trainingSession->status?->value !== 'open') {
+            return [
+                'message' => 'Training session is not open for booking',
+                'code' => 422,
+            ];
+        }
+
+        $sessionTime = $slot->sessionTime;
+        if ($sessionTime && $trainingSession->date->isToday()) {
+            $slotEndTime = $sessionTime->end_time;
+            $currentTime = $now->format('H:i:s');
+
+            if ($currentTime >= $slotEndTime) {
+                return [
+                    'message' => 'Cannot book this slot. The session time has already passed.',
+                    'code' => 422,
+                ];
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Admin books a session slot for a member (using member_package_id).
      */
@@ -164,5 +214,83 @@ class SessionBookingController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function update(Request $request, SessionBooking $sessionBooking)
+    {
+        $validated = $request->validate([
+            'training_session_slot_id' => 'required|exists:training_session_slots,id',
+        ]);
+
+        if ($sessionBooking->status !== 'confirmed') {
+            return response()->json([
+                'message' => 'Only confirmed bookings can be updated',
+            ], 422);
+        }
+
+        $targetSlot = TrainingSessionSlot::with(['trainingSession', 'sessionTime'])
+            ->findOrFail($validated['training_session_slot_id']);
+
+        if ((int) $sessionBooking->training_session_slot_id === (int) $targetSlot->id) {
+            return response()->json([
+                'message' => 'Booking is already in the selected slot',
+            ], 422);
+        }
+
+        $bookableError = $this->validateSlotBookable($targetSlot);
+        if ($bookableError) {
+            return response()->json(['message' => $bookableError['message']], $bookableError['code']);
+        }
+
+        $currentBookings = SessionBooking::where('training_session_slot_id', $targetSlot->id)
+            ->where('status', 'confirmed')
+            ->count();
+
+        if ($currentBookings >= $targetSlot->max_participants) {
+            return response()->json([
+                'message' => 'Target slot is full',
+            ], 422);
+        }
+
+        $alreadyExists = SessionBooking::where('member_package_id', $sessionBooking->member_package_id)
+            ->where('training_session_slot_id', $targetSlot->id)
+            ->where('status', 'confirmed')
+            ->exists();
+
+        if ($alreadyExists) {
+            return response()->json([
+                'message' => 'Member already booked in target slot',
+            ], 422);
+        }
+
+        $sessionBooking->update([
+            'training_session_slot_id' => $targetSlot->id,
+        ]);
+
+        return response()->json([
+            'message' => 'Booking moved successfully',
+            'data' => $sessionBooking->fresh()->load([
+                'memberPackage.member',
+                'trainingSessionSlot.sessionTime',
+                'trainingSessionSlot.trainingSession',
+            ]),
+        ]);
+    }
+
+    public function destroy(SessionBooking $sessionBooking)
+    {
+        if ($sessionBooking->status !== 'confirmed') {
+            return response()->json([
+                'message' => 'Only confirmed bookings can be removed',
+            ], 422);
+        }
+
+        $sessionBooking->update([
+            'status' => 'canceled',
+        ]);
+
+        return response()->json([
+            'message' => 'Booking removed successfully',
+        ]);
     }
 }

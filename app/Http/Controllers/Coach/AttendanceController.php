@@ -42,7 +42,8 @@ class AttendanceController extends Controller
     {
         // Verify coach owns this session
         $coach = auth()->user()->coach;
-        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
+        $forBooking = $request->boolean('for_booking', false);
+        if (!$forBooking && !$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'You can only view your own training sessions'
             ], 403);

@@ -63,8 +63,12 @@ class TrainingSessionController extends Controller
 
         $this->autoCloseCoachSessionsIfNeeded($coach);
 
-        $query = TrainingSession::with(['slots.sessionTime', 'slots.coaches', 'slots.confirmedBookings.memberPackage.member'])
-            ->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id));
+        $query = TrainingSession::with(['slots.sessionTime', 'slots.coaches', 'slots.confirmedBookings.memberPackage.member']);
+
+        $forBooking = $request->boolean('for_booking', false);
+        if (!$forBooking) {
+            $query->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id));
+        }
 
         // Filter by status if provided
         if ($request->has('status')) {
@@ -90,31 +94,34 @@ class TrainingSessionController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'date' => 'required|date|after_or_equal:today',
+        $validated = $request->validate(
+            [
+                'date' => 'required|date|after_or_equal:today|unique:training_sessions,date',
 
-            // Create a day session with multiple slots
-            'slots' => 'required|array|min:1',
-            'slots.*.session_time_id' => 'required|exists:session_times,id',
-            'slots.*.max_participants' => 'required|integer|min:1|max:50',
-            'slots.*.coach_ids' => 'sometimes|array',
-            'slots.*.coach_ids.*' => 'required_with:slots.*.coach_ids|exists:coaches,id',
-        ]);
-
-        // Get coach record
-        $coach = Coach::where('user_id', auth()->id())->first();
-        
-        if (!$coach) {
-            return response()->json([
-                'message' => 'Coach profile not found',
-            ], 404);
-        }
+                'slots' => 'required|array|min:1',
+                'slots.*.session_time_id' => 'required|exists:session_times,id',
+                'slots.*.max_participants' => 'required|integer|min:1|max:50',
+                'slots.*.coach_ids' => 'sometimes|array',
+                'slots.*.coach_ids.*' => 'required_with:slots.*.coach_ids|exists:coaches,id',
+            ],
+            [
+                'date.required' => 'Tanggal sesi wajib diisi.',
+                'date.after_or_equal' => 'Tanggal sesi tidak boleh sebelum hari ini.',
+                'date.unique' => 'Sesi untuk tanggal ini sudah ada. Pilih tanggal lain.',
+                'slots.required' => 'Minimal pilih satu slot sesi.',
+                'slots.min' => 'Minimal pilih satu slot sesi.',
+                'slots.*.session_time_id.required' => 'Waktu sesi wajib dipilih.',
+                'slots.*.max_participants.required' => 'Kuota peserta wajib diisi.',
+                'slots.*.max_participants.min' => 'Kuota minimal 1 peserta.',
+                'slots.*.max_participants.max' => 'Kuota maksimal 50 peserta.',
+            ]
+        );
 
         // Check for duplicate session times
         $sessionTimeIds = collect($validated['slots'])->pluck('session_time_id');
         if ($sessionTimeIds->count() !== $sessionTimeIds->unique()->count()) {
             return response()->json([
-                'message' => 'Duplicate session_time_id in slots payload.',
+                'message' => 'Ada slot waktu yang dipilih lebih dari sekali.',
             ], 422);
         }
 
@@ -135,16 +142,17 @@ class TrainingSessionController extends Controller
                     'max_participants' => $slotPayload['max_participants'],
                 ]);
 
-                // Build coach list (always include current coach + any additional coaches)
+                // Use only coaches explicitly selected from UI payload
                 $coachIds = collect($slotPayload['coach_ids'] ?? [])
                     ->map(fn ($id) => (int) $id)
                     ->filter()
-                    ->push($coach->id)
                     ->unique()
                     ->values()
                     ->all();
 
-                $slot->coaches()->attach($coachIds);
+                if (!empty($coachIds)) {
+                    $slot->coaches()->attach($coachIds);
+                }
             }
 
             DB::commit();
@@ -169,8 +177,9 @@ class TrainingSessionController extends Controller
     {
         // Verify coach owns this session
         $coach = Coach::where('user_id', auth()->id())->first();
+        $forBooking = request()->boolean('for_booking', false);
 
-        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
+        if (!$forBooking && !$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);
@@ -178,7 +187,11 @@ class TrainingSessionController extends Controller
 
         $trainingSession->applyAutoClose(now());
 
-        return response()->json($trainingSession->load(['slots.sessionTime', 'slots.coaches']));
+        return response()->json($trainingSession->load([
+            'slots.sessionTime',
+            'slots.coaches',
+            'slots.confirmedBookings.memberPackage.member',
+        ]));
     }
 
     /**
@@ -216,7 +229,11 @@ class TrainingSessionController extends Controller
 
         return response()->json([
             'message' => 'Quota updated successfully',
-            'data' => $trainingSession->fresh()->load(['slots.sessionTime', 'slots.coaches']),
+            'data' => $trainingSession->fresh()->load([
+                'slots.sessionTime',
+                'slots.coaches',
+                'slots.confirmedBookings.memberPackage.member',
+            ]),
         ]);
     }
 
@@ -260,7 +277,11 @@ class TrainingSessionController extends Controller
 
         return response()->json([
             'message' => 'Coaches updated successfully',
-            'data' => $trainingSession->fresh()->load(['slots.sessionTime', 'slots.coaches']),
+            'data' => $trainingSession->fresh()->load([
+                'slots.sessionTime',
+                'slots.coaches',
+                'slots.confirmedBookings.memberPackage.member',
+            ]),
         ]);
     }
 
