@@ -392,10 +392,9 @@ class AdminTestDataSeeder extends Seeder
                 // Create different scenarios
                 if ($index === 0) {
                     // Active package with some sessions used
-                    MemberPackage::firstOrCreate(
+                    MemberPackage::updateOrCreate(
                         [
                             'member_id' => $member->id,
-                            'package_id' => $package->id,
                         ],
                         [
                             'member_id' => $member->id,
@@ -411,10 +410,9 @@ class AdminTestDataSeeder extends Seeder
                     );
                 } elseif ($index === 1) {
                     // Recently started package
-                    MemberPackage::firstOrCreate(
+                    MemberPackage::updateOrCreate(
                         [
                             'member_id' => $member->id,
-                            'package_id' => $package->id,
                         ],
                         [
                             'member_id' => $member->id,
@@ -430,10 +428,9 @@ class AdminTestDataSeeder extends Seeder
                     );
                 } elseif ($index === 2) {
                     // Expired package
-                    MemberPackage::firstOrCreate(
+                    MemberPackage::updateOrCreate(
                         [
                             'member_id' => $member->id,
-                            'package_id' => $package->id,
                         ],
                         [
                             'member_id' => $member->id,
@@ -452,10 +449,9 @@ class AdminTestDataSeeder extends Seeder
                     $usagePercent = mt_rand(10, 70) / 100; // 10-70% used
                     $daysUsed = mt_rand(5, (int)($package->duration_days * 0.5)); // Used 5 to 50% of duration
                     
-                    MemberPackage::firstOrCreate(
+                    MemberPackage::updateOrCreate(
                         [
                             'member_id' => $member->id,
-                            'package_id' => $package->id,
                         ],
                         [
                             'member_id' => $member->id,
