@@ -3,11 +3,8 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
-use App\Models\Attendance;
 use App\Models\Member;
 use App\Models\SessionBooking;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -61,7 +58,8 @@ class DashboardController extends Controller
             ->whereHas('attendance')
             ->with([
                 'trainingSessionSlot.sessionTime',
-                'trainingSessionSlot.trainingSession.coach',
+                'trainingSessionSlot.coaches',
+                'trainingSessionSlot.trainingSession',
                 'attendance',
                 'memberPackage.package'
             ])
@@ -71,12 +69,15 @@ class DashboardController extends Controller
             ->map(function ($booking) {
                 $trainingSession = $booking->trainingSessionSlot?->trainingSession;
                 $sessionTime = $booking->trainingSessionSlot?->sessionTime;
+                $coachNames = $booking->trainingSessionSlot?->coaches
+                    ? $booking->trainingSessionSlot->coaches->pluck('name')->filter()->values()->all()
+                    : [];
 
                 return [
                     'id' => $booking->id,
                     'session_date' => $trainingSession?->date,
                     'session_time' => $sessionTime?->name,
-                    'coach_name' => $trainingSession?->coach?->name,
+                    'coach_name' => !empty($coachNames) ? implode(', ', $coachNames) : '-',
                     'package_name' => $booking->memberPackage->package->name ?? null,
                     'attendance_status' => $booking->attendance->status,
                     'validated_at' => $booking->attendance->validated_at,

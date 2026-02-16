@@ -51,8 +51,8 @@ class SessionBookingController extends Controller
 
         // Get available sessions (OPEN status, today or future)
         $sessions = TrainingSession::with([
-            'coach:id,name',
-            'slots.sessionTime:id,name,start_time,end_time'
+            'slots.sessionTime:id,name,start_time,end_time',
+            'slots.coaches:id,name'
         ])
             ->where('status', 'open')
             ->where('date', '>=', now()->startOfDay())
@@ -61,6 +61,12 @@ class SessionBookingController extends Controller
             ->filter(fn ($session) => $session->isBookableAt(now()))
             ->values()
             ->map(function ($session) {
+                $coach = $session->slots
+                    ->flatMap(fn ($slot) => $slot->coaches)
+                    ->unique('id')
+                    ->values()
+                    ->first();
+
                 $slots = $session->slots->map(function ($slot) {
                     $currentBookings = SessionBooking::where('training_session_slot_id', $slot->id)
                         ->where('status', 'confirmed')
@@ -81,7 +87,10 @@ class SessionBookingController extends Controller
                     'id' => $session->id,
                     'date' => $session->date->format('Y-m-d'),
                     'date_formatted' => $session->date->locale('id')->isoFormat('dddd, D MMMM YYYY'),
-                    'coach' => $session->coach,
+                    'coach' => $coach ? [
+                        'id' => $coach->id,
+                        'name' => $coach->name,
+                    ] : null,
                     'status' => $session->status->value,
                     'slots' => $slots,
                 ];
@@ -112,7 +121,9 @@ class SessionBookingController extends Controller
         $query = SessionBooking::with([
             'memberPackage.member',
             'trainingSessionSlot.sessionTime',
-            'trainingSessionSlot.trainingSession.coach'
+            'trainingSessionSlot.trainingSession',
+            'trainingSessionSlot.coaches',
+            'attendance',
         ])
             ->whereIn('member_package_id', $memberPackageIds);
 
@@ -122,6 +133,31 @@ class SessionBookingController extends Controller
         }
 
         $bookings = $query->latest()->paginate(15);
+
+        $bookings->setCollection(
+            $bookings->getCollection()->map(function ($booking) {
+                $trainingSession = $booking->trainingSessionSlot?->trainingSession;
+                $sessionTime = $booking->trainingSessionSlot?->sessionTime;
+                $coachNames = $booking->trainingSessionSlot?->coaches
+                    ? $booking->trainingSessionSlot->coaches->pluck('name')->filter()->values()->all()
+                    : [];
+
+                return [
+                    'id' => $booking->id,
+                    'status' => $booking->status,
+                    'notes' => $booking->notes,
+                    'created_at' => $booking->created_at,
+                    'session_date' => $trainingSession?->date,
+                    'session_time' => $sessionTime?->name,
+                    'member_name' => $booking->memberPackage?->member?->name ?? '-',
+                    'coach_name' => !empty($coachNames) ? implode(', ', $coachNames) : '-',
+                    'attendance' => $booking->attendance ? [
+                        'status' => $booking->attendance->status,
+                        'notes' => $booking->attendance->notes,
+                    ] : null,
+                ];
+            })
+        );
 
         return response()->json($bookings);
     }
@@ -147,15 +183,9 @@ class SessionBookingController extends Controller
             ], 404);
         }
 
-        if (!$member->is_active || $member->status === StatusMember::STATUS_INACTIVE->value) {
-            return response()->json([
-                'message' => 'Your membership is inactive',
-            ], 403);
-        }
-
         // Verify member package belongs to this member
         $memberPackage = MemberPackage::where('id', $validated['member_package_id'])
-            ->where('member_id', $member->id)
+            ->whereIn('member_id', $memberIds)
             ->with(['package', 'member'])
             ->first();
 
@@ -163,6 +193,12 @@ class SessionBookingController extends Controller
             return response()->json([
                 'message' => 'Member package not found or does not belong to you',
             ], 404);
+        }
+
+        if (!$memberPackage->member?->is_active || $memberPackage->member?->status === StatusMember::STATUS_INACTIVE->value) {
+            return response()->json([
+                'message' => 'Your membership is inactive',
+            ], 403);
         }
 
         // Check if package is active
@@ -279,7 +315,8 @@ class SessionBookingController extends Controller
                 'data' => $booking->load([
                     'memberPackage.member',
                     'trainingSessionSlot.sessionTime',
-                    'trainingSessionSlot.trainingSession.coach'
+                    'trainingSessionSlot.trainingSession',
+                    'trainingSessionSlot.coaches'
                 ]),
                 'remaining_sessions' => $memberPackage->total_sessions - $memberPackage->used_sessions,
             ], 201);
@@ -307,7 +344,8 @@ class SessionBookingController extends Controller
         return response()->json($sessionBooking->load([
             'memberPackage.member',
             'trainingSessionSlot.sessionTime',
-            'trainingSessionSlot.trainingSession.coach'
+            'trainingSessionSlot.trainingSession',
+            'trainingSessionSlot.coaches'
         ]));
     }
 

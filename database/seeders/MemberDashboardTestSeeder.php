@@ -16,574 +16,377 @@ use App\Models\SessionTime;
 use App\Models\TrainingSession;
 use App\Models\TrainingSessionSlot;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class MemberDashboardTestSeeder extends Seeder
 {
     /**
-     * Seed test data untuk Member Dashboard
-     *
-     * Data yang dibuat:
-     * - 1 User dengan role Member (login credential)
-     * - 3 Member profiles (self + 2 family members) dengan berbagai status
-     * - 2 Coaches
-     * - 3 Packages (Basic, Premium, Professional)
-     * - Multiple member packages (active, expired, pending)
-     * - Training sessions (past, present, future) - 30 days worth
-     * - Bookings dengan attendance (present, absent, late)
-     * - Achievements (medals, milestones, competitions)
-     * - Complete data untuk testing semua fitur dashboard
+     * Seed test data untuk Member Dashboard (data sedang berjalan).
      */
     public function run(): void
     {
-        echo "\n";
-        echo "========================================\n";
-        echo "🎯 MEMBER DASHBOARD TEST DATA SEEDER\n";
-        echo "========================================\n\n";
+        $this->command->info('🎯 Seeding member dashboard test data...');
 
-        // Cleanup existing test data if exists
-        $existingUser = User::where('email', 'memberdashboard@test.com')->first();
-        if ($existingUser) {
-            echo "🧹 Cleaning up existing test data...\n";
-            // Delete will cascade to related data through foreign key constraints
-            $existingUser->delete();
-            echo "   ✅ Cleaned up\n\n";
-        }
-
-        // Cleanup existing training sessions for seeder coaches (so this seeder can be re-run)
-        $existingCoachUsers = User::whereIn('email', ['coachdashboard@test.com', 'coach2dashboard@test.com'])->pluck('id');
-        if ($existingCoachUsers->isNotEmpty()) {
-            $existingCoachIds = Coach::whereIn('user_id', $existingCoachUsers)->pluck('id');
-            if ($existingCoachIds->isNotEmpty()) {
-                TrainingSession::whereIn('coach_id', $existingCoachIds)->delete();
-            }
-        }
-
-        // 1. Create Member User
-        echo "1️⃣ Creating Member User...\n";
-        $memberUser = User::firstOrCreate(
+        $memberUser = User::query()->updateOrCreate(
             ['email' => 'memberdashboard@test.com'],
             [
-                'name' => 'Member Test User',
+                'name' => 'Member Dashboard Test',
+                'role' => UserRoles::MEMBER->value,
+                'phone' => '081200000111',
                 'password' => Hash::make('password123'),
-                'role' => UserRoles::MEMBER,
-                'email_verified_at' => now(),
             ]
         );
-        echo "   ✅ User created: {$memberUser->email}\n\n";
 
-        // 2. Create or get Coaches
-        echo "2️⃣ Creating Coaches...\n";
-        $coachUser = User::firstOrCreate(
+        $coachUser = User::query()->updateOrCreate(
             ['email' => 'coachdashboard@test.com'],
             [
-                'name' => 'Coach Test Primary',
+                'name' => 'Coach Dashboard Test',
+                'role' => UserRoles::COACH->value,
+                'phone' => '081200000222',
                 'password' => Hash::make('password123'),
-                'role' => UserRoles::COACH,
-                'email_verified_at' => now(),
             ]
         );
 
-        $coach = Coach::firstOrCreate(
+        $coach = Coach::query()->updateOrCreate(
             ['user_id' => $coachUser->id],
             [
-                'name' => 'Coach Test Primary',
-                'phone' => '081234567800',
-            ]
-        );
-        echo "   ✅ Primary coach: {$coach->name}\n";
-
-        $coachUser2 = User::firstOrCreate(
-            ['email' => 'coach2dashboard@test.com'],
-            [
-                'name' => 'Coach Test Secondary',
-                'password' => Hash::make('password123'),
-                'role' => UserRoles::COACH,
-                'email_verified_at' => now(),
+                'name' => $coachUser->name,
+                'phone' => $coachUser->phone,
             ]
         );
 
-        $coach2 = Coach::firstOrCreate(
-            ['user_id' => $coachUser2->id],
+        $adminUser = User::query()->firstOrCreate(
+            ['email' => 'admin@clubpanahan.com'],
             [
-                'name' => 'Coach Test Secondary',
-                'phone' => '081234567801',
+                'name' => 'Admin Club Panahan',
+                'role' => UserRoles::ADMIN->value,
+                'phone' => '081234567890',
+                'password' => Hash::make('admin123'),
             ]
         );
-        echo "   ✅ Secondary coach: {$coach2->name}\n\n";
 
-        // 3. Create Member Profile (self)
-        echo "3️⃣ Creating Member Profile (Self)...\n";
-        $member = Member::create([
-            'user_id' => $memberUser->id,
-            'registered_by' => $memberUser->id,
-            'name' => 'Member Test User',
-            'phone' => '081234567801',
-            'is_self' => true,
-            'status' => StatusMember::STATUS_ACTIVE,
-            'is_active' => true,
-        ]);
-        echo "   ✅ Member profile: {$member->name}\n";
-        echo "      Status: active\n\n";
-
-        // 4. Create Family Members
-        echo "4️⃣ Creating Family Members...\n";
-
-        $childMember1 = Member::create([
-            'user_id' => $memberUser->id,
-            'registered_by' => $memberUser->id,
-            'name' => 'Sarah Test (Daughter)',
-            'phone' => '081234567802',
-            'is_self' => false,
-            'status' => StatusMember::STATUS_ACTIVE,
-            'is_active' => true,
-        ]);
-        echo "   ✅ Family member 1: {$childMember1->name} - Active\n";
-
-        $childMember2 = Member::create([
-            'user_id' => $memberUser->id,
-            'registered_by' => $memberUser->id,
-            'name' => 'Michael Test (Son)',
-            'phone' => '081234567803',
-            'is_self' => false,
-            'status' => StatusMember::STATUS_PENDING,
-            'is_active' => true,
-        ]);
-        echo "   ✅ Family member 2: {$childMember2->name} - Pending\n\n";
-
-        // 5. Create Multiple Packages
-        echo "5️⃣ Creating Packages...\n";
-        $basicPackage = Package::create([
-            'name' => 'Basic Package',
-            'description' => 'Paket dasar untuk pemula dengan 8 sesi latihan per bulan',
-            'price' => 500000,
-            'duration_days' => 30,
-            'session_count' => 8,
-        ]);
-        echo "   ✅ {$basicPackage->name} - {$basicPackage->session_count} sessions\n";
-
-        $package = Package::create([
-            'name' => 'Premium Package',
-            'description' => 'Paket premium untuk member dengan 12 sesi latihan per bulan',
-            'price' => 750000,
-            'duration_days' => 30,
-            'session_count' => 12,
-        ]);
-        echo "   ✅ {$package->name} - {$package->session_count} sessions\n";
-
-        $proPackage = Package::create([
-            'name' => 'Professional Package',
-            'description' => 'Paket profesional dengan unlimited sessions dan private coaching',
-            'price' => 1500000,
-            'duration_days' => 30,
-            'session_count' => 20,
-        ]);
-        echo "   ✅ {$proPackage->name} - {$proPackage->session_count} sessions\n\n";
-
-        // 6. Create Active Member Package (Primary)
-        echo "6️⃣ Creating Member Packages...\n";
-        $memberPackage = MemberPackage::create([
-            'member_id' => $member->id,
-            'package_id' => $package->id,
-            'start_date' => now()->subDays(10),
-            'end_date' => now()->addDays(20),
-            'total_sessions' => 12,
-            'used_sessions' => 7,
-            'is_active' => true,
-        ]);
-        $remaining = $memberPackage->total_sessions - $memberPackage->used_sessions;
-        echo "   ✅ Primary Package (Active)\n";
-        echo "      Member: {$member->name}\n";
-        echo "      Total: {$memberPackage->total_sessions} sessions\n";
-        echo "      Used: {$memberPackage->used_sessions} sessions\n";
-        echo "      Remaining: {$remaining} sessions\n";
-        echo "      Valid: {$memberPackage->start_date->format('d M')} - {$memberPackage->end_date->format('d M Y')}\n\n";
-
-        // Expired package untuk testing
-        $expiredPackage = MemberPackage::create([
-            'member_id' => $member->id,
-            'package_id' => $basicPackage->id,
-            'start_date' => now()->subDays(60),
-            'end_date' => now()->subDays(30),
-            'total_sessions' => 8,
-            'used_sessions' => 8,
-            'is_active' => false,
-        ]);
-        echo "   ✅ Expired Package\n";
-        echo "      Expired at: {$expiredPackage->end_date->format('d M Y')}\n\n";
-
-        // Active package untuk family member
-        $childPackage = MemberPackage::create([
-            'member_id' => $childMember1->id,
-            'package_id' => $basicPackage->id,
-            'start_date' => now()->subDays(5),
-            'end_date' => now()->addDays(25),
-            'total_sessions' => 8,
-            'used_sessions' => 2,
-            'is_active' => true,
-        ]);
-        echo "   ✅ Family Package (Active)\n";
-        echo "      Member: {$childMember1->name}\n";
-        echo "      Remaining: " . ($childPackage->total_sessions - $childPackage->used_sessions) . " sessions\n\n";
-
-        // 7. Create Session Times
-        echo "7️⃣ Creating Session Times...\n";
-        $sessionTimes = [
+        $member = Member::query()->updateOrCreate(
+            ['user_id' => $memberUser->id, 'is_self' => true],
             [
-                'name' => 'Senin Pagi',
-                'start_time' => '07:00:00',
-                'end_time' => '09:00:00',
+                'registered_by' => $memberUser->id,
+                'name' => $memberUser->name,
+                'phone' => $memberUser->phone,
+                'status' => StatusMember::STATUS_ACTIVE->value,
                 'is_active' => true,
-            ],
-            [
-                'name' => 'Senin Sore',
-                'start_time' => '16:00:00',
-                'end_time' => '18:00:00',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Rabu Siang',
-                'start_time' => '13:00:00',
-                'end_time' => '15:00:00',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Jumat Sore',
-                'start_time' => '16:00:00',
-                'end_time' => '18:00:00',
-                'is_active' => true,
-            ],
-            [
-                'name' => 'Sabtu Pagi',
-                'start_time' => '09:00:00',
-                'end_time' => '11:00:00',
-                'is_active' => true,
-            ],
-        ];
+            ]
+        );
 
-        $createdTimes = [];
-        foreach ($sessionTimes as $timeData) {
-            $time = SessionTime::firstOrCreate(
-                ['name' => $timeData['name']],
+        $childActive = Member::query()->updateOrCreate(
+            ['user_id' => $memberUser->id, 'is_self' => false, 'name' => 'Sarah Dashboard Test'],
+            [
+                'registered_by' => $memberUser->id,
+                'phone' => '081200000333',
+                'status' => StatusMember::STATUS_ACTIVE->value,
+                'is_active' => true,
+            ]
+        );
+
+        Member::query()->updateOrCreate(
+            ['user_id' => $memberUser->id, 'is_self' => false, 'name' => 'Michael Dashboard Test'],
+            [
+                'registered_by' => $memberUser->id,
+                'phone' => '081200000444',
+                'status' => StatusMember::STATUS_PENDING->value,
+                'is_active' => true,
+            ]
+        );
+
+        $premiumPackage = Package::query()->updateOrCreate(
+            ['name' => 'Premium Package'],
+            [
+                'description' => 'Paket premium untuk pengujian dashboard member',
+                'price' => 900000,
+                'duration_days' => 30,
+                'session_count' => 12,
+                'is_active' => true,
+            ]
+        );
+
+        $basicPackage = Package::query()->updateOrCreate(
+            ['name' => 'Basic Package'],
+            [
+                'description' => 'Paket basic untuk pengujian dashboard member',
+                'price' => 500000,
+                'duration_days' => 30,
+                'session_count' => 8,
+                'is_active' => true,
+            ]
+        );
+
+        $memberPackage = MemberPackage::query()->updateOrCreate(
+            ['member_id' => $member->id],
+            [
+                'package_id' => $premiumPackage->id,
+                'total_sessions' => 12,
+                'used_sessions' => 5,
+                'start_date' => now()->subDays(9)->toDateString(),
+                'end_date' => now()->addDays(21)->toDateString(),
+                'is_active' => true,
+                'validated_by' => $adminUser->id,
+                'validated_at' => now()->subDays(9),
+            ]
+        );
+
+        $childPackage = MemberPackage::query()->updateOrCreate(
+            ['member_id' => $childActive->id],
+            [
+                'package_id' => $basicPackage->id,
+                'total_sessions' => 8,
+                'used_sessions' => 2,
+                'start_date' => now()->subDays(4)->toDateString(),
+                'end_date' => now()->addDays(26)->toDateString(),
+                'is_active' => true,
+                'validated_by' => $adminUser->id,
+                'validated_at' => now()->subDays(4),
+            ]
+        );
+
+        $sessionTimes = SessionTime::query()->orderBy('start_time')->get();
+        if ($sessionTimes->isEmpty()) {
+            $sessionTimes = collect([
+                SessionTime::query()->firstOrCreate(
+                    ['name' => 'Sesi 1'],
+                    ['start_time' => '07:30:00', 'end_time' => '09:00:00', 'is_active' => true]
+                ),
+                SessionTime::query()->firstOrCreate(
+                    ['name' => 'Sesi 2'],
+                    ['start_time' => '09:00:00', 'end_time' => '10:30:00', 'is_active' => true]
+                ),
+                SessionTime::query()->firstOrCreate(
+                    ['name' => 'Sesi 3'],
+                    ['start_time' => '15:00:00', 'end_time' => '16:30:00', 'is_active' => true]
+                ),
+            ]);
+        }
+
+        $sessionDates = [-6, -4, -2, -1, 0, 1, 3];
+        $slotsByOffset = [];
+
+        foreach ($sessionDates as $index => $offset) {
+            $date = Carbon::today()->addDays($offset);
+            $status = $date->isPast() ? TrainingSessionStatus::CLOSED : TrainingSessionStatus::OPEN;
+
+            $trainingSession = TrainingSession::query()->firstOrCreate(
                 [
-                    'start_time' => $timeData['start_time'],
-                    'end_time' => $timeData['end_time'],
-                    'is_active' => $timeData['is_active'],
+                    'date' => $date->toDateString(),
+                    'created_by' => $coachUser->id,
+                ],
+                ['status' => $status]
+            );
+
+            if ($trainingSession->status !== $status) {
+                $trainingSession->update(['status' => $status]);
+            }
+
+            $sessionTime = $sessionTimes[$index % $sessionTimes->count()];
+
+            $slot = TrainingSessionSlot::query()->firstOrCreate(
+                [
+                    'training_session_id' => $trainingSession->id,
+                    'session_time_id' => $sessionTime->id,
+                ],
+                [
+                    'max_participants' => 10,
                 ]
             );
-            $createdTimes[] = $time;
+
+            $slot->coaches()->syncWithoutDetaching([$coach->id]);
+            $slotsByOffset[$offset] = $slot;
         }
-        echo "   ✅ Created " . count($createdTimes) . " session times across 2 coaches\n\n";
 
-        // 8. Create Training Sessions
-        echo "8️⃣ Creating Training Sessions...\n";
-        $trainingSessions = [];
+        $pastOffsetsForAttendance = [-6, -4, -2, -1];
 
-        // Past sessions (10 days ago to 1 day ago)
-        echo "   Creating past sessions (completed)...\n";
-        $pastCount = 0;
-        for ($i = 10; $i >= 1; $i--) {
-            // Vary coach assignments
-            $coachId = ($i % 2 == 0) ? $coach->id : $coach2->id;
-            $timeIndex = ($i % count($createdTimes));
+        foreach ($pastOffsetsForAttendance as $idx => $offset) {
+            $slot = $slotsByOffset[$offset];
 
-            $sessionDate = now()->subDays($i)->format('Y-m-d');
-            $session = TrainingSession::create([
-                'coach_id' => $coachId,
-                'date' => $sessionDate,
-                'status' => TrainingSessionStatus::CLOSED,
-            ]);
+            $booking = SessionBooking::query()->firstOrCreate(
+                [
+                    'member_package_id' => $memberPackage->id,
+                    'training_session_slot_id' => $slot->id,
+                ],
+                [
+                    'booked_by' => $memberUser->id,
+                    'status' => 'confirmed',
+                    'notes' => 'Seeded booking for dashboard history',
+                ]
+            );
 
-            TrainingSessionSlot::create([
-                'training_session_id' => $session->id,
-                'session_time_id' => $createdTimes[$timeIndex]->id,
-                'max_participants' => 10,
-            ]);
+            $isPresent = $idx !== 2;
 
-            $trainingSessions[] = $session;
-            $pastCount++;
+            Attendance::query()->firstOrCreate(
+                ['session_booking_id' => $booking->id],
+                [
+                    'status' => $isPresent ? 'present' : 'absent',
+                    'validated_by' => $coachUser->id,
+                    'validated_at' => Carbon::parse($slot->trainingSession->date)->setTime(17, 0),
+                    'notes' => $isPresent ? 'Present (seeded)' : 'Absent (seeded)',
+                ]
+            );
         }
-        echo "      ✅ {$pastCount} completed sessions\n";
 
-        // Today's session
-        echo "   Creating today's session...\n";
-        $todaySession = TrainingSession::create([
-            'coach_id' => $coach->id,
-            'date' => now()->format('Y-m-d'),
-            'status' => TrainingSessionStatus::OPEN,
-        ]);
-        TrainingSessionSlot::create([
-            'training_session_id' => $todaySession->id,
-            'session_time_id' => $createdTimes[1]->id,
-            'max_participants' => 10,
-        ]);
-        $trainingSessions[] = $todaySession;
-        echo "      ✅ 1 today's session\n";
-
-        // Future sessions (next 10 days)
-        echo "   Creating future sessions (available for booking)...\n";
-        $futureCount = 0;
-        for ($i = 1; $i <= 10; $i++) {
-            // Vary coach assignments
-            $coachId = ($i % 2 == 0) ? $coach->id : $coach2->id;
-            $timeIndex = ($i % count($createdTimes));
-
-            $sessionDate = now()->addDays($i)->format('Y-m-d');
-            $session = TrainingSession::create([
-                'coach_id' => $coachId,
-                'date' => $sessionDate,
-                'status' => TrainingSessionStatus::OPEN,
-            ]);
-
-            TrainingSessionSlot::create([
-                'training_session_id' => $session->id,
-                'session_time_id' => $createdTimes[$timeIndex]->id,
-                'max_participants' => 10,
-            ]);
-
-            $trainingSessions[] = $session;
-            $futureCount++;
-        }
-        echo "      ✅ {$futureCount} future sessions\n";
-        echo "   ✅ Total: " . count($trainingSessions) . " training sessions\n\n";
-
-        // 9. Create Bookings with Attendance (for past sessions)
-        echo "9️⃣ Creating Bookings & Attendance...\n";
-        $bookingCount = 0;
-        $attendanceCount = 0;
-        $presentCount = 0;
-        $absentCount = 0;
-
-        // Book 7 past sessions dengan attendance (5 present, 2 absent)
-        $pastSessions = array_filter($trainingSessions, function($s) {
-            return $s->date->lt(now()->startOfDay());
-        });
-
-        foreach (array_slice($pastSessions, 0, 7) as $index => $session) {
-            $slot = $session->slots()->with('sessionTime')->first();
-            $booking = SessionBooking::create([
+        $futureSlot = $slotsByOffset[1];
+        SessionBooking::query()->firstOrCreate(
+            [
                 'member_package_id' => $memberPackage->id,
-                'training_session_slot_id' => $slot->id,
+                'training_session_slot_id' => $futureSlot->id,
+            ],
+            [
                 'booked_by' => $memberUser->id,
                 'status' => 'confirmed',
-                'notes' => 'Test booking ' . ($index + 1),
-            ]);
-            $bookingCount++;
+                'notes' => 'Seeded future booking',
+            ]
+        );
 
-            // Create attendance (5 present, 2 absent)
-            $isPresent = $index < 5;
-            Attendance::create([
-                'session_booking_id' => $booking->id,
-                'status' => $isPresent ? 'present' : 'absent',
-                'validated_by' => $session->coach->user_id,
-                'validated_at' => Carbon::parse($session->date->format('Y-m-d') . ' ' . $slot->sessionTime->start_time),
-                'notes' => $isPresent ? 'Hadir tepat waktu' : 'Tidak hadir tanpa keterangan',
-            ]);
-            $attendanceCount++;
+        $childPastSlot = $slotsByOffset[-2];
+        $childBooking = SessionBooking::query()->firstOrCreate(
+            [
+                'member_package_id' => $childPackage->id,
+                'training_session_slot_id' => $childPastSlot->id,
+            ],
+            [
+                'booked_by' => $memberUser->id,
+                'status' => 'confirmed',
+                'notes' => 'Seeded child booking',
+            ]
+        );
 
-            if ($isPresent) {
-                $presentCount++;
-            } else {
-                $absentCount++;
-            }
-        }
+        Attendance::query()->firstOrCreate(
+            ['session_booking_id' => $childBooking->id],
+            [
+                'status' => 'present',
+                'validated_by' => $coachUser->id,
+                'validated_at' => Carbon::parse($childPastSlot->trainingSession->date)->setTime(17, 15),
+                'notes' => 'Present (child seeded)',
+            ]
+        );
 
-        // Create 2 future bookings
-        $futureSlot1 = $trainingSessions[12]->slots()->first();
-        $futureBooking1 = SessionBooking::create([
-            'member_package_id' => $memberPackage->id,
-            'training_session_slot_id' => $futureSlot1->id,
-            'booked_by' => $memberUser->id,
-            'status' => 'confirmed',
-            'notes' => 'Booking untuk sesi besok',
-        ]);
-        $bookingCount++;
+        $memberDataUser = User::query()->updateOrCreate(
+            ['email' => 'memberdata@test.com'],
+            [
+                'name' => 'Member Data Test',
+                'role' => UserRoles::MEMBER->value,
+                'phone' => '081200000555',
+                'password' => Hash::make('password123'),
+            ]
+        );
 
-        $futureSlot2 = $trainingSessions[15]->slots()->first();
-        $futureBooking2 = SessionBooking::create([
-            'member_package_id' => $memberPackage->id,
-            'training_session_slot_id' => $futureSlot2->id,
-            'booked_by' => $memberUser->id,
-            'status' => 'confirmed',
-            'notes' => 'Booking untuk minggu depan',
-        ]);
-        $bookingCount++;
+        $memberData = Member::query()->updateOrCreate(
+            ['user_id' => $memberDataUser->id, 'is_self' => true],
+            [
+                'registered_by' => $memberDataUser->id,
+                'name' => $memberDataUser->name,
+                'phone' => $memberDataUser->phone,
+                'status' => StatusMember::STATUS_ACTIVE->value,
+                'is_active' => true,
+            ]
+        );
 
-        // Create 1 booking for child member
-        $childPastSession = array_values($pastSessions)[0];
-        $childSlot = $childPastSession->slots()->with('sessionTime')->first();
-        $childBooking = SessionBooking::create([
-            'member_package_id' => $childPackage->id,
-            'training_session_slot_id' => $childSlot->id,
-            'booked_by' => $memberUser->id,
-            'status' => 'confirmed',
-            'notes' => 'Booking untuk anak',
-        ]);
-        $bookingCount++;
+        $memberDataPackage = MemberPackage::query()->updateOrCreate(
+            ['member_id' => $memberData->id],
+            [
+                'package_id' => $premiumPackage->id,
+                'total_sessions' => 12,
+                'used_sessions' => 4,
+                'start_date' => now()->subDays(7)->toDateString(),
+                'end_date' => now()->addDays(23)->toDateString(),
+                'is_active' => true,
+                'validated_by' => $adminUser->id,
+                'validated_at' => now()->subDays(7),
+            ]
+        );
 
-        Attendance::create([
-            'session_booking_id' => $childBooking->id,
-            'status' => 'present',
-            'validated_by' => $childPastSession->coach->user_id,
-            'validated_at' => Carbon::parse($childPastSession->date->format('Y-m-d') . ' ' . $childSlot->sessionTime->start_time),
-            'notes' => 'Hadir dan antusias',
-        ]);
-        $attendanceCount++;
-        $presentCount++;
+        $memberDataPastSlot = $slotsByOffset[-4];
+        $memberDataPastBooking = SessionBooking::query()->firstOrCreate(
+            [
+                'member_package_id' => $memberDataPackage->id,
+                'training_session_slot_id' => $memberDataPastSlot->id,
+            ],
+            [
+                'booked_by' => $memberDataUser->id,
+                'status' => 'confirmed',
+                'notes' => 'Seeded member data past booking',
+            ]
+        );
 
-        echo "   ✅ Created {$bookingCount} bookings\n";
-        echo "   ✅ Created {$attendanceCount} attendance records\n";
-        echo "      - Present: {$presentCount}\n";
-        echo "      - Absent: {$absentCount}\n";
-        echo "      - Future bookings: 2\n\n";
+        Attendance::query()->firstOrCreate(
+            ['session_booking_id' => $memberDataPastBooking->id],
+            [
+                'status' => 'present',
+                'validated_by' => $coachUser->id,
+                'validated_at' => Carbon::parse($memberDataPastSlot->trainingSession->date)->setTime(17, 10),
+                'notes' => 'Present (member data test)',
+            ]
+        );
 
-        // 10. Create Achievements
-        echo "🔟 Creating Achievements...\n";
+        $memberDataPastSlot2 = $slotsByOffset[-1];
+        $memberDataPastBooking2 = SessionBooking::query()->firstOrCreate(
+            [
+                'member_package_id' => $memberDataPackage->id,
+                'training_session_slot_id' => $memberDataPastSlot2->id,
+            ],
+            [
+                'booked_by' => $memberDataUser->id,
+                'status' => 'confirmed',
+                'notes' => 'Seeded member data second past booking',
+            ]
+        );
+
+        Attendance::query()->firstOrCreate(
+            ['session_booking_id' => $memberDataPastBooking2->id],
+            [
+                'status' => 'absent',
+                'validated_by' => $coachUser->id,
+                'validated_at' => Carbon::parse($memberDataPastSlot2->trainingSession->date)->setTime(17, 20),
+                'notes' => 'Absent (member data test)',
+            ]
+        );
+
+        $memberDataFutureSlot = $slotsByOffset[3];
+        SessionBooking::query()->firstOrCreate(
+            [
+                'member_package_id' => $memberDataPackage->id,
+                'training_session_slot_id' => $memberDataFutureSlot->id,
+            ],
+            [
+                'booked_by' => $memberDataUser->id,
+                'status' => 'confirmed',
+                'notes' => 'Seeded member data future booking',
+            ]
+        );
+
         $achievements = [
-            [
-                'member_id' => $member->id,
-                'type' => 'member',
-                'title' => '🥇 Juara 1 Regional Championship 2026',
-                'description' => 'Meraih medali emas pada Regional Archery Championship kategori compound bow dengan skor 695/720. Kompetisi diikuti oleh 45 peserta dari berbagai club.',
-                'date' => now()->subMonths(1)->format('Y-m-d'),
-                'photo_path' => null,
-            ],
-            [
-                'member_id' => $member->id,
-                'type' => 'member',
-                'title' => '🌟 Best Newcomer Award 2025',
-                'description' => 'Mendapatkan penghargaan Best Newcomer pada club annual tournament dengan performa luar biasa sebagai member baru.',
-                'date' => now()->subMonths(2)->format('Y-m-d'),
-                'photo_path' => null,
-            ],
-            [
-                'member_id' => $member->id,
-                'type' => 'member',
-                'title' => '🎯 Perfect 10 Streak Achievement',
-                'description' => 'Berhasil mendapatkan 8 arrow perfect 10 berturut-turut pada sesi latihan. New personal record!',
-                'date' => now()->subWeeks(2)->format('Y-m-d'),
-                'photo_path' => null,
-            ],
-            [
-                'member_id' => $member->id,
-                'type' => 'member',
-                'title' => '💯 100 Sessions Milestone',
-                'description' => 'Mencapai milestone 100 sesi latihan di club dengan attendance rate 95%. Dedicated member!',
-                'date' => now()->subWeek()->format('Y-m-d'),
-                'photo_path' => null,
-            ],
-            [
-                'member_id' => $member->id,
-                'type' => 'member',
-                'title' => '🥈 Silver Medal - Provincial Games',
-                'description' => 'Meraih medali perak pada Provincial Games 2025 kategori recurve bow dengan skor 672/720.',
-                'date' => now()->subMonths(3)->format('Y-m-d'),
-                'photo_path' => null,
-            ],
-            [
-                'member_id' => $member->id,
-                'type' => 'member',
-                'title' => '🎖️ Most Improved Archer Award',
-                'description' => 'Mendapatkan penghargaan Most Improved Archer dengan peningkatan skor rata-rata 15% dalam 3 bulan.',
-                'date' => now()->subMonths(4)->format('Y-m-d'),
-                'photo_path' => null,
-            ],
-            // Achievements untuk family member
-            [
-                'member_id' => $childMember1->id,
-                'type' => 'member',
-                'title' => '🏆 Junior Champion - U15 Category',
-                'description' => 'Sarah meraih juara 1 kategori U15 pada Junior Archery Tournament dengan skor tertinggi 580/600.',
-                'date' => now()->subWeeks(3)->format('Y-m-d'),
-                'photo_path' => null,
-            ],
-            [
-                'member_id' => $childMember1->id,
-                'type' => 'member',
-                'title' => '⭐ Rising Star Award',
-                'description' => 'Mendapatkan penghargaan Rising Star sebagai atlet muda paling berpotensi dalam club.',
-                'date' => now()->subMonths(1)->format('Y-m-d'),
-                'photo_path' => null,
-            ],
+            ['member_id' => $member->id, 'type' => 'member', 'title' => 'Juara 1 Regional 2026'],
+            ['member_id' => $member->id, 'type' => 'member', 'title' => 'Best Improvement Award'],
+            ['member_id' => $member->id, 'type' => 'member', 'title' => 'Perfect 10 Streak'],
+            ['member_id' => $childActive->id, 'type' => 'member', 'title' => 'Junior Rising Star'],
         ];
 
-        foreach ($achievements as $achievementData) {
-            Achievement::create($achievementData);
+        foreach ($achievements as $i => $achievement) {
+            Achievement::query()->firstOrCreate(
+                [
+                    'member_id' => $achievement['member_id'],
+                    'title' => $achievement['title'],
+                ],
+                [
+                    'type' => $achievement['type'],
+                    'description' => 'Achievement seeded for dashboard testing.',
+                    'date' => now()->subDays(($i + 1) * 7)->toDateString(),
+                    'photo_path' => null,
+                ]
+            );
         }
-        echo "   ✅ Created " . count($achievements) . " achievements\n";
-        echo "      - Main member: 6 achievements\n";
-        echo "      - Family member: 2 achievements\n\n";
 
-        // Summary
-        echo "========================================\n";
-        echo "✨ SEEDING COMPLETED SUCCESSFULLY!\n";
-        echo "========================================\n\n";
-        echo "📊 COMPREHENSIVE TEST DATA SUMMARY:\n";
-        echo "-------------------------------------------\n";
-        echo "👤 LOGIN CREDENTIALS:\n";
-        echo "   Email     : {$memberUser->email}\n";
-        echo "   Password  : password123\n";
-        echo "   Role      : Member\n\n";
-
-        echo "👥 MEMBERS CREATED:\n";
-        echo "   1. {$member->name} (Self) - Active\n";
-        echo "   2. {$childMember1->name} - Active\n";
-        echo "   3. {$childMember2->name} - Pending\n\n";
-
-        echo "📦 PACKAGES:\n";
-        echo "   • {$basicPackage->name} ({$basicPackage->session_count} sessions)\n";
-        echo "   • {$package->name} ({$package->session_count} sessions)\n";
-        echo "   • {$proPackage->name} ({$proPackage->session_count} sessions)\n\n";
-
-        echo "🎫 MEMBER PACKAGES:\n";
-        echo "   Active   : 2 packages\n";
-        echo "   Expired  : 1 package\n";
-        echo "   Primary Package:\n";
-        echo "     - Total    : {$memberPackage->total_sessions} sessions\n";
-        echo "     - Used     : {$memberPackage->used_sessions} sessions\n";
-        echo "     - Remaining: " . ($memberPackage->total_sessions - $memberPackage->used_sessions) . " sessions\n";
-        echo "     - Valid    : {$memberPackage->start_date->format('d M')} - {$memberPackage->end_date->format('d M Y')}\n\n";
-
-        echo "📝 BOOKINGS & ATTENDANCE:\n";
-        echo "   Total Bookings : {$bookingCount}\n";
-        echo "   ✅ Present     : {$presentCount}\n";
-        echo "   ❌ Absent      : {$absentCount}\n";
-        echo "   🔮 Future      : 2\n\n";
-
-        echo "🏆 ACHIEVEMENTS:\n";
-        echo "   Total          : " . count($achievements) . "\n";
-        echo "   Main Member    : 6 achievements\n";
-        echo "   Family Member : 2 achievements\n\n";
-
-        echo "🗓️  TRAINING SESSIONS:\n";
-        echo "   Total          : " . count($trainingSessions) . "\n";
-        echo "   Past (Closed)  : {$pastCount} sessions\n";
-        echo "   Today (Open)   : 1 session\n";
-        echo "   Future (Open)  : {$futureCount} sessions\n\n";
-
-        echo "👨‍🏫 COACHES:\n";
-        echo "   1. {$coach->name}\n";
-        echo "   2. {$coach2->name}\n\n";
-
-        echo "⏰ SESSION TIMES:\n";
-        echo "   " . count($createdTimes) . " time slots across all coaches\n\n";
-
-        echo "-------------------------------------------\n";
-        echo "🚀 READY TO TEST!\n";
-        echo "-------------------------------------------\n";
-        echo "Login URL: http://localhost/login\n";
-        echo "Dashboard: http://localhost/member/dashboard\n\n";
-        echo "✅ All features ready for comprehensive testing:\n";
-        echo "   • Dashboard overview with stats\n";
-        echo "   • Active package display with quota\n";
-        echo "   • Attendance history timeline\n";
-        echo "   • Achievements showcase\n";
-        echo "   • Profile management\n";
-        echo "   • Membership (family members)\n";
-        echo "   • Session booking system\n";
-        echo "   • Package purchase flow\n";
-        echo "========================================\n\n";
+        $this->command->info('✅ Member dashboard test data seeded successfully!');
+        $this->command->info('📧 Login: memberdashboard@test.com / password123');
+        $this->command->info('📧 Login: memberdata@test.com / password123');
+        $this->command->info('👨‍🏫 Coach: coachdashboard@test.com / password123');
+        $this->command->info('📊 Member active package remaining sessions: ' . ($memberPackage->total_sessions - $memberPackage->used_sessions));
     }
 }
