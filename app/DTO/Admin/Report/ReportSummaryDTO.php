@@ -8,7 +8,6 @@ final readonly class ReportSummaryDTO
         public int $totalMemberAktif,
         public int $totalSesiPeriode,
         public int $totalAttendancePresent,
-        public int $totalAttendanceAbsent,
     ) {
     }
 }

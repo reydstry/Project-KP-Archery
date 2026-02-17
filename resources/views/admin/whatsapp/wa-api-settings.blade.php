@@ -14,7 +14,7 @@
             </select>
         </div>
 
-        <x-form-input label="Endpoint URL" name="endpoint_url" type="url" placeholder="https://jkt.wablas.com" x-model="endpoint" />
+        <x-form-input label="Endpoint URL" name="endpoint_url" type="url" placeholder="https://jkt.wablas.com/api" x-model="endpoint" />
         <x-form-input label="API Token" name="api_key" type="text" placeholder="Masukkan API token" x-model="apiKey" />
         <x-form-input label="Secret Key" name="secret_key" type="text" placeholder="Masukkan secret key" x-model="secretKey" />
         <x-form-input label="Timeout (detik)" name="timeout" type="number" min="3" max="120" x-model="timeout" />
@@ -46,6 +46,7 @@ function waApiSettingsPage() {
         sandbox: false,
         loading: false,
         saving: false,
+        testPhone: '',
         async init() {
             this.loading = true;
             try {
@@ -58,7 +59,7 @@ function waApiSettingsPage() {
                 this.timeout = Number(data.timeout ?? 15);
                 this.sandbox = Boolean(data.sandbox ?? false);
             } catch (error) {
-                window.showToast?.(error?.message || 'Gagal memuat pengaturan WhatsApp.', 'error');
+                window.showToast(error?.message || 'Gagal memuat pengaturan WhatsApp.', 'error');
             } finally {
                 this.loading = false;
             }
@@ -76,17 +77,24 @@ function waApiSettingsPage() {
                 };
 
                 const response = await window.API.put('/admin/whatsapp/settings', payload);
-                window.showToast?.(response?.message || 'Pengaturan WhatsApp berhasil disimpan.', 'success');
+                window.showToast(response?.message || 'Pengaturan WhatsApp berhasil disimpan.', 'success');
             } catch (error) {
-                window.showToast?.(error?.message || 'Gagal menyimpan pengaturan WhatsApp.', 'error');
+                window.showToast(error?.message || 'Gagal menyimpan pengaturan WhatsApp.', 'error');
             } finally {
                 this.saving = false;
             }
         },
         async testConnection() {
+            const defaultPhone = this.testPhone || '628xxxxxxxxxx';
+            const phone = window.prompt('Nomor tujuan test (format 62xxxx):', defaultPhone);
+            if (!phone) {
+                return;
+            }
+            this.testPhone = phone;
+
             try {
                 const payload = {
-                    phone: '6280000000000',
+                    phone,
                     message: 'Test koneksi WhatsApp dari halaman pengaturan admin.',
                 };
 
@@ -94,13 +102,14 @@ function waApiSettingsPage() {
                 const data = response?.data ?? {};
 
                 if (data?.success === false) {
-                    window.showToast?.(data?.message || 'Test connection gagal.', 'error');
+                    window.showToast(data?.message || 'Test connection gagal.', 'error');
                     return;
                 }
 
-                window.showToast?.(response?.message || 'Test connection berhasil.', 'success');
+                const details = JSON.stringify(data, null, 2);
+                window.showToast((response?.message || 'Test connection berhasil.') + `\n\n${details}`, 'success');
             } catch (error) {
-                window.showToast?.(error?.message || 'Gagal melakukan test connection.', 'error');
+                window.showToast(error?.message || 'Gagal melakukan test connection.', 'error');
             }
         }
     }

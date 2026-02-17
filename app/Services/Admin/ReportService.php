@@ -93,7 +93,6 @@ class ReportService
             totalMemberAktif: $totalMemberAktif,
             totalSesiPeriode: $totalSesiPeriode,
             totalAttendancePresent: $totalAttendancePresent,
-            totalAttendanceAbsent: 0,
         );
     }
 

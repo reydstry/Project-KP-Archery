@@ -48,7 +48,7 @@ class UserSeeder extends Seeder
         'name' => 'Member Dummy',
         'password' => Hash::make('password'),
         'role' => UserRoles::MEMBER,
-        'phone' => '081234567892',
+        'phone' => '089685105076',
       ]
     );
 

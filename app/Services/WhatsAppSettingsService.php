@@ -25,9 +25,11 @@ class WhatsAppSettingsService
 
     public function saveWhatsAppSettings(array $settings): array
     {
+        $baseUrl = $this->normalizeWablasBaseUrl($settings['base_url'] ?? null);
+
         Cache::forever(self::WHATSAPP_SETTINGS_KEY, [
             'driver' => $settings['driver'],
-            'base_url' => $settings['base_url'] ?? config('whatsapp.drivers.wablas.base_url'),
+            'base_url' => $baseUrl ?? config('whatsapp.drivers.wablas.base_url'),
             'token' => $settings['token'] ?? '',
             'secret_key' => $settings['secret_key'] ?? '',
             'timeout' => (int) ($settings['timeout'] ?? 15),
@@ -56,5 +58,30 @@ class WhatsAppSettingsService
         ]);
 
         return $this->getReminderSettings();
+    }
+
+    private function normalizeWablasBaseUrl(?string $baseUrl): ?string
+    {
+        if ($baseUrl === null) {
+            return null;
+        }
+
+        $baseUrl = rtrim(trim($baseUrl), '/');
+
+        if ($baseUrl === '') {
+            return null;
+        }
+
+        $parts = parse_url($baseUrl);
+
+        if ($parts === false) {
+            return $baseUrl;
+        }
+
+        $path = $parts['path'] ?? '';
+
+        return ($path === '' || $path === '/')
+            ? ($baseUrl . '/api')
+            : $baseUrl;
     }
 }

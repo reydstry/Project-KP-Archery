@@ -538,6 +538,28 @@
             window.showInfo = function(message, title = 'Information') {
                 window.showAlert(title, message, 'info');
             };
+
+            // Backward-compatible toast helper used across dashboard pages.
+            // The admin layout uses modal alerts, so map toast calls to the modal system.
+            window.showToast = function(message, type = 'info') {
+                const normalizedType = String(type || 'info').toLowerCase();
+                const text = message ?? '';
+
+                switch (normalizedType) {
+                    case 'success':
+                        window.showSuccess(text, 'Success');
+                        break;
+                    case 'error':
+                        window.showError(text, 'Error');
+                        break;
+                    case 'warning':
+                        window.showWarning(text, 'Warning');
+                        break;
+                    default:
+                        window.showInfo(text, 'Information');
+                        break;
+                }
+            };
         })();
     </script>
 

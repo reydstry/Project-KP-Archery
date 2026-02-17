@@ -14,18 +14,20 @@
         </div>
     </div>
 
-    <x-table :headers="['Tanggal', 'Nomor', 'Nama Member', 'Status', 'Response']">
+    <x-table :headers="['Tanggal', 'Nomor', 'Status']">
         <template x-for="log in logs" :key="log.id">
             <tr>
-                <td class="px-4 py-3 text-slate-700" x-text="log.sent_at || '-' "></td>
+                <td class="px-4 py-3 text-slate-700"
+                x-text="log.sent_at 
+                    ? new Date(log.sent_at).toISOString().split('T')[0] 
+                    : '-'">
+                </td>
                 <td class="px-4 py-3 text-slate-700" x-text="log.phone"></td>
-                <td class="px-4 py-3 font-medium text-slate-800" x-text="log.name || '-' "></td>
                 <td class="px-4 py-3">
                     <span class="px-2 py-1 rounded-md border text-xs font-semibold"
                           :class="log.status === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'"
                           x-text="log.status"></span>
                 </td>
-                <td class="px-4 py-3 text-xs text-slate-600" x-text="typeof log.response === 'string' ? log.response : JSON.stringify(log.response)"></td>
             </tr>
         </template>
     </x-table>

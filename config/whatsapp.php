@@ -11,9 +11,9 @@ return [
             'token' => env('WABLAS_TOKEN', ''),
             'secret_key' => env('WABLAS_SECRET_KEY', ''),
             'timeout' => env('WABLAS_TIMEOUT', 15),
-            'send_message_path' => env('WABLAS_SEND_MESSAGE_PATH', '/send-message'),
-            'send_bulk_path' => env('WABLAS_SEND_BULK_PATH', '/send-bulk-message'),
-            'schedule_path' => env('WABLAS_SCHEDULE_PATH', '/send-schedule-message'),
+            'send_message_path' => env('WABLAS_SEND_MESSAGE_PATH', '/v2/send-message'),
+            'send_bulk_path' => env('WABLAS_SEND_BULK_PATH', '/v2/send-message'),
+            'schedule_path' => env('WABLAS_SCHEDULE_PATH', '/v2/schedule'),
         ],
 
         'dummy' => [],

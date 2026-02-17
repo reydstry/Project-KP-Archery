@@ -30,11 +30,11 @@ class ReportMemberRecapSheet implements FromQuery, WithHeadings, WithMapping, Sh
     {
         return [
             'Nama Member',
-            'Status',
+            'Status Member',
             'Nama Paket',
-            'Tanggal Mulai',
-            'Tanggal Expired',
-            'Total Attendance',
+            'Tanggal Mulai Paket',
+            'Tanggal Expired Paket',
+            'Total Kehadiran',
             'Sisa Kuota',
         ];
     }
