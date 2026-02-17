@@ -8,7 +8,6 @@ use App\Models\Member;
 use App\Models\SessionTime;
 use App\Models\TrainingSession;
 use App\Models\TrainingSessionSlot;
-use App\Models\SessionBooking;
 use App\Models\Attendance;
 use App\Models\MemberPackage;
 use App\Enums\TrainingSessionStatus;
@@ -93,42 +92,18 @@ class CoachTestDataSeeder extends Seeder
                 $slot->coaches()->syncWithoutDetaching([$firstCoach->id]);
 
                 $isPastDate = $date->isPast();
-                $targetBookings = $isPastDate ? 6 : 4;
+                $targetAttendances = $isPastDate ? 6 : 4;
 
                 $selectedPackages = $activeMemberPackages
                     ->shuffle()
-                    ->take(min($targetBookings, $slot->max_participants));
+                    ->take(min($targetAttendances, $slot->max_participants));
 
-                foreach ($selectedPackages as $memberIndex => $memberPackage) {
-                    $booking = SessionBooking::firstOrCreate(
-                        [
-                            'training_session_slot_id' => $slot->id,
-                            'member_package_id' => $memberPackage->id,
-                        ],
-                        [
-                            'training_session_slot_id' => $slot->id,
-                            'member_package_id' => $memberPackage->id,
-                            'booked_by' => $memberPackage->member->user->id,
-                            'status' => 'confirmed',
-                            'notes' => $isPastDate ? 'Seeded closed-session booking' : 'Seeded upcoming booking',
-                        ]
-                    );
-
-                    if ($isPastDate) {
-                        $isPresent = ($memberIndex % 5) !== 4;
-
-                        Attendance::firstOrCreate(
-                            [
-                                'session_booking_id' => $booking->id,
-                            ],
-                            [
-                                'session_booking_id' => $booking->id,
-                                'status' => $isPresent ? 'present' : 'absent',
-                                'validated_by' => $firstCoach->user_id,
-                                'validated_at' => $date->copy()->setTime(17, 30),
-                                'notes' => $isPresent ? 'Present (seeded)' : 'Absent (seeded)',
-                            ]
-                        );
+                if ($isPastDate) {
+                    foreach ($selectedPackages as $memberPackage) {
+                        Attendance::firstOrCreate([
+                            'session_id' => $trainingSession->id,
+                            'member_id' => $memberPackage->member_id,
+                        ]);
                     }
                 }
             }
@@ -140,7 +115,6 @@ class CoachTestDataSeeder extends Seeder
         $this->command->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         $this->command->info('📅 Training Sessions: ' . TrainingSession::count());
         $this->command->info('🎯 Training Slots: ' . TrainingSessionSlot::count());
-        $this->command->info('📝 Bookings: ' . SessionBooking::count());
         $this->command->info('✅ Attendance Records: ' . Attendance::count());
         $this->command->info('👥 Active Members with Package: ' . Member::query()->whereHas('memberPackages', fn ($q) => $q->active())->count());
         $this->command->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

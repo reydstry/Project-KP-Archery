@@ -2,29 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\StatusMember;
 use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Models\MemberPackage;
-use App\Models\Package;
+use App\Services\Admin\PackageManagementService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class MemberPackageController extends Controller
 {
+    public function __construct(
+        private readonly PackageManagementService $packageManagementService,
+    ) {
+    }
+
     /**
      * Display a listing of member packages
      */
     public function index()
     {
-        $memberPackages = MemberPackage::with(['member', 'package', 'validator'])
-            ->latest()
-            ->get();
-
-        return response()->json([
-            'message' => 'Data member packages berhasil diambil',
-            'data' => $memberPackages,
-        ]);
+        return response()->json($this->packageManagementService->listMemberPackages());
     }
 
     /**
@@ -37,66 +33,14 @@ class MemberPackageController extends Controller
             'start_date' => 'required|date',
         ]);
 
-        // Get package details
-        $package = Package::findOrFail($validated['package_id']);
+        $result = $this->packageManagementService->assignPackageToMember(
+            member: $member,
+            packageId: (int) $validated['package_id'],
+            startDate: $validated['start_date'],
+            validatorId: auth()->id(),
+        );
 
-        if (property_exists($package, 'is_active') && !$package->is_active) {
-            return response()->json([
-                'message' => 'Package is inactive',
-            ], 422);
-        }
-
-        // Calculate end date
-        $startDate = \Carbon\Carbon::parse($validated['start_date']);
-        $endDate = $startDate->copy()->addDays($package->duration_days);
-
-        DB::beginTransaction();
-        try {
-            $memberPackage = MemberPackage::where('member_id', $member->id)
-                ->latest('id')
-                ->first();
-
-            $isCreate = false;
-            if (!$memberPackage) {
-                $memberPackage = new MemberPackage();
-                $memberPackage->member_id = $member->id;
-                $isCreate = true;
-            }
-
-            $memberPackage->package_id = $package->id;
-            $memberPackage->total_sessions = $package->session_count;
-            $memberPackage->used_sessions = 0;
-            $memberPackage->start_date = $startDate;
-            $memberPackage->end_date = $endDate;
-            $memberPackage->is_active = true;
-            $memberPackage->validated_by = auth()->id();
-            $memberPackage->validated_at = now();
-            $memberPackage->save();
-
-            if (
-                !$member->is_active
-                || $member->status === StatusMember::STATUS_PENDING->value
-                || $member->status === StatusMember::STATUS_INACTIVE->value
-            ) {
-                $member->update([
-                    'is_active' => true,
-                    'status' => StatusMember::STATUS_ACTIVE->value,
-                ]);
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Package assigned successfully',
-                'data' => $memberPackage->load(['member', 'package', 'validator']),
-            ], $isCreate ? 201 : 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Failed to assign package',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json($result['body'], $result['status']);
     }
 
     /**
@@ -104,8 +48,7 @@ class MemberPackageController extends Controller
      */
     public function show(MemberPackage $memberPackage)
     {
-        $memberPackage->load(['member', 'package', 'validator']);
-        return response()->json($memberPackage);
+        return response()->json($this->packageManagementService->showMemberPackage($memberPackage));
     }
 
     /**
@@ -113,11 +56,6 @@ class MemberPackageController extends Controller
      */
     public function getMemberPackages(Member $member)
     {
-        $packages = MemberPackage::with(['package', 'validator'])
-            ->where('member_id', $member->id)
-            ->latest()
-            ->get();
-
-        return response()->json($packages);
+        return response()->json($this->packageManagementService->listPackagesByMember($member));
     }
 }

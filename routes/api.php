@@ -1,30 +1,30 @@
 <?php
 
-use App\Http\Controllers\Admin\CoachController;
-use App\Http\Controllers\Admin\MemberBookingController as AdminMemberBookingController;
-use App\Http\Controllers\Admin\MemberController;
-use App\Http\Controllers\Admin\MemberPackageController;
-use App\Http\Controllers\Admin\NewsController as AdminNewsController;
-use App\Http\Controllers\Admin\AchievementController as AdminAchievementController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\PackageController;
-use App\Http\Controllers\Admin\SessionBookingController as AdminSessionBookingController;
-use App\Http\Controllers\Admin\TrainingSessionController as AdminTrainingSessionController;
 use App\Http\Controllers\Auth\ChangePasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Coach\AttendanceController;
 use App\Http\Controllers\Coach\DashboardController as CoachDashboardController;
 use App\Http\Controllers\Coach\MemberController as CoachMemberController;
-use App\Http\Controllers\Coach\SessionBookingController as CoachSessionBookingController;
 use App\Http\Controllers\Coach\TrainingSessionController;
 use App\Http\Controllers\Member\DashboardController;
 use App\Http\Controllers\Member\RegistrationController;
-use App\Http\Controllers\Member\SessionBookingController;
 use App\Http\Controllers\PublicSite\NewsController as PublicNewsController;
 use App\Http\Controllers\PublicSite\AchievementController as PublicAchievementController;
+use App\Modules\Admin\Attendance\Controllers\AttendanceController as AdminAttendanceController;
+use App\Modules\Admin\Coach\Controllers\CoachController;
+use App\Modules\Admin\Dashboard\Controllers\AchievementController as AdminAchievementController;
+use App\Modules\Admin\Dashboard\Controllers\DashboardController as AdminDashboardController;
+use App\Modules\Admin\Dashboard\Controllers\NewsController as AdminNewsController;
+use App\Modules\Admin\Member\Controllers\MemberController as AdminMemberController;
+use App\Modules\Admin\Member\Controllers\MemberPackageController as AdminMemberPackageController;
+use App\Modules\Admin\Package\Controllers\PackageController;
+use App\Modules\Admin\Report\Controllers\ReportController;
+use App\Modules\Admin\Training\Controllers\TrainingSessionController as AdminTrainingSessionController;
+use App\Modules\Admin\WhatsApp\Controllers\ReminderSettingsController;
+use App\Modules\Admin\WhatsApp\Controllers\WhatsAppController as AdminWhatsAppController;
+use App\Modules\Admin\WhatsApp\Controllers\WhatsAppSettingsController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes - Authentication
@@ -56,19 +56,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/register-child', [RegistrationController::class, 'registerChild']);
         Route::get('/my-members', [RegistrationController::class, 'myMembers']);
 
-        // Session Bookings
-        Route::get('bookings/available', [SessionBookingController::class, 'availableSessions']);
-        Route::get('bookings', [SessionBookingController::class, 'index']);
-        Route::post('bookings', [SessionBookingController::class, 'store']);
-        Route::get('bookings/{sessionBooking}', [SessionBookingController::class, 'show']);
-        Route::post('bookings/{sessionBooking}/cancel', [SessionBookingController::class, 'cancel']);
     });
 
     // Routes untuk COACH (pelatih)
     Route::middleware('role:coach')->prefix('coach')->group(function () {
         Route::get('/dashboard', [CoachDashboardController::class, 'index']);
 
-        // Members list for booking
+        // Members list
         Route::get('members', [CoachMemberController::class, 'index']);
 
         // Training Sessions
@@ -81,15 +75,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('training-sessions/{trainingSession}/close', [TrainingSessionController::class, 'close']);
         Route::post('training-sessions/{trainingSession}/cancel', [TrainingSessionController::class, 'cancel']);
 
-        // Attendance
-        Route::get('training-sessions/{trainingSession}/bookings', [AttendanceController::class, 'getSessionBookings']);
-        Route::post('bookings/{sessionBooking}/attendance', [AttendanceController::class, 'validateAttendance']);
-        Route::patch('bookings/{sessionBooking}/attendance', [AttendanceController::class, 'update']);
-
-        // Coach books for member
-        Route::post('bookings', [CoachSessionBookingController::class, 'store']);
-        Route::patch('bookings/{sessionBooking}', [CoachSessionBookingController::class, 'update']);
-        Route::delete('bookings/{sessionBooking}', [CoachSessionBookingController::class, 'destroy']);
     });
 
     // Routes untuk ADMIN
@@ -109,28 +94,48 @@ Route::middleware('auth:sanctum')->group(function () {
         // Master Coaches
         Route::apiResource('coaches', CoachController::class);
 
-        // Master Members
-        Route::apiResource('members', MemberController::class);
-        Route::post('members/{id}/restore', [MemberController::class, 'restore']);
+        // Member domain
+        Route::prefix('members')->group(function () {
+            Route::get('/', [AdminMemberController::class, 'index']);
+            Route::post('/', [AdminMemberController::class, 'store']);
+            Route::get('/{member}', [AdminMemberController::class, 'show']);
+            Route::match(['put', 'patch'], '/{member}', [AdminMemberController::class, 'update']);
+            Route::delete('/{member}', [AdminMemberController::class, 'destroy']);
+            Route::post('/{id}/restore', [AdminMemberController::class, 'restore']);
 
-        // Member Packages
-        Route::get('member-packages', [MemberPackageController::class, 'index']);
-        Route::post('members/{member}/assign-package', [MemberPackageController::class, 'assignPackage']);
-        Route::get('member-packages/{memberPackage}', [MemberPackageController::class, 'show']);
-        Route::get('members/{member}/packages', [MemberPackageController::class, 'getMemberPackages']);
+            Route::post('/{member}/assign-package', [AdminMemberPackageController::class, 'assignPackage']);
+            Route::get('/{member}/packages', [AdminMemberPackageController::class, 'getMemberPackages']);
+        });
+
+        Route::get('member-packages', [AdminMemberPackageController::class, 'index']);
+        Route::get('member-packages/{memberPackage}', [AdminMemberPackageController::class, 'show']);
 
         // Pending Members
         Route::get('pending-members', [RegistrationController::class, 'pendingMembers']);
 
-        // Booking (admin)
+        // Training & Attendance (admin)
         Route::get('training-sessions', [AdminTrainingSessionController::class, 'index']);
         Route::post('training-sessions', [AdminTrainingSessionController::class, 'store']);
         Route::get('training-sessions/{trainingSession}', [AdminTrainingSessionController::class, 'show']);
         Route::delete('training-sessions/{trainingSession}', [AdminTrainingSessionController::class, 'destroy']);
         Route::patch('training-session-slots/{trainingSessionSlot}/coaches', [AdminTrainingSessionController::class, 'updateSlotCoaches']);
-        Route::get('booking-members', [AdminMemberBookingController::class, 'index']);
-        Route::post('bookings', [AdminSessionBookingController::class, 'store']);
-        Route::patch('bookings/{sessionBooking}', [AdminSessionBookingController::class, 'update']);
-        Route::delete('bookings/{sessionBooking}', [AdminSessionBookingController::class, 'destroy']);
+
+        Route::get('attendance/active-members', [AdminAttendanceController::class, 'activeMembers']);
+        Route::get('training-sessions/{trainingSession}/attendances', [AdminAttendanceController::class, 'index']);
+        Route::post('training-sessions/{trainingSession}/attendances', [AdminAttendanceController::class, 'store']);
+
+        // WhatsApp Blast & Logs
+        Route::get('whatsapp/recipients-count', [AdminWhatsAppController::class, 'recipientsCount']);
+        Route::post('whatsapp/blast', [AdminWhatsAppController::class, 'blast']);
+        Route::get('whatsapp/logs', [AdminWhatsAppController::class, 'logs']);
+        Route::get('whatsapp/logs/export', [AdminWhatsAppController::class, 'export']);
+        Route::get('whatsapp/settings', [WhatsAppSettingsController::class, 'show']);
+        Route::put('whatsapp/settings', [WhatsAppSettingsController::class, 'update']);
+        Route::post('whatsapp/settings/test-connection', [WhatsAppSettingsController::class, 'testConnection']);
+        Route::get('whatsapp/reminder-settings', [ReminderSettingsController::class, 'show']);
+        Route::put('whatsapp/reminder-settings', [ReminderSettingsController::class, 'update']);
+
+        // Report Export
+        Route::get('reports/export', [ReportController::class, 'export']);
     });
 });

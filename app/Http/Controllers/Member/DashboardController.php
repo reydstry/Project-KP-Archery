@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attendance;
 use App\Models\Member;
-use App\Models\SessionBooking;
 
 class DashboardController extends Controller
 {
@@ -49,62 +49,42 @@ class DashboardController extends Controller
             ];
         }
 
-        // Get attendance history (only from bookings with attendance records)
-        $attendanceHistory = SessionBooking::where('member_package_id', function ($query) use ($member) {
-            $query->select('id')
-                ->from('member_packages')
-                ->where('member_id', $member->id);
-        })
-            ->whereHas('attendance')
+        $attendanceHistory = Attendance::query()
+            ->where('member_id', $member->id)
             ->with([
-                'trainingSessionSlot.sessionTime',
-                'trainingSessionSlot.coaches',
-                'trainingSessionSlot.trainingSession',
-                'attendance',
-                'memberPackage.package'
+                'session.slots.sessionTime',
+                'session.slots.coaches',
             ])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get()
-            ->map(function ($booking) {
-                $trainingSession = $booking->trainingSessionSlot?->trainingSession;
-                $sessionTime = $booking->trainingSessionSlot?->sessionTime;
-                $coachNames = $booking->trainingSessionSlot?->coaches
-                    ? $booking->trainingSessionSlot->coaches->pluck('name')->filter()->values()->all()
+            ->map(function ($attendance) use ($activePackage) {
+                $session = $attendance->session;
+                $firstSlot = $session?->slots?->first();
+                $sessionTime = $firstSlot?->sessionTime;
+                $coachNames = $firstSlot?->coaches
+                    ? $firstSlot->coaches->pluck('name')->filter()->values()->all()
                     : [];
 
                 return [
-                    'id' => $booking->id,
-                    'session_date' => $trainingSession?->date,
+                    'id' => $attendance->id,
+                    'session_date' => $session?->date,
                     'session_time' => $sessionTime?->name,
                     'coach_name' => !empty($coachNames) ? implode(', ', $coachNames) : '-',
-                    'package_name' => $booking->memberPackage->package->name ?? null,
-                    'attendance_status' => $booking->attendance->status,
-                    'validated_at' => $booking->attendance->validated_at,
-                    'notes' => $booking->attendance->notes,
+                    'package_name' => $activePackage?->package?->name,
+                    'attendance_status' => 'present',
+                    'validated_at' => $attendance->created_at,
+                    'notes' => null,
                 ];
             });
 
-        // Count attendance statistics
+        $totalAttended = Attendance::query()
+            ->where('member_id', $member->id)
+            ->count();
+
         $attendanceStats = [
-            'total_attended' => SessionBooking::where('member_package_id', function ($query) use ($member) {
-                $query->select('id')
-                    ->from('member_packages')
-                    ->where('member_id', $member->id);
-            })
-                ->whereHas('attendance', function ($q) {
-                    $q->where('status', 'present');
-                })
-                ->count(),
-            'total_absent' => SessionBooking::where('member_package_id', function ($query) use ($member) {
-                $query->select('id')
-                    ->from('member_packages')
-                    ->where('member_id', $member->id);
-            })
-                ->whereHas('attendance', function ($q) {
-                    $q->where('status', 'absent');
-                })
-                ->count(),
+            'total_attended' => $totalAttended,
+            'total_absent' => 0,
         ];
 
         // Get achievements

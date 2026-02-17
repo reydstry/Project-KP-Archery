@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StatusMember;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,65 +11,44 @@ class Attendance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'session_booking_id',
-        'status',
-        'validated_by',
-        'validated_at',
-        'notes',
+        'session_id',
+        'member_id',
     ];
 
     protected function casts(): array
     {
         return [
-            'validated_at' => 'datetime',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 
-    /**
-     * Get the session booking
-     */
-    public function sessionBooking()
+    public function session()
     {
-        return $this->belongsTo(SessionBooking::class);
+        return $this->belongsTo(TrainingSession::class, 'session_id');
     }
 
-    /**
-     * Get the validator (coach who validated)
-     */
-    public function validator()
+    public function member()
     {
-        return $this->belongsTo(User::class, 'validated_by');
+        return $this->belongsTo(Member::class);
     }
 
-    /**
-     * Check if member was present
-     */
-    public function isPresent(): bool
+    public function scopeForSession($query, int $sessionId)
     {
-        return $this->status === 'present';
+        return $query->where('session_id', $sessionId);
     }
 
-    /**
-     * Check if member was absent
-     */
-    public function isAbsent(): bool
+    public function scopeForMember($query, int $memberId)
     {
-        return $this->status === 'absent';
+        return $query->where('member_id', $memberId);
     }
 
-    /**
-     * Scope for present attendances
-     */
-    public function scopePresent($query)
+    public function scopeOnlyActiveMembers($query)
     {
-        return $query->where('status', 'present');
-    }
-
-    /**
-     * Scope for absent attendances
-     */
-    public function scopeAbsent($query)
-    {
-        return $query->where('status', 'absent');
+        return $query->whereHas('member', function ($memberQuery) {
+            $memberQuery
+                ->where('is_active', true)
+                ->where('status', StatusMember::STATUS_ACTIVE->value);
+        });
     }
 }

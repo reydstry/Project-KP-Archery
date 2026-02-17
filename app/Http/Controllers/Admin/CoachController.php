@@ -5,25 +5,23 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Enums\UserRoles;
 use App\Models\User;
+use App\Services\Admin\CoachManagementService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class CoachController extends Controller
 {
+    public function __construct(
+        private readonly CoachManagementService $coachManagementService,
+    ) {
+    }
+
     /**
      * Display a listing of coaches.
      */
     public function index()
     {
-        $coaches = User::where('role', UserRoles::COACH)
-            ->latest()
-            ->get();
-
-        return response()->json([
-            'message' => 'Data coaches berhasil diambil',
-            'data' => $coaches,
-        ]);
+        return response()->json($this->coachManagementService->list());
     }
 
     /**
@@ -50,13 +48,7 @@ class CoachController extends Controller
             ]
         );
 
-        $coach = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'phone' => $data['phone'] ?? null,
-            'role' => UserRoles::COACH,
-        ]);
+        $coach = $this->coachManagementService->create($data);
 
         return response()->json([
             'message' => 'Coach berhasil dibuat',
@@ -69,140 +61,15 @@ class CoachController extends Controller
      */
     public function show(User $coach)
     {
-        // Pastikan user yang diambil adalah coach
-        if ($coach->role !== UserRoles::COACH) {
+        $result = $this->coachManagementService->detail($coach);
+
+        if ($result === null) {
             return response()->json([
                 'message' => 'User bukan coach',
             ], 404);
         }
 
-        // Calculate teaching statistics
-        $stats = $this->calculateCoachStats($coach);
-
-        return response()->json([
-            'message' => 'Data coach berhasil diambil',
-            'data' => $coach,
-            'statistics' => $stats,
-        ]);
-    }
-
-    /**
-     * Calculate coach teaching statistics
-     */
-    private function calculateCoachStats(User $coach)
-    {
-        $now = now();
-        
-        // Get coach profile and all slots they taught
-        $coachProfile = \App\Models\Coach::where('user_id', $coach->id)->first();
-        
-        if (!$coachProfile) {
-            return [
-                'teaching_count_this_week' => 0,
-                'teaching_count_this_month' => 0,
-                'teaching_count_this_year' => 0,
-                'week_streak' => 0,
-                'total_sessions_taught' => 0,
-            ];
-        }
-
-        // Get all training session slots where this coach was assigned
-        $taughtSlots = \App\Models\TrainingSessionSlot::whereHas('coaches', function ($query) use ($coachProfile) {
-            $query->where('coach_id', $coachProfile->id);
-        })
-        ->with(['trainingSession'])
-        ->get()
-        ->filter(function ($slot) {
-            // Only count sessions that have occurred (past or today)
-            $sessionDate = $slot->trainingSession?->date;
-            return $sessionDate && $sessionDate->lte(now());
-        });
-
-        // Count sessions this week (Monday to Sunday)
-        $thisWeekStart = $now->copy()->startOfWeek();
-        $thisWeekEnd = $now->copy()->endOfWeek();
-        $thisWeekCount = $taughtSlots->filter(function ($slot) use ($thisWeekStart, $thisWeekEnd) {
-            $sessionDate = $slot->trainingSession?->date;
-            return $sessionDate && $sessionDate->between($thisWeekStart, $thisWeekEnd);
-        })->count();
-
-        // Count sessions this month
-        $thisMonthStart = $now->copy()->startOfMonth();
-        $thisMonthEnd = $now->copy()->endOfMonth();
-        $thisMonthCount = $taughtSlots->filter(function ($slot) use ($thisMonthStart, $thisMonthEnd) {
-            $sessionDate = $slot->trainingSession?->date;
-            return $sessionDate && $sessionDate->between($thisMonthStart, $thisMonthEnd);
-        })->count();
-
-        // Count sessions this year
-        $thisYearStart = $now->copy()->startOfYear();
-        $thisYearEnd = $now->copy()->endOfYear();
-        $thisYearCount = $taughtSlots->filter(function ($slot) use ($thisYearStart, $thisYearEnd) {
-            $sessionDate = $slot->trainingSession?->date;
-            return $sessionDate && $sessionDate->between($thisYearStart, $thisYearEnd);
-        })->count();
-
-        // Calculate week streak (consecutive weeks with at least one session taught)
-        $weekStreak = $this->calculateCoachWeekStreak($taughtSlots);
-
-        return [
-            'teaching_count_this_week' => $thisWeekCount,
-            'teaching_count_this_month' => $thisMonthCount,
-            'teaching_count_this_year' => $thisYearCount,
-            'week_streak' => $weekStreak,
-            'total_sessions_taught' => $taughtSlots->count(),
-        ];
-    }
-
-    /**
-     * Calculate consecutive weeks with teaching sessions
-     */
-    private function calculateCoachWeekStreak($taughtSlots)
-    {
-        if ($taughtSlots->isEmpty()) {
-            return 0;
-        }
-
-        // Group taught sessions by week
-        $weeklySessions = $taughtSlots
-            ->map(function ($slot) {
-                $sessionDate = $slot->trainingSession?->date;
-                if (!$sessionDate) return null;
-                return $sessionDate->copy()->startOfWeek()->toDateString();
-            })
-            ->filter()
-            ->unique()
-            ->sort()
-            ->values();
-
-        if ($weeklySessions->isEmpty()) {
-            return 0;
-        }
-
-        // Check if current week or last week has teaching
-        $now = now();
-        $currentWeekStart = $now->copy()->startOfWeek()->toDateString();
-        $lastWeekStart = $now->copy()->subWeek()->startOfWeek()->toDateString();
-        
-        $hasCurrentWeek = $weeklySessions->contains($currentWeekStart);
-        $hasLastWeek = $weeklySessions->contains($lastWeekStart);
-        
-        // If no teaching in current or last week, streak is 0
-        if (!$hasCurrentWeek && !$hasLastWeek) {
-            return 0;
-        }
-
-        // Start counting from current week or last week
-        $streak = 0;
-        $checkWeek = $hasCurrentWeek ? $currentWeekStart : $lastWeekStart;
-        
-        // Count backwards consecutive weeks
-        while ($weeklySessions->contains($checkWeek)) {
-            $streak++;
-            $checkWeek = \Carbon\Carbon::parse($checkWeek)->subWeek()->startOfWeek()->toDateString();
-        }
-
-        return $streak;
+        return response()->json($result);
     }
 
     /**
@@ -210,13 +77,6 @@ class CoachController extends Controller
      */
     public function update(Request $request, User $coach)
     {
-        // Pastikan user yang diupdate adalah coach
-        if ($coach->role !== UserRoles::COACH) {
-            return response()->json([
-                'message' => 'User bukan coach',
-            ], 404);
-        }
-
         $data = $request->validate(
             [
                 'name' => ['required', 'string', 'max:255'],
@@ -235,23 +95,15 @@ class CoachController extends Controller
             ]
         );
 
-        $updateData = [
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'] ?? null,
-        ];
+        $result = $this->coachManagementService->update($coach, $data);
 
-        // Update password jika diisi
-        if (!empty($data['password'])) {
-            $updateData['password'] = Hash::make($data['password']);
+        if ($result === null) {
+            return response()->json([
+                'message' => 'User bukan coach',
+            ], 404);
         }
 
-        $coach->update($updateData);
-
-        return response()->json([
-            'message' => 'Coach berhasil diupdate',
-            'data' => $coach->fresh(),
-        ]);
+        return response()->json($result);
     }
 
     /**
@@ -259,17 +111,14 @@ class CoachController extends Controller
      */
     public function destroy(User $coach)
     {
-        // Pastikan user yang dihapus adalah coach
-        if ($coach->role !== UserRoles::COACH) {
+        $result = $this->coachManagementService->delete($coach);
+
+        if ($result === null) {
             return response()->json([
                 'message' => 'User bukan coach',
             ], 404);
         }
 
-        $coach->delete();
-
-        return response()->json([
-            'message' => 'Coach berhasil dihapus',
-        ]);
+        return response()->json($result);
     }
 }

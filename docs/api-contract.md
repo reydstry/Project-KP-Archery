@@ -90,41 +90,16 @@ Register user baru (role default: `member`) dan mengembalikan token.
 
 **201 Response**
 
-````json
-
-### POST `/coach/bookings`
-{
-
-**Body**
-- `training_session_slot_id` (required, exists)
-- `member_package_id` (required, exists)
-- `notes` (nullable, max 500)
-
-**201 Response**
 ```json
 {
-  "message": "Session booked successfully",
-  "data": { /* SessionBooking + relations */ },
-  "remaining_sessions": 10
+    "message": "Registrasi Berhasil",
+    "data": {
+        "user": { "id": 1, "name": "...", "email": "...", "role": "member" },
+        "token": "...",
+        "token_type": "Bearer"
+    }
 }
-````
-
-**422 Response**
-Contoh kasus:
-
-- package tidak aktif / expired
-- quota habis
-- session tidak `open` / sudah lewat / sudah lewat jam 18:00 / penuh
-- sudah booking slot yang sama
-  "message": "Registrasi Berhasil",
-  "data": {
-  "user": { "id": 1, "name": "...", "email": "...", "role": "member" },
-  "token": "...",
-  "token_type": "Bearer"
-  }
-  }
-
-````
+```
 
 ### POST `/login`
 Login dan mengembalikan token. Token lama dihapus.
@@ -390,70 +365,13 @@ List member yang terdaftar oleh user ini (self + anak).
 }
 ```
 
-### GET `/member/bookings`
+### Catatan Perubahan Member Flow
 
-List booking milik member (berdasarkan package milik member self).
+Fitur booking member sudah dihapus. Alur member sekarang menggunakan:
 
-**Query**
-
-- `status` (optional): mis. `confirmed`, `cancelled`
-
-**200 Response**: Pagination shape (per_page = 15)
-
-### POST `/member/bookings`
-
-Buat booking training session.
-
-**Body**
-
-- `training_session_id` (int, required, exists)
-- `member_package_id` (int, required, exists)
-- `notes` (string, nullable, max 500)
-
-**201 Response**
-
-```json
-{
-    "message": "Session booked successfully",
-    "data": {
-        /* SessionBooking + relations */
-    },
-    "remaining_sessions": 10
-}
-```
-
-**422 Response**
-Contoh kasus:
-
-- package tidak aktif / expired
-- quota habis
-- session tidak `open` / sudah lewat / penuh
-- sudah booking session yang sama
-
-### GET `/member/bookings/{sessionBooking}`
-
-Detail booking.
-
-**200 Response**
-Model booking (tanpa wrapper `data`).
-
-**403 Response**
-Jika booking bukan milik member tersebut.
-
-### POST `/member/bookings/{sessionBooking}/cancel`
-
-Cancel booking (hanya future session).
-
-**200 Response**
-
-```json
-{
-    "message": "Booking cancelled successfully",
-    "data": {
-        /* booking */
-    }
-}
-```
+- paket aktif (`member_packages`) sebagai kuota latihan,
+- kehadiran dicatat admin per sesi,
+- riwayat kehadiran diambil dari data `attendances`.
 
 ---
 
@@ -606,7 +524,7 @@ Hapus training session (day) milik coach.
 
 Catatan:
 
-- Tidak bisa dihapus jika sudah ada booking.
+- Tidak bisa dihapus jika sudah ada data kehadiran.
 
 **200 Response**
 
@@ -616,75 +534,11 @@ Catatan:
 }
 ```
 
-### GET `/coach/training-sessions/{trainingSession}/bookings`
+### Catatan Perubahan Coach Flow
 
-List bookings pada session tersebut + status attendance.
+Fitur booking dan validasi attendance berbasis booking sudah dihapus.
 
-**200 Response**
-
-```json
-{
-    "session": {
-        "id": 1,
-        "date": "YYYY-MM-DD",
-        "session_time": "...",
-        "status": "open"
-    },
-    "bookings": [
-        {
-            "id": 1,
-            "member_name": "...",
-            "member_id": 1,
-            "has_attendance": false,
-            "attendance_status": null,
-            "validated_at": null,
-            "notes": null
-        }
-    ],
-    "total_bookings": 0,
-    "attended": 0,
-    "absent": 0,
-    "not_validated": 0
-}
-```
-
-### POST `/coach/bookings/{sessionBooking}/attendance`
-
-Validasi attendance.
-
-**Body**
-
-- `status` (required): `present` | `absent`
-- `notes` (nullable, max 500)
-
-**201 Response**
-
-```json
-{
-    "message": "Attendance validated successfully",
-    "attendance": {
-        "id": 1,
-        "booking_id": 1,
-        "member_name": "...",
-        "status": "present",
-        "validated_at": "...",
-        "notes": "..."
-    },
-    "remaining_sessions": 9
-}
-```
-
-### PATCH `/coach/bookings/{sessionBooking}/attendance`
-
-Update attendance yang sudah ada.
-
-**Body**
-
-- `status` (required): `present` | `absent`
-- `notes` (nullable)
-
-**200 Response**
-Sama seperti validate, tetapi status 200.
+Kehadiran sekarang dikelola admin melalui endpoint attendance admin per sesi.
 
 ---
 

@@ -108,6 +108,9 @@ class RegistrationController extends Controller
 
     /**
      * Get pending members (for admin approval list)
+     *
+     * @deprecated STEP 1 Admin cleanup: endpoint legacy untuk verifikasi pending.
+     *             Dipertahankan sementara untuk kompatibilitas test existing.
      */
     public function pendingMembers(Request $request)
     {

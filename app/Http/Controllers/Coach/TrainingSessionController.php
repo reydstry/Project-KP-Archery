@@ -63,12 +63,9 @@ class TrainingSessionController extends Controller
 
         $this->autoCloseCoachSessionsIfNeeded($coach);
 
-        $query = TrainingSession::with(['slots.sessionTime', 'slots.coaches', 'slots.confirmedBookings.memberPackage.member']);
+        $query = TrainingSession::with(['slots.sessionTime', 'slots.coaches', 'attendances.member']);
 
-        $forBooking = $request->boolean('for_booking', false);
-        if (!$forBooking) {
-            $query->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id));
-        }
+        $query->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id));
 
         // Filter by status if provided
         if ($request->has('status')) {
@@ -177,9 +174,7 @@ class TrainingSessionController extends Controller
     {
         // Verify coach owns this session
         $coach = Coach::where('user_id', auth()->id())->first();
-        $forBooking = request()->boolean('for_booking', false);
-
-        if (!$forBooking && !$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);
@@ -190,7 +185,7 @@ class TrainingSessionController extends Controller
         return response()->json($trainingSession->load([
             'slots.sessionTime',
             'slots.coaches',
-            'slots.confirmedBookings.memberPackage.member',
+            'attendances.member',
         ]));
     }
 
@@ -232,7 +227,7 @@ class TrainingSessionController extends Controller
             'data' => $trainingSession->fresh()->load([
                 'slots.sessionTime',
                 'slots.coaches',
-                'slots.confirmedBookings.memberPackage.member',
+                'attendances.member',
             ]),
         ]);
     }
@@ -280,7 +275,7 @@ class TrainingSessionController extends Controller
             'data' => $trainingSession->fresh()->load([
                 'slots.sessionTime',
                 'slots.coaches',
-                'slots.confirmedBookings.memberPackage.member',
+                'attendances.member',
             ]),
         ]);
     }
@@ -379,7 +374,7 @@ class TrainingSessionController extends Controller
 
     /**
      * Delete a training session (day) and its slots.
-     * Guard: only allowed when there are no bookings.
+        * Guard: only allowed when there are no attendance records.
      */
     public function destroy(TrainingSession $trainingSession)
     {
@@ -391,10 +386,10 @@ class TrainingSessionController extends Controller
             ], 403);
         }
 
-        $hasBookings = $trainingSession->bookings()->exists();
-        if ($hasBookings) {
+        $hasAttendances = $trainingSession->attendances()->exists();
+        if ($hasAttendances) {
             return response()->json([
-                'message' => 'Cannot delete session that already has bookings',
+                'message' => 'Cannot delete session that already has attendance records',
             ], 422);
         }
 

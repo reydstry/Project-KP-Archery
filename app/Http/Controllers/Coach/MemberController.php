@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class MemberController extends Controller
 {
     /**
-     * Get list of members with their active packages for coach booking
+     * Get list of members with their active packages.
      */
     public function index(Request $request)
     {

@@ -1,4 +1,4 @@
-@extends('layouts.auth')
+@extends('components.layouts.auth')
 
 @section('title', 'Set Password - FocusOneX Archery')
 

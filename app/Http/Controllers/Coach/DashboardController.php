@@ -38,15 +38,18 @@ class DashboardController extends Controller
             ->where('date', $shouldCloseToday ? '<=' : '<', $today)
             ->update(['status' => 'closed']);
 
+        $assignedToCoach = fn ($query) => $query
+            ->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id));
+
         $todaySessions = TrainingSession::query()
-            ->with(['slots.sessionTime', 'slots.confirmedBookings.memberPackage.member', 'slots.coaches'])
+            ->with(['slots.sessionTime', 'slots.coaches', 'attendances.member'])
             ->whereDate('date', $today)
-            ->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id))
+            ->where($assignedToCoach)
             ->get();
 
         $todaySlots = $todaySessions
             ->flatMap(fn (TrainingSession $session) => $session->slots
-                ->filter(fn ($slot) => $slot->coaches->contains('id', $coach->id)) // Only slots where this coach is assigned
+                ->filter(fn ($slot) => $slot->coaches->contains('id', $coach->id))
                 ->sortBy('session_time_id')
                 ->values()
                 ->map(fn ($slot) => [
@@ -56,15 +59,15 @@ class DashboardController extends Controller
                     'status' => $session->status?->value,
                     'max_participants' => $slot->max_participants,
                     'capacity' => $slot->max_participants,
-                    'total_bookings' => $slot->confirmedBookings->count(),
+                    'total_attendances' => $session->attendances->count(),
                     'coaches' => $slot->coaches->map(fn ($c) => [
                         'id' => $c->id,
                         'name' => $c->name,
                     ])->values(),
-                    'members' => $slot->confirmedBookings
-                        ? $slot->confirmedBookings->map(fn ($booking) => [
-                            'id' => $booking->memberPackage?->member?->id,
-                            'name' => $booking->memberPackage?->member?->name,
+                    'members' => $session->attendances
+                        ? $session->attendances->map(fn ($attendance) => [
+                            'id' => $attendance->member?->id,
+                            'name' => $attendance->member?->name,
                         ])->filter(fn ($m) => $m['id'])->values()
                         : [],
                     'session_time' => [
@@ -78,11 +81,11 @@ class DashboardController extends Controller
 
         $upcomingCount = TrainingSession::query()
             ->whereDate('date', '>=', $today)
-            ->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id))
+            ->where($assignedToCoach)
             ->count();
 
         $totalCount = TrainingSession::query()
-            ->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id))
+            ->where($assignedToCoach)
             ->count();
 
         return response()->json([

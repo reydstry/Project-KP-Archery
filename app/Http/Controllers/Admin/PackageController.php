@@ -4,21 +4,22 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Package;
+use App\Services\Admin\PackageManagementService;
 use Illuminate\Http\Request;
 
 class PackageController extends Controller
 {
+    public function __construct(
+        private readonly PackageManagementService $packageManagementService,
+    ) {
+    }
+
     /**
      * Display a listing of packages.
      */
     public function index()
     {
-        $packages = Package::latest()->get();
-
-        return response()->json([
-            'message' => 'Data packages berhasil diambil',
-            'data' => $packages,
-        ]);
+        return response()->json($this->packageManagementService->listPackages());
     }
 
     /**
@@ -34,9 +35,7 @@ class PackageController extends Controller
             'session_count' => ['required', 'integer', 'min:1'],
         ]);
 
-        $data['is_active'] = true;
-
-        $package = Package::create($data);
+        $package = $this->packageManagementService->createPackage($data);
 
         return response()->json([
             'message' => 'Package berhasil dibuat',
@@ -49,10 +48,7 @@ class PackageController extends Controller
      */
     public function show(Package $package)
     {
-        return response()->json([
-            'message' => 'Data package berhasil diambil',
-            'data' => $package,
-        ]);
+        return response()->json($this->packageManagementService->showPackage($package));
     }
 
     /**
@@ -68,12 +64,7 @@ class PackageController extends Controller
             'session_count' => ['required', 'integer', 'min:1'],
         ]);
 
-        $package->update($data);
-
-        return response()->json([
-            'message' => 'Package berhasil diupdate',
-            'data' => $package->fresh(),
-        ]);
+        return response()->json($this->packageManagementService->updatePackage($package, $data));
     }
 
     /**
@@ -81,20 +72,11 @@ class PackageController extends Controller
      */
     public function destroy(Package $package)
     {
-        $package->update(['is_active' => false]);
-
-        return response()->json([
-            'message' => 'Package berhasil dihapus',
-        ]);
+        return response()->json($this->packageManagementService->deactivatePackage($package));
     }
 
     public function restore(Package $package)
     {
-        $package->update(['is_active' => true]);
-
-        return response()->json([
-            'message' => 'Package berhasil diaktifkan',
-            'data' => $package->fresh(),
-        ]);
+        return response()->json($this->packageManagementService->restorePackage($package));
     }
 }
