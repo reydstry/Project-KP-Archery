@@ -95,10 +95,6 @@
                                         </template>
                                     </div>
                                 </div>
-
-                                <div class="pt-2 flex justify-end">
-                                    <a :href="`/coach/sessions/${slot.training_session_id}/edit`" class="px-4 py-2 bg-[#1a307b] hover:bg-[#152866] text-white text-sm font-semibold rounded-lg transition">Edit Session</a>
-                                </div>
                             </div>
                         </div>
                     </template>
