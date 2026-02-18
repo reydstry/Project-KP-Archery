@@ -54,4 +54,23 @@ class AttendanceController extends Controller
             'data' => $result,
         ], 201);
     }
+
+    public function sync(Request $request, TrainingSession $trainingSession)
+    {
+        $validated = $request->validate([
+            'session_id' => ['required', 'integer', 'in:' . $trainingSession->id],
+            'member_ids' => ['required', 'array'],
+            'member_ids.*' => ['required', 'integer', 'distinct', 'exists:members,id'],
+        ]);
+
+        $result = $this->attendanceService->syncForSession(
+            trainingSession: $trainingSession,
+            memberIds: $validated['member_ids'],
+        );
+
+        return response()->json([
+            'message' => 'Attendance berhasil diperbarui.',
+            'data' => $result,
+        ]);
+    }
 }

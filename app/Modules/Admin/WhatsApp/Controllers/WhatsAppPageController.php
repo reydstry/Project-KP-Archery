@@ -18,11 +18,11 @@ class WhatsAppPageController extends Controller
 
     public function waApiSettings()
     {
-        return view('admin.whatsapp.wa-api-settings');
+        return view('dashboards.admin.whatsapp.wa-api-settings');
     }
 
     public function reminderSettings()
     {
-        return view('admin.whatsapp.reminder-settings');
+        return view('dashboards.admin.whatsapp.reminder-settings');
     }
 }

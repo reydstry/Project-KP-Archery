@@ -8,21 +8,21 @@ class TrainingPageController extends Controller
 {
     public function sessionsIndex()
     {
-        return view('admin.training.training-sessions');
+        return view('dashboards.admin.training.training-sessions');
     }
 
     public function sessionsCreate()
     {
-        return view('admin.training.training-sessions-create');
+        return view('dashboards.admin.training.training-sessions-create');
     }
 
     public function sessionsEdit(int $id)
     {
-        return view('admin.training.training-sessions-edit-meta', compact('id'));
+        return view('dashboards.admin.training.training-sessions-edit-meta', compact('id'));
     }
 
     public function slotCoachAssignment()
     {
-        return view('admin.training.slots-coach-assignment');
+        return view('dashboards.admin.training.slots-coach-assignment');
     }
 }

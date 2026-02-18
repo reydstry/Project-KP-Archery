@@ -5,63 +5,63 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 
 /**
- * @deprecated Web admin pages telah dipindahkan ke App\Modules\Admin\*\Controllers\*PageController.
+ * @deprecated Web dashboards.admin pages telah dipindahkan ke App\Modules\Admin\*\Controllers\*PageController.
  *             Kelas ini dipertahankan sementara untuk backward compatibility transisi.
  */
 class AdminUiController extends Controller
 {
     public function sessionsIndex()
     {
-        return view('admin.training.training-sessions');
+        return view('dashboards.admin.training.training-sessions');
     }
 
     public function sessionsCreate()
     {
-        return view('admin.training.training-sessions-create');
+        return view('dashboards.admin.training.training-sessions-create');
     }
 
     public function sessionsEdit(int $id)
     {
-        return view('admin.training.training-sessions-edit-meta', compact('id'));
+        return view('dashboards.admin.training.training-sessions-edit-meta', compact('id'));
     }
 
     public function slotCoachAssignment()
     {
-        return view('admin.training.slots-coach-assignment');
+        return view('dashboards.admin.training.slots-coach-assignment');
     }
 
     public function attendanceManagement()
     {
-        return view('admin.attendance.attendance-management');
+        return view('dashboards.admin.attendance.attendance-management');
     }
 
     public function waBlast()
     {
-        return view('admin.whatsapp.wa-blast');
+        return view('dashboards.admin.whatsapp.wa-blast');
     }
 
     public function waLogs()
     {
-        return view('admin.whatsapp.wa-logs');
+        return view('dashboards.admin.whatsapp.wa-logs');
     }
 
     public function monthlyRecap()
     {
-        return view('admin.report.monthly-recap');
+        return view('dashboards.admin.report.monthly-recap');
     }
 
     public function exportExcel()
     {
-        return view('admin.report.export-excel');
+        return view('dashboards.admin.report.export-excel');
     }
 
     public function waApiSettings()
     {
-        return view('admin.whatsapp.wa-api-settings');
+        return view('dashboards.dashboards.admin.whatsapp.wa-api-settings');
     }
 
     public function reminderSettings()
     {
-        return view('admin.whatsapp.reminder-settings');
+        return view('dashboards.dashboards.admin.whatsapp.reminder-settings');
     }
 }

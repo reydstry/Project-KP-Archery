@@ -83,6 +83,68 @@ class AttendanceService
         ];
     }
 
+    public function syncForSession(TrainingSession $trainingSession, array $memberIds): array
+    {
+        $memberIds = collect($memberIds)
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->unique()
+            ->values();
+
+        $activeMembers = Member::query()
+            ->whereIn('id', $memberIds)
+            ->where('is_active', true)
+            ->where('status', StatusMember::STATUS_ACTIVE->value)
+            ->pluck('id');
+
+        $invalidMemberIds = $memberIds->diff($activeMembers)->values();
+        if ($invalidMemberIds->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'member_ids' => [
+                    'Hanya member ACTIVE yang dapat dicatat kehadirannya.',
+                    'Member tidak valid: ' . $invalidMemberIds->implode(', '),
+                ],
+            ]);
+        }
+
+        $existingMemberIds = Attendance::query()
+            ->where('session_id', $trainingSession->id)
+            ->pluck('member_id')
+            ->map(fn ($id) => (int) $id);
+
+        $toDelete = $existingMemberIds->diff($memberIds)->values();
+        $toInsert = $memberIds->diff($existingMemberIds)->values();
+
+        DB::transaction(function () use ($trainingSession, $toDelete, $toInsert) {
+            if ($toDelete->isNotEmpty()) {
+                Attendance::query()
+                    ->where('session_id', $trainingSession->id)
+                    ->whereIn('member_id', $toDelete)
+                    ->delete();
+            }
+
+            if ($toInsert->isNotEmpty()) {
+                $now = now();
+                $rows = $toInsert->map(fn ($memberId) => [
+                    'session_id' => $trainingSession->id,
+                    'member_id' => $memberId,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ])->all();
+
+                DB::table('attendances')->insert($rows);
+            }
+        });
+
+        return [
+            'session_id' => $trainingSession->id,
+            'present_count' => $memberIds->count(),
+            'inserted_count' => $toInsert->count(),
+            'deleted_count' => $toDelete->count(),
+            'member_ids' => $memberIds->all(),
+        ];
+    }
+
     public function activeMembers(string $search = '', int $limit = 100)
     {
         $query = Member::query()

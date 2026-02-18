@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coach;
+use App\Models\SessionTime;
 use App\Models\TrainingSession;
 use App\Models\TrainingSessionSlot;
 use App\Services\Admin\TrainingManagementService;
@@ -92,5 +94,24 @@ class TrainingSessionController extends Controller
         $result = $this->trainingManagementService->delete($trainingSession);
 
         return response()->json($result['body'], $result['status']);
+    }
+
+    public function sessionTimes()
+    {
+        return response()->json([
+            'data' => SessionTime::query()
+                ->where('is_active', true)
+                ->orderBy('start_time')
+                ->get(['id', 'name', 'start_time', 'end_time']),
+        ]);
+    }
+
+    public function coaches()
+    {
+        return response()->json([
+            'data' => Coach::query()
+                ->orderBy('name')
+                ->get(['id', 'user_id', 'name']),
+        ]);
     }
 }

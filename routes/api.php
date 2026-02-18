@@ -71,6 +71,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('training-sessions/{trainingSession}', [TrainingSessionController::class, 'destroy']);
         Route::patch('training-sessions/{trainingSession}/quota', [TrainingSessionController::class, 'updateQuota']);
         Route::patch('training-sessions/{trainingSession}/coaches', [TrainingSessionController::class, 'updateCoaches']);
+        Route::get('attendance/active-members', [TrainingSessionController::class, 'activeMembers']);
+        Route::get('training-sessions/{trainingSession}/attendances', [TrainingSessionController::class, 'attendances']);
+        Route::put('training-sessions/{trainingSession}/attendances', [TrainingSessionController::class, 'syncAttendances']);
         Route::post('training-sessions/{trainingSession}/open', [TrainingSessionController::class, 'open']);
         Route::post('training-sessions/{trainingSession}/close', [TrainingSessionController::class, 'close']);
         Route::post('training-sessions/{trainingSession}/cancel', [TrainingSessionController::class, 'cancel']);
@@ -114,6 +117,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('pending-members', [RegistrationController::class, 'pendingMembers']);
 
         // Training & Attendance (admin)
+        Route::get('session-times', [AdminTrainingSessionController::class, 'sessionTimes']);
+        Route::get('training-coaches', [AdminTrainingSessionController::class, 'coaches']);
         Route::get('training-sessions', [AdminTrainingSessionController::class, 'index']);
         Route::post('training-sessions', [AdminTrainingSessionController::class, 'store']);
         Route::get('training-sessions/{trainingSession}', [AdminTrainingSessionController::class, 'show']);
@@ -123,6 +128,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('attendance/active-members', [AdminAttendanceController::class, 'activeMembers']);
         Route::get('training-sessions/{trainingSession}/attendances', [AdminAttendanceController::class, 'index']);
         Route::post('training-sessions/{trainingSession}/attendances', [AdminAttendanceController::class, 'store']);
+        Route::put('training-sessions/{trainingSession}/attendances', [AdminAttendanceController::class, 'sync']);
 
         // WhatsApp Blast & Logs
         Route::get('whatsapp/recipients-count', [AdminWhatsAppController::class, 'recipientsCount']);

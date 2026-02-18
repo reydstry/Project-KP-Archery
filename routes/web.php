@@ -99,13 +99,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/sessions/{id}/edit', [AdminTrainingPageController::class, 'sessionsEdit'])->name('sessions.edit');
         Route::get('/training/slots', [AdminTrainingPageController::class, 'slotCoachAssignment'])->name('training.slots');
         Route::get('/training/attendance', [AdminAttendancePageController::class, 'attendanceManagement'])->name('training.attendance');
-        Route::get('/sessions/{id}/attendance', fn($id) => view('admin.attendance.sessions-attendance-input', [
-            'sessionId' => $id,
-        ]))->name('sessions.attendance');
+        Route::get('/sessions/{id}/attendance', [AdminAttendancePageController::class, 'sessionAttendanceInput'])->name('sessions.attendance');
 
         // Website
-        Route::get('/news', fn() => view('admin.dashboard.news'))->name('news');
-        Route::get('/achievements', fn() => view('admin.dashboard.achievements'))->name('achievements');
+        Route::get('/news', fn() => view('dashboards.admin.dashboard.news'))->name('news');
+        Route::get('/achievements', fn() => view('dashboards.admin.dashboard.achievements'))->name('achievements');
 
         // Communication
         Route::get('/communication/wa-blast', [AdminWhatsAppPageController::class, 'waBlast'])->name('communication.wa-blast');
@@ -121,8 +119,9 @@ Route::middleware('auth')->group(function () {
     });
     // Coach routes
     Route::prefix('coach')->name('coach.')->middleware('role:coach')->group(function () {
-        Route::get('/sessions', fn() => view('components.dashboards.coach.sessions'))->name('sessions.index');
-        Route::get('/sessions/{id}/edit', fn($id) => view('components.dashboards.coach.sessions-edit', [
+        Route::get('/sessions', fn() => view('dashboards.coach.sessions'))->name('sessions.index');
+        Route::get('/attendance', fn() => view('dashboards.coach.attendance'))->name('attendance.index');
+        Route::get('/sessions/{id}/edit', fn($id) => view('dashboards.coach.sessions-edit', [
             'id' => $id,
             'coaches' => Coach::query()->orderBy('name')->get(['id', 'name']),
             'myCoachId' => auth()->user()?->coach?->id,
