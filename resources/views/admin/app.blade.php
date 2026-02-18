@@ -1,1 +1,1 @@
-@extends('components.layouts.admin')
+@extends('layouts.admin')
