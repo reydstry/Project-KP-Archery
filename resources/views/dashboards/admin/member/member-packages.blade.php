@@ -373,6 +373,84 @@
         </div>
     </div>
 
+    <!-- Success Modal -->
+    <div x-show="showSuccessModal" x-cloak @click.self="closeSuccessModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showSuccessModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <!-- Success Icon -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                    <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Berhasil Disimpan!</h3>
+                
+                <!-- Message -->
+                <p class="text-slate-600 mb-6" x-text="successMessage"></p>
+                
+                <!-- Button -->
+                <button @click="closeSuccessModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div x-show="showErrorModal" x-cloak @click.self="closeErrorModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showErrorModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <!-- Error Icon -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                    <svg class="h-10 w-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Terjadi Kesalahan!</h3>
+                
+                <!-- Message -->
+                <p class="text-slate-600 mb-6" x-text="errorMessage"></p>
+                
+                <!-- Button -->
+                <button @click="closeErrorModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -387,6 +465,10 @@
             search: '',
             showAssignModal: false,
             showDetailsModal: false,
+            showSuccessModal: false,
+            showErrorModal: false,
+            successMessage: '',
+            errorMessage: '',
             selectedMemberPackage: null,
             selectedPackageInfo: null,
             assignForm: {
@@ -407,7 +489,7 @@
                     const data = await window.API.get('/admin/member-packages');
                     this.memberPackages = data.data || [];
                 } catch (error) {
-                    window.showToast('Failed to load member packages: ' + error.message, 'error');
+                    this.showErrorMessage('Gagal memuat data member packages: ' + error.message);
                 } finally {
                     this.loading = false;
                 }
@@ -419,7 +501,7 @@
                     this.members = data.data || [];
                 } catch (error) {
                     console.error('Failed to load members:', error);
-                    window.showToast('Failed to load members: ' + error.message, 'error');
+                    this.showErrorMessage('Gagal memuat data members: ' + error.message);
                 }
             },
 
@@ -438,7 +520,7 @@
                     }
                 } catch (error) {
                     console.error('Failed to load packages:', error);
-                    window.showToast('Failed to load packages: ' + error.message, 'error');
+                    this.showErrorMessage('Gagal memuat data packages: ' + error.message);
                 }
             },
 
@@ -530,11 +612,11 @@
                         start_date: this.assignForm.start_date
                     });
                     
-                    window.showToast('Package assigned successfully', 'success');
                     this.closeAssignModal();
+                    this.showSuccessMessage('Package berhasil di-assign ke member.');
                     await this.loadMemberPackages();
                 } catch (error) {
-                    window.showToast('Failed to assign package: ' + error.message, 'error');
+                    this.showErrorMessage(error?.response?.data?.message || error?.message || 'Gagal assign package.');
                 } finally {
                     this.submitting = false;
                 }
@@ -550,6 +632,26 @@
                 this.selectedMemberPackage = null;
             },
 
+            showSuccessMessage(message) {
+                this.successMessage = message;
+                this.showSuccessModal = true;
+            },
+
+            closeSuccessModal() {
+                this.showSuccessModal = false;
+                this.successMessage = '';
+            },
+
+            showErrorMessage(message) {
+                this.errorMessage = message;
+                this.showErrorModal = true;
+            },
+
+            closeErrorModal() {
+                this.showErrorModal = false;
+                this.errorMessage = '';
+            },
+
             async toggleMemberActiveFromDetails() {
                 const mp = this.selectedMemberPackage;
                 const memberId = mp?.member_id;
@@ -560,10 +662,10 @@
                     const isInactive = mp?.member?.status === 'inactive' || mp?.member?.is_active === false;
                     if (isInactive) {
                         await window.API.post(`/admin/members/${memberId}/restore`);
-                        window.showToast('Member activated successfully', 'success');
+                        this.showSuccessMessage('Member berhasil diaktifkan.');
                     } else {
                         await window.API.delete(`/admin/members/${memberId}`);
-                        window.showToast('Member deactivated successfully', 'success');
+                        this.showSuccessMessage('Member berhasil dinonaktifkan.');
                     }
 
                     await this.loadMembers();
@@ -573,7 +675,7 @@
                     const refreshed = this.displayRows.find(r => String(r.member_id) === String(memberId));
                     this.selectedMemberPackage = refreshed || this.selectedMemberPackage;
                 } catch (error) {
-                    window.showToast('Failed to update member status: ' + (error.message || 'Unknown error'), 'error');
+                    this.showErrorMessage(error?.response?.data?.message || error?.message || 'Gagal mengubah status member.');
                 } finally {
                     this.togglingMember = false;
                 }

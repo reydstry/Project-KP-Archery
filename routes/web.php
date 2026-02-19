@@ -88,10 +88,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/member-packages', [AdminMemberPageController::class, 'packages'])->name('member-packages');
 
         // Coach domain
-        Route::get('/coaches', fn() => view('admin.coach.coaches'))->name('coaches');
+        Route::get('/coaches', fn() => view('dashboards.admin.coach.coaches'))->name('coaches');
 
         // Package domain
-        Route::get('/packages', fn() => view('admin.package.packages'))->name('packages');
+        Route::get('/packages', fn() => view('dashboards.admin.package.packages'))->name('packages');
 
         // Training operations
         Route::get('/sessions', [AdminTrainingPageController::class, 'sessionsIndex'])->name('sessions.index');
@@ -129,7 +129,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/change-password', function() {
             $user = auth()->user();
             $coach = $user->coach;
-            return view('components.dashboards.coach.change-password', compact('user', 'coach'));
+            return view('dashboards.coach.change-password', compact('user', 'coach'));
         })->name('change-password');
         Route::post('/change-password', [\App\Http\Controllers\Coach\ProfileController::class, 'updatePassword'])->name('change-password.password');
     });

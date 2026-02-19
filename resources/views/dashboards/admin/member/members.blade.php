@@ -318,6 +318,70 @@
             </div>
         </div>
     </div>
+
+    <!-- Success Modal -->
+    <div x-show="showSuccessModal" x-cloak @click.self="closeSuccessModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showSuccessModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                    <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Berhasil Disimpan!</h3>
+                <p class="text-slate-600 mb-6" x-text="successMessage"></p>
+                <button @click="closeSuccessModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div x-show="showErrorModal" x-cloak @click.self="closeErrorModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showErrorModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                    <svg class="h-10 w-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Terjadi Kesalahan!</h3>
+                <p class="text-slate-600 mb-6" x-text="errorMessage"></p>
+                <button @click="closeErrorModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -332,6 +396,10 @@ function membersData() {
         showModal: false,
         showToggleConfirm: false,
         showDetailsModal: false,
+        showSuccessModal: false,
+        showErrorModal: false,
+        successMessage: '',
+        errorMessage: '',
         loadingDetails: false,
         editingMember: null,
         memberToToggle: null,
@@ -371,8 +439,8 @@ function membersData() {
                 }
             } catch (error) {
                 console.error('Failed to load members:', error);
-                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load members data';
-                showToast(errorMsg, 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal memuat members.';
+                this.showErrorMessage(errorMsg);
                 this.members = []; // Set empty array on error
             } finally {
                 this.loading = false;
@@ -389,7 +457,7 @@ function membersData() {
         openEditModal(member) {
             // Validate member object
             if (!member || !member.id) {
-                showToast('Invalid member data', 'error');
+                this.showErrorMessage('Data member tidak valid.');
                 return;
             }
             
@@ -411,7 +479,7 @@ function membersData() {
         async viewMemberDetails(member) {
             // Validate member
             if (!member || !member.id) {
-                showToast('Invalid member data', 'error');
+                this.showErrorMessage('Data member tidak valid.');
                 return;
             }
             
@@ -432,8 +500,8 @@ function membersData() {
                 this.statistics = response.statistics || {};
             } catch (error) {
                 console.error('Failed to load member details:', error);
-                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load member details';
-                showToast(errorMsg, 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal memuat detail member.';
+                this.showErrorMessage(errorMsg);
                 
                 // Close modal on error
                 this.showDetailsModal = false;
@@ -446,6 +514,26 @@ function membersData() {
             this.showDetailsModal = false;
             this.memberDetails = null;
             this.statistics = null;
+        },
+
+        showSuccessMessage(message) {
+            this.successMessage = message;
+            this.showSuccessModal = true;
+        },
+
+        closeSuccessModal() {
+            this.showSuccessModal = false;
+            this.successMessage = '';
+        },
+
+        showErrorMessage(message) {
+            this.errorMessage = message;
+            this.showErrorModal = true;
+        },
+
+        closeErrorModal() {
+            this.showErrorModal = false;
+            this.errorMessage = '';
         },
 
         activeMemberPackage() {
@@ -482,12 +570,12 @@ function membersData() {
             
             // Validate form
             if (!this.form.name || this.form.name.trim() === '') {
-                showToast('Name is required', 'error');
+                this.showErrorMessage('Nama wajib diisi.');
                 return;
             }
             
             if (this.form.name.trim().length < 3) {
-                showToast('Name must be at least 3 characters', 'error');
+                this.showErrorMessage('Nama minimal 3 karakter.');
                 return;
             }
             
@@ -495,7 +583,7 @@ function membersData() {
                 // Basic phone validation
                 const phoneRegex = /^[0-9\s\-\+\(\)]+$/;
                 if (!phoneRegex.test(this.form.phone)) {
-                    showToast('Invalid phone number format', 'error');
+                    this.showErrorMessage('Format nomor telepon tidak valid.');
                     return;
                 }
             }
@@ -525,7 +613,7 @@ function membersData() {
                         await this.loadMembers();
                     }
                     
-                    showToast('✓ Member updated successfully', 'success');
+                    this.showSuccessMessage('Member berhasil diperbarui.');
                 } else {
                     response = await API.post('/admin/members', this.form);
                     
@@ -535,14 +623,14 @@ function membersData() {
                     }
                     
                     this.members.unshift(response.data);
-                    showToast('✓ Member added successfully', 'success');
+                    this.showSuccessMessage('Member berhasil ditambahkan.');
                 }
                 
                 this.closeModal();
             } catch (error) {
                 console.error('Failed to save member:', error);
-                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to save member';
-                showToast(errorMsg, 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal menyimpan member.';
+                this.showErrorMessage(errorMsg);
             } finally {
                 this.saving = false;
             }
@@ -551,7 +639,7 @@ function membersData() {
         confirmToggle(member) {
             // Validate member
             if (!member || !member.id) {
-                showToast('Invalid member data', 'error');
+                this.showErrorMessage('Data member tidak valid.');
                 return;
             }
             
@@ -562,14 +650,14 @@ function membersData() {
         async toggleMember() {
             // Validate member
             if (!this.memberToToggle || !this.memberToToggle.id) {
-                showToast('Invalid member data', 'error');
+                this.showErrorMessage('Data member tidak valid.');
                 this.showToggleConfirm = false;
                 return;
             }
             
             // Prevent double-submit
             if (this.toggling) {
-                showToast('Operation in progress...', 'warning');
+                this.showErrorMessage('Operasi sedang berlangsung...');
                 return;
             }
             
@@ -580,10 +668,10 @@ function membersData() {
                 
                 if (isInactive) {
                     await API.post(`/admin/members/${this.memberToToggle.id}/restore`);
-                    showToast('✓ Member activated successfully', 'success');
+                    this.showSuccessMessage('Member berhasil diaktifkan.');
                 } else {
                     await API.delete(`/admin/members/${this.memberToToggle.id}`);
-                    showToast('✓ Member deactivated successfully', 'success');
+                    this.showSuccessMessage('Member berhasil dinonaktifkan.');
                 }
 
                 // Reload members list
@@ -598,8 +686,8 @@ function membersData() {
                 this.memberToToggle = null;
             } catch (error) {
                 console.error('Failed to toggle member:', error);
-                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to update member status';
-                showToast(errorMsg, 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal mengubah status member.';
+                this.showErrorMessage(errorMsg);
             } finally {
                 this.toggling = false;
             }

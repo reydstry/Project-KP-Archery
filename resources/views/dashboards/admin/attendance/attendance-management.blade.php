@@ -38,8 +38,8 @@
                     </div>
                     <div class="grid grid-cols-2 gap-3 w-full lg:w-auto">
                         <div class="text-center px-4 py-3 bg-slate-50 rounded-xl border border-slate-200">
-                            <p class="text-2xl font-bold text-green-600" id="presentCount">0</p>
-                            <p class="text-sm text-green-700 font-semibold">Member Hadir</p>
+                            <p class="text-2xl font-bold text-[#1a307b]" id="presentCount">0</p>
+                            <p class="text-sm text-[#2a4a9f] font-semibold">Member Hadir</p>
                         </div>
                         <div class="text-center px-4 py-3 bg-slate-50 rounded-xl border border-slate-200">
                             <p class="text-2xl font-bold text-slate-600" id="totalCount">0</p>
@@ -88,6 +88,58 @@
         </div>
     </div>
 </div>
+
+<!-- Success Modal -->
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 backdrop-blur-sm" style="display: none;">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform transition-all" id="successModalContent">
+        <div class="text-center">
+            <!-- Success Icon -->
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            
+            <!-- Title -->
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Berhasil Disimpan!</h3>
+            
+            <!-- Message -->
+            <p class="text-slate-600 mb-6">Attendance berhasil diperbarui.</p>
+            
+            <!-- Button -->
+            <button onclick="closeSuccessModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                Oke, Mengerti
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modalFadeIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.95) translateY(-10px);
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0);
+    }
+}
+
+#successModal.show {
+    display: flex !important;
+    animation: fadeIn 0.2s ease-out;
+}
+
+#successModal.show #successModalContent {
+    animation: modalFadeIn 0.3s ease-out;
+}
+</style>
 
 <script>
 let currentSessionId = null;
@@ -294,7 +346,7 @@ function renderParticipants(filteredParticipants = participants) {
                     <p class="text-xs text-slate-600 mt-1">ID: ${p.member_id}</p>
                 </div>
                 <button onclick="toggleMemberStatus(${originalIndex})"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 ${isPresent ? 'bg-green-600 hover:bg-green-700' : 'bg-slate-200 hover:bg-slate-300 text-slate-700'} text-white rounded-lg text-xs font-bold transition-all">
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 ${isPresent ? 'bg-[#1a307b] hover:bg-[#152866] text-white' : 'bg-slate-200 hover:bg-slate-300 text-slate-700'} rounded-lg text-xs font-bold transition-all">
                     ${isPresent ? 'Hadir' : 'Tidak Hadir'}
                 </button>
             </div>
@@ -346,7 +398,7 @@ function saveAttendance() {
         member_ids: presentIds,
     })
     .then(() => {
-        showNotification('Attendance berhasil disimpan.', 'success');
+        showSuccessModal();
         loadAttendanceData(currentSessionId, currentSlotId);
     })
     .catch((error) => {
@@ -356,6 +408,24 @@ function saveAttendance() {
         saveBtn.disabled = false;
         saveBtn.textContent = originalText;
     });
+}
+
+function showSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('show');
+        modal.style.display = 'flex';
+    }
+}
+
+function closeSuccessModal() {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.classList.remove('show');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+    }
 }
 
 function formatIndonesianDate(dateString) {

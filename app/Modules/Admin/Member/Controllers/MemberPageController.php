@@ -8,11 +8,11 @@ class MemberPageController extends Controller
 {
     public function index()
     {
-        return view('admin.member.members');
+        return view('dashboards.admin.member.members');
     }
 
     public function packages()
     {
-        return view('admin.member.member-packages');
+        return view('dashboards.admin.member.member-packages');
     }
 }
