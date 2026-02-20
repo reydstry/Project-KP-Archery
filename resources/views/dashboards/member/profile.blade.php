@@ -1,9 +1,130 @@
-@extends('layouts.member')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Profil Saya - FocusOneX Archery</title>
 
-@section('title', 'Profil Saya')
-@section('subtitle', 'Kelola informasi profil dan akun Anda')
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-@section('content')
+    <style>
+        [x-cloak] { display: none !important; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card-animate { animation: slideIn 0.5s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+
+    <!-- Toast Notifications -->
+    <div x-data="toastManager()" @show-toast.window="show($event.detail)" class="fixed top-4 right-4 z-[100] space-y-2">
+        <template x-for="toast in toasts" :key="toast.id">
+            <div x-show="toast.visible" x-transition class="min-w-[320px] bg-white rounded-xl shadow-2xl border-l-4 p-4 flex items-start gap-3"
+                 :class="{
+                     'border-green-500': toast.type === 'success',
+                     'border-red-500': toast.type === 'error',
+                     'border-amber-500': toast.type === 'warning',
+                     'border-blue-500': toast.type === 'info'
+                 }">
+                <div class="mt-0.5">
+                    <svg class="w-5 h-5" :class="{
+                        'text-green-500': toast.type === 'success',
+                        'text-red-500': toast.type === 'error',
+                        'text-amber-500': toast.type === 'warning',
+                        'text-blue-500': toast.type === 'info'
+                    }" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path x-show="toast.type === 'success'" stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path x-show="toast.type === 'error'" stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        <path x-show="toast.type === 'warning'" stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        <path x-show="toast.type === 'info'" stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-slate-800" x-text="toast.message"></p>
+                </div>
+                <button @click="remove(toast.id)" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </template>
+    </div>
+
+    <!-- Top Navbar -->
+    <nav class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-40">
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center gap-3">
+                    <img src="{{ asset('asset/img/logofocus.png') }}" alt="FocusOneX" class="h-10">
+                    <p class="text-sm font-bold text-slate-800">Dashboard Member</p>
+                </div>
+
+                <!-- User Menu -->
+                <div x-data="{ open: false }" class="relative">
+                    <button @click="open = !open" class="flex items-center gap-3 px-4 py-2 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name }}</p>
+                            <p class="text-xs text-slate-500">Member</p>
+                        </div>
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
+                            <span>{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform" :class="open && 'rotate-180'" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown -->
+                    <div x-show="open" @click.away="open = false" x-transition
+                         class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-slate-200 py-2">
+                        <div class="px-4 py-3 border-b border-slate-100">
+                            <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name }}</p>
+                            <p class="text-xs text-slate-500">{{ auth()->user()->email }}</p>
+                        </div>
+
+                        <a href="{{ route('member.profile') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                            </svg>
+                            Edit Profile
+                        </a>
+
+                        <div class="border-t border-slate-100 my-1"></div>
+
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Back Button -->
+        <div class="mb-6">
+            <a href="{{ route('member.dashboard') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all text-slate-700 hover:text-blue-600 font-semibold">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+                </svg>
+                <span>Kembali ke Dashboard</span>
+            </a>
+        </div>
+
 <div x-data="profileData()" x-init="init(); fetchProfile();">
 
     <!-- Loading State -->
@@ -149,35 +270,23 @@
                     </h3>
 
                     <div class="space-y-3">
-                        <div class="p-4 bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm text-slate-600">Total Booking</span>
-                                <span class="text-2xl font-bold text-blue-600" x-text="stats.total_bookings || 0"></span>
-                            </div>
-                            <div class="w-full bg-slate-200 rounded-full h-2">
-                                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style="width: 100%"></div>
-                            </div>
-                        </div>
-
                         <div class="p-4 bg-gradient-to-br from-green-50 to-slate-50 rounded-xl">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-sm text-slate-600">Hadir</span>
                                 <span class="text-2xl font-bold text-green-600" x-text="stats.total_attended || 0"></span>
                             </div>
                             <div class="w-full bg-slate-200 rounded-full h-2">
-                                <div class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full"
-                                     :style="`width: ${stats.total_bookings ? (stats.total_attended / stats.total_bookings * 100) : 0}%`"></div>
+                                <div class="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full" style="width: 100%"></div>
                             </div>
                         </div>
 
-                        <div class="p-4 bg-gradient-to-br from-amber-50 to-slate-50 rounded-xl">
+                        <div class="p-4 bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm text-slate-600">Prestasi</span>
-                                <span class="text-2xl font-bold text-amber-600" x-text="stats.total_achievements || 0"></span>
+                                <span class="text-sm text-slate-600">Total Anggota Keluarga</span>
+                                <span class="text-2xl font-bold text-blue-600" x-text="stats.total_members || 1"></span>
                             </div>
                             <div class="w-full bg-slate-200 rounded-full h-2">
-                                <div class="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full"
-                                     :style="`width: ${Math.min(stats.total_achievements * 10, 100)}%`"></div>
+                                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style="width: 80%"></div>
                             </div>
                         </div>
                     </div>
@@ -187,38 +296,104 @@
                 <div class="card-animate bg-gradient-to-br from-slate-800 via-slate-700 to-slate-800 rounded-2xl shadow-lg p-6 text-white" style="animation-delay: 0.2s">
                     <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
                     <div class="space-y-2">
-                        <a href="{{ route('member.bookings.create') }}"
+                        <a href="{{ route('member.dashboard') }}"
                            class="block px-4 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all">
                             <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                                <span class="font-semibold">Booking Sesi Baru</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                                <span class="font-semibold">Kembali ke Dashboard</span>
                             </div>
                         </a>
 
-                        <a href="{{ route('member.bookings') }}"
+                        <a href="https://wa.me/6281234567890?text=Halo, saya ingin booking sesi latihan" target="_blank"
                            class="block px-4 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all">
                             <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                                <span class="font-semibold">Lihat Booking</span>
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                                </svg>
+                                <span class="font-semibold">Booking via WhatsApp</span>
                             </div>
                         </a>
 
-                        <a href="{{ route('member.achievements') }}"
-                           class="block px-4 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all">
+                        <button @click="editMode = !editMode"
+                                class="w-full px-4 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl transition-all">
                             <div class="flex items-center gap-3">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0"/></svg>
-                                <span class="font-semibold">Prestasi Saya</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/></svg>
+                                <span class="font-semibold" x-text="editMode ? 'Batal Edit' : 'Edit Profil'"></span>
                             </div>
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    </div>
 
-@push('scripts')
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-16 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-sm text-slate-600">
+                <p>&copy; 2026 FocusOneX Archery. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
 <script>
+// Toast Manager
+function toastManager() {
+    return {
+        toasts: [],
+        nextId: 1,
+        show(detail) {
+            const id = this.nextId++;
+            const toast = {
+                id,
+                message: detail.message || 'Notification',
+                type: detail.type || 'info',
+                visible: true
+            };
+            this.toasts.push(toast);
+            setTimeout(() => this.remove(id), 5000);
+        },
+        remove(id) {
+            const index = this.toasts.findIndex(t => t.id === id);
+            if (index > -1) {
+                this.toasts[index].visible = false;
+                setTimeout(() => {
+                    this.toasts.splice(index, 1);
+                }, 300);
+            }
+        }
+    }
+}
+
+window.showToast = (message, type = 'info') => {
+    window.dispatchEvent(new CustomEvent('show-toast', {
+        detail: { message, type }
+    }));
+};
+
+// Auto-refresh CSRF token every 60 minutes to prevent expiry
+setInterval(() => {
+    fetch('/api/me', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
+        },
+        credentials: 'same-origin'
+    }).then(response => {
+        if (response.status === 419) {
+            showToast('Session expired, silakan login kembali', 'error');
+            setTimeout(() => window.location.href = '/login', 2000);
+        }
+    }).catch(console.error);
+}, 60 * 60 * 1000); // Every 60 minutes
+
+// Handle form resubmission (back button after POST)
+if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_BACK_FORWARD) {
+    window.location.reload();
+}
+
 function profileData() {
     return {
         loading: true,
@@ -270,9 +445,8 @@ function profileData() {
                 };
 
                 this.stats = {
-                    total_bookings: 25,
                     total_attended: 20,
-                    total_achievements: 5
+                    total_members: 3
                 };
 
                 this.resetForm();
@@ -342,6 +516,5 @@ function profileData() {
     }
 }
 </script>
-@endpush
-
-@endsection
+</body>
+</html>
