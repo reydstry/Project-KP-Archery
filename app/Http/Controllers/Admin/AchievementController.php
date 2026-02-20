@@ -4,18 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Achievement;
+use App\Services\Admin\ContentManagementService;
 use Illuminate\Http\Request;
 
 class AchievementController extends Controller
 {
+    public function __construct(
+        private readonly ContentManagementService $contentManagementService,
+    ) {
+    }
+
     public function index()
     {
-        $achievements = Achievement::query()
-            ->orderBy('date', 'desc')
-            ->orderBy('id', 'desc')
-            ->paginate(10);
-
-        return response()->json($achievements);
+        return response()->json($this->contentManagementService->listAchievements());
     }
 
     public function store(Request $request)
@@ -38,18 +39,7 @@ class AchievementController extends Controller
             ], 422);
         }
 
-        if ($validated['type'] === 'club') {
-            $validated['member_id'] = null;
-        }
-
-        // Handle photo upload
-        if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('achievements', 'public');
-            $validated['photo_path'] = $path;
-        }
-
-        unset($validated['photo']);
-        $achievement = Achievement::create($validated);
+        $achievement = $this->contentManagementService->createAchievement($validated, $request->file('photo'));
 
         return response()->json([
             'message' => 'Achievement created successfully',
@@ -87,37 +77,17 @@ class AchievementController extends Controller
             ], 422);
         }
 
-        if ($type === 'club') {
-            $validated['member_id'] = null;
-        }
-
-        // Handle photo upload
-        if ($request->hasFile('photo')) {
-            // Delete old photo if exists
-            if ($achievement->photo_path && \Storage::disk('public')->exists($achievement->photo_path)) {
-                \Storage::disk('public')->delete($achievement->photo_path);
-            }
-            $path = $request->file('photo')->store('achievements', 'public');
-            $validated['photo_path'] = $path;
-        }
-
-        unset($validated['photo']);
-        $achievement->update($validated);
+        $achievement = $this->contentManagementService->updateAchievement($achievement, $validated, $request->file('photo'));
 
         return response()->json([
             'message' => 'Achievement updated successfully',
-            'data' => $achievement->fresh(),
+            'data' => $achievement,
         ]);
     }
 
     public function destroy(Achievement $achievement)
     {
-        // Delete photo if exists
-        if ($achievement->photo_path && \Storage::disk('public')->exists($achievement->photo_path)) {
-            \Storage::disk('public')->delete($achievement->photo_path);
-        }
-
-        $achievement->delete();
+        $this->contentManagementService->deleteAchievement($achievement);
 
         return response()->json([
             'message' => 'Achievement deleted successfully',

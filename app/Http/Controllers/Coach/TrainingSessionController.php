@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\Coach;
 
+use App\Enums\StatusMember;
 use App\Enums\TrainingSessionStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Attendance;
 use App\Models\Coach;
+use App\Models\Member;
 use App\Models\TrainingSession;
 use App\Models\TrainingSessionSlot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class TrainingSessionController extends Controller
 {
@@ -47,6 +51,11 @@ class TrainingSessionController extends Controller
             ->exists();
     }
 
+    private function authenticatedCoach(): ?Coach
+    {
+        return Coach::query()->where('user_id', auth()->id())->first();
+    }
+
     /**
      * Display a listing of training sessions for the authenticated coach
      */
@@ -63,12 +72,9 @@ class TrainingSessionController extends Controller
 
         $this->autoCloseCoachSessionsIfNeeded($coach);
 
-        $query = TrainingSession::with(['slots.sessionTime', 'slots.coaches', 'slots.confirmedBookings.memberPackage.member']);
+        $query = TrainingSession::with(['slots.sessionTime', 'slots.coaches', 'attendances.member']);
 
-        $forBooking = $request->boolean('for_booking', false);
-        if (!$forBooking) {
-            $query->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id));
-        }
+        $query->whereHas('slots.coaches', fn ($q) => $q->where('coaches.id', $coach->id));
 
         // Filter by status if provided
         if ($request->has('status')) {
@@ -177,9 +183,7 @@ class TrainingSessionController extends Controller
     {
         // Verify coach owns this session
         $coach = Coach::where('user_id', auth()->id())->first();
-        $forBooking = request()->boolean('for_booking', false);
-
-        if (!$forBooking && !$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
             return response()->json([
                 'message' => 'Unauthorized',
             ], 403);
@@ -190,7 +194,7 @@ class TrainingSessionController extends Controller
         return response()->json($trainingSession->load([
             'slots.sessionTime',
             'slots.coaches',
-            'slots.confirmedBookings.memberPackage.member',
+            'attendances.member',
         ]));
     }
 
@@ -232,7 +236,7 @@ class TrainingSessionController extends Controller
             'data' => $trainingSession->fresh()->load([
                 'slots.sessionTime',
                 'slots.coaches',
-                'slots.confirmedBookings.memberPackage.member',
+                'attendances.member',
             ]),
         ]);
     }
@@ -280,7 +284,7 @@ class TrainingSessionController extends Controller
             'data' => $trainingSession->fresh()->load([
                 'slots.sessionTime',
                 'slots.coaches',
-                'slots.confirmedBookings.memberPackage.member',
+                'attendances.member',
             ]),
         ]);
     }
@@ -379,7 +383,7 @@ class TrainingSessionController extends Controller
 
     /**
      * Delete a training session (day) and its slots.
-     * Guard: only allowed when there are no bookings.
+        * Guard: only allowed when there are no attendance records.
      */
     public function destroy(TrainingSession $trainingSession)
     {
@@ -391,10 +395,10 @@ class TrainingSessionController extends Controller
             ], 403);
         }
 
-        $hasBookings = $trainingSession->bookings()->exists();
-        if ($hasBookings) {
+        $hasAttendances = $trainingSession->attendances()->exists();
+        if ($hasAttendances) {
             return response()->json([
-                'message' => 'Cannot delete session that already has bookings',
+                'message' => 'Cannot delete session that already has attendance records',
             ], 422);
         }
 
@@ -402,6 +406,142 @@ class TrainingSessionController extends Controller
 
         return response()->json([
             'message' => 'Training session deleted successfully',
+        ]);
+    }
+
+    public function activeMembers(Request $request)
+    {
+        $coach = $this->authenticatedCoach();
+
+        if (!$coach) {
+            return response()->json([
+                'message' => 'Coach profile not found',
+            ], 404);
+        }
+
+        $search = (string) $request->query('search', '');
+        $limit = max(1, min(300, (int) $request->query('limit', 200)));
+
+        $query = Member::query()
+            ->where('is_active', true)
+            ->where('status', StatusMember::STATUS_ACTIVE->value)
+            ->orderBy('name');
+
+        if ($search !== '') {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery
+                    ->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('phone', 'like', '%' . $search . '%');
+            });
+        }
+
+        return response()->json([
+            'data' => $query->limit($limit)->get(['id', 'name', 'phone', 'status', 'is_active']),
+        ]);
+    }
+
+    public function attendances(TrainingSession $trainingSession)
+    {
+        $coach = $this->authenticatedCoach();
+
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+        $attendances = Attendance::query()
+            ->with(['member:id,name,phone,status,is_active'])
+            ->where('session_id', $trainingSession->id)
+            ->latest('id')
+            ->get(['id', 'session_id', 'member_id', 'created_at']);
+
+        return response()->json([
+            'session' => [
+                'id' => $trainingSession->id,
+                'date' => $trainingSession->date,
+                'status' => $trainingSession->status?->value,
+            ],
+            'attendances' => $attendances,
+        ]);
+    }
+
+    public function syncAttendances(Request $request, TrainingSession $trainingSession)
+    {
+        $coach = $this->authenticatedCoach();
+
+        if (!$this->isCoachAssignedToAnySlot($coach, $trainingSession)) {
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'session_id' => ['required', 'integer', 'in:' . $trainingSession->id],
+            'member_ids' => ['required', 'array'],
+            'member_ids.*' => ['required', 'integer', 'distinct', 'exists:members,id'],
+        ]);
+
+        $memberIds = collect($validated['member_ids'])
+            ->map(fn ($id) => (int) $id)
+            ->filter()
+            ->unique()
+            ->values();
+
+        $activeMembers = Member::query()
+            ->whereIn('id', $memberIds)
+            ->where('is_active', true)
+            ->where('status', StatusMember::STATUS_ACTIVE->value)
+            ->pluck('id');
+
+        $invalidMemberIds = $memberIds->diff($activeMembers)->values();
+        if ($invalidMemberIds->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'member_ids' => [
+                    'Hanya member ACTIVE yang dapat dicatat kehadirannya.',
+                    'Member tidak valid: ' . $invalidMemberIds->implode(', '),
+                ],
+            ]);
+        }
+
+        $existingMemberIds = Attendance::query()
+            ->where('session_id', $trainingSession->id)
+            ->pluck('member_id')
+            ->map(fn ($id) => (int) $id);
+
+        $toDelete = $existingMemberIds->diff($memberIds)->values();
+        $toInsert = $memberIds->diff($existingMemberIds)->values();
+
+        DB::transaction(function () use ($trainingSession, $toDelete, $toInsert) {
+            if ($toDelete->isNotEmpty()) {
+                Attendance::query()
+                    ->where('session_id', $trainingSession->id)
+                    ->whereIn('member_id', $toDelete)
+                    ->delete();
+            }
+
+            if ($toInsert->isNotEmpty()) {
+                $now = now();
+                $rows = $toInsert->map(fn ($memberId) => [
+                    'session_id' => $trainingSession->id,
+                    'member_id' => $memberId,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ])->all();
+
+                DB::table('attendances')->insert($rows);
+            }
+        });
+
+        return response()->json([
+            'message' => 'Attendance berhasil diperbarui.',
+            'data' => [
+                'session_id' => $trainingSession->id,
+                'present_count' => $memberIds->count(),
+                'inserted_count' => $toInsert->count(),
+                'deleted_count' => $toDelete->count(),
+                'member_ids' => $memberIds->all(),
+            ],
         ]);
     }
 }

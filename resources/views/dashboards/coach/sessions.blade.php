@@ -122,11 +122,7 @@ function renderSessions(sessions) {
         const dateStr = (session.date || '').toString().slice(0, 10);
         const status = (session.status || '').toLowerCase();
         const slots = Array.isArray(session.slots) ? session.slots : [];
-        const bookingsCount = slots.reduce((sum, slot) => {
-            const bookings = Array.isArray(slot.confirmed_bookings) ? slot.confirmed_bookings : [];
-            return sum + bookings.length;
-        }, 0);
-        const hasBookings = bookingsCount > 0;
+        const attendanceCount = Array.isArray(session.attendances) ? session.attendances.length : 0;
 
         return `
             <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
@@ -137,7 +133,7 @@ function renderSessions(sessions) {
                         <div class="mt-2 inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${statusClass[status] || statusClass.closed}">${(session.status || 'unknown').toUpperCase()}</div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button type="button" onclick="deleteSession(${session.id}, ${hasBookings})" class="p-2 rounded-lg ${hasBookings ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-[#d12823] text-white hover:bg-[#b8231f]'}" ${hasBookings ? 'disabled' : ''} title="${hasBookings ? 'Tidak dapat dihapus karena ada booking' : 'Hapus sesi'}">
+                        <button type="button" onclick="deleteSession(${session.id})" class="p-2 rounded-lg bg-[#d12823] text-white hover:bg-[#b8231f]" title="Hapus sesi">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                         </button>
                         <a href="/coach/sessions/${session.id}/edit" class="p-2 rounded-lg bg-[#1a307b] text-white hover:bg-[#162a69]" title="Edit sesi">
@@ -146,11 +142,10 @@ function renderSessions(sessions) {
                     </div>
                 </div>
                 <div class="p-4 space-y-2">
-                    <div class="text-xs text-slate-600">${slots.length} slot • ${bookingsCount} booking</div>
+                    <div class="text-xs text-slate-600">${slots.length} slot • ${attendanceCount} kehadiran</div>
                     ${slots.length ? slots.map(slot => {
                         const st = slot.session_time || slot.sessionTime || {};
-                        const bookings = Array.isArray(slot.confirmed_bookings) ? slot.confirmed_bookings.length : (Array.isArray(slot.confirmedBookings) ? slot.confirmedBookings.length : 0);
-                        return `<div class="px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between gap-2"><div><p class="text-sm font-semibold text-slate-800">${escapeHtml(st.name || 'Slot')}</p><p class="text-xs text-slate-600">${escapeHtml(st.start_time || '')}${st.start_time && st.end_time ? ' - ' : ''}${escapeHtml(st.end_time || '')}</p></div><p class="text-xs font-semibold text-slate-700">${bookings}/${slot.max_participants ?? '-'}</p></div>`;
+                        return `<div class="px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between gap-2"><div><p class="text-sm font-semibold text-slate-800">${escapeHtml(st.name || 'Slot')}</p><p class="text-xs text-slate-600">${escapeHtml(st.start_time || '')}${st.start_time && st.end_time ? ' - ' : ''}${escapeHtml(st.end_time || '')}</p></div><p class="text-xs font-semibold text-slate-700">${attendanceCount}/${slot.max_participants ?? '-'}</p></div>`;
                     }).join('') : '<div class="px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600">Belum ada slot.</div>'}
 
                     <button type="button" onclick="toggleSessionDetails(${session.id})" class="w-full mt-2 px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-2">
@@ -159,7 +154,7 @@ function renderSessions(sessions) {
                     </button>
 
                     <div id="detailSection-${session.id}" class="hidden mt-2 border border-slate-200 rounded-lg bg-slate-50 p-3 space-y-3">
-                        ${renderSessionDetails(session.id, slots)}
+                        ${renderSessionDetails(session, slots)}
                     </div>
                 </div>
             </div>
@@ -167,7 +162,7 @@ function renderSessions(sessions) {
     }).join('');
 }
 
-function renderSessionDetails(sessionId, slots) {
+function renderSessionDetails(session, slots) {
     if (!slots.length) {
         return '<p class="text-xs text-slate-500">Belum ada data slot.</p>';
     }
@@ -175,13 +170,14 @@ function renderSessionDetails(sessionId, slots) {
     return slots.map(slot => {
         const st = slot.session_time || slot.sessionTime || {};
         const coaches = Array.isArray(slot.coaches) ? slot.coaches : [];
-        const rawBookings = Array.isArray(slot.confirmed_bookings) ? slot.confirmed_bookings : (Array.isArray(slot.confirmedBookings) ? slot.confirmedBookings : []);
-        const members = rawBookings.map((booking) => {
-            const member = booking?.member_package?.member || booking?.memberPackage?.member || {};
-            return member?.name ? escapeHtml(member.name) : null;
-        }).filter(Boolean);
-        const slotBubbleId = `slotDetail-${sessionId}-${slot.id}`;
-        const slotBubbleIconId = `slotDetailIcon-${sessionId}-${slot.id}`;
+        const members = Array.isArray(session.attendances)
+            ? session.attendances.map((attendance) => {
+                const member = attendance?.member || {};
+                return member?.name ? escapeHtml(member.name) : null;
+            }).filter(Boolean)
+            : [];
+        const slotBubbleId = `slotDetail-${session.id}-${slot.id}`;
+        const slotBubbleIconId = `slotDetailIcon-${session.id}-${slot.id}`;
 
         return `
             <div class="rounded-xl border border-slate-200 bg-white overflow-hidden">
@@ -230,11 +226,7 @@ function toggleSessionDetails(sessionId) {
     icon.classList.toggle('rotate-180');
 }
 
-function deleteSession(sessionId, hasBookings = false) {
-    if (hasBookings) {
-        window.showToast('Sesi tidak bisa dihapus karena masih memiliki booking', 'error');
-        return;
-    }
+function deleteSession(sessionId) {
     sessionToDelete = sessionId;
     const target = allSessions.find(s => Number(s.id) === Number(sessionId));
     const dateStr = (target?.date || '').toString().slice(0, 10);

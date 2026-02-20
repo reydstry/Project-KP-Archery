@@ -4,18 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
+use App\Services\Admin\ContentManagementService;
 use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {
+    public function __construct(
+        private readonly ContentManagementService $contentManagementService,
+    ) {
+    }
+
     public function index()
     {
-        $news = News::query()
-            ->orderBy('publish_date', 'desc')
-            ->orderBy('id', 'desc')
-            ->paginate(10);
-
-        return response()->json($news);
+        return response()->json($this->contentManagementService->listNews());
     }
 
     public function store(Request $request)
@@ -27,14 +28,7 @@ class NewsController extends Controller
             'photo' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120',
         ]);
 
-        // Handle photo upload
-        if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('news', 'public');
-            $validated['photo_path'] = $path;
-        }
-
-        unset($validated['photo']);
-        $news = News::create($validated);
+        $news = $this->contentManagementService->createNews($validated, $request->file('photo'));
 
         return response()->json([
             'message' => 'News created successfully',
@@ -58,33 +52,17 @@ class NewsController extends Controller
             'photo' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:5120',
         ]);
 
-        // Handle photo upload
-        if ($request->hasFile('photo')) {
-            // Delete old photo if exists
-            if ($news->photo_path && \Storage::disk('public')->exists($news->photo_path)) {
-                \Storage::disk('public')->delete($news->photo_path);
-            }
-            $path = $request->file('photo')->store('news', 'public');
-            $validated['photo_path'] = $path;
-        }
-
-        unset($validated['photo']);
-        $news->update($validated);
+        $news = $this->contentManagementService->updateNews($news, $validated, $request->file('photo'));
 
         return response()->json([
             'message' => 'News updated successfully',
-            'data' => $news->fresh(),
+            'data' => $news,
         ]);
     }
 
     public function destroy(News $news)
     {
-        // Delete photo if exists
-        if ($news->photo_path && \Storage::disk('public')->exists($news->photo_path)) {
-            \Storage::disk('public')->delete($news->photo_path);
-        }
-
-        $news->delete();
+        $this->contentManagementService->deleteNews($news);
 
         return response()->json([
             'message' => 'News deleted successfully',

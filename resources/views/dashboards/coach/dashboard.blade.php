@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="flex items-center gap-4 shrink-0">
                                     <p class="text-sm font-semibold text-slate-700">
-                                        <span class="text-[#1a307b]" x-text="slot.total_bookings || 0"></span>
+                                        <span class="text-[#1a307b]" x-text="slot.total_attendances || 0"></span>
                                         /
                                         <span x-text="slot.capacity || 0"></span>
                                     </p>
@@ -94,10 +94,6 @@
                                             <p class="text-xs text-slate-700 px-2 py-1 rounded bg-white border border-slate-200" x-text="member.name"></p>
                                         </template>
                                     </div>
-                                </div>
-
-                                <div class="pt-2 flex justify-end">
-                                    <a :href="`/coach/sessions/${slot.training_session_id}/edit`" class="px-4 py-2 bg-[#1a307b] hover:bg-[#152866] text-white text-sm font-semibold rounded-lg transition">Edit Session</a>
                                 </div>
                             </div>
                         </div>

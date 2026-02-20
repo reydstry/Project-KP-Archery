@@ -40,24 +40,4 @@ class TrainingSessionSlot extends Model
         return $this->belongsToMany(Coach::class, 'training_session_slot_coach')
             ->withTimestamps();
     }
-
-    public function bookings()
-    {
-        return $this->hasMany(SessionBooking::class);
-    }
-
-    public function confirmedBookings()
-    {
-        return $this->bookings()->where('status', 'confirmed');
-    }
-
-    public function getCurrentParticipantsAttribute(): int
-    {
-        return $this->confirmedBookings()->count();
-    }
-
-    public function isFull(): bool
-    {
-        return $this->current_participants >= $this->max_participants;
-    }
 }

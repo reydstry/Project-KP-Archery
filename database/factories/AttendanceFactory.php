@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Attendance;
-use App\Models\SessionBooking;
-use App\Models\User;
+use App\Models\Member;
+use App\Models\TrainingSession;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AttendanceFactory extends Factory
@@ -14,25 +14,8 @@ class AttendanceFactory extends Factory
     public function definition(): array
     {
         return [
-            'session_booking_id' => SessionBooking::factory(),
-            'status' => 'present',
-            'validated_by' => User::factory(),
-            'validated_at' => now(),
-            'notes' => null,
+            'session_id' => TrainingSession::factory(),
+            'member_id' => Member::factory(),
         ];
-    }
-
-    public function absent(): self
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'absent',
-        ]);
-    }
-
-    public function withNotes(string $notes): self
-    {
-        return $this->state(fn (array $attributes) => [
-            'notes' => $notes,
-        ]);
     }
 }

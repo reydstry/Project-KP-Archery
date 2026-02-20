@@ -88,10 +88,10 @@
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>Keanggotaan</span>
                     </a>
-                    <a href="{{ route('member.bookings') }}" @click="if(isMobile) sidebarOpen = false"
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('member.bookings*') ? 'bg-[#1a307b] text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
+                          <a href="{{ route('member.membership') }}" @click="if(isMobile) sidebarOpen = false"
+                              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('member.membership') ? 'bg-[#1a307b] text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                        <span>Bookings</span>
+                        <span>Keanggotaan</span>
                     </a>
                     <a href="{{ route('member.achievements') }}" @click="if(isMobile) sidebarOpen = false"
                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('member.achievements') ? 'bg-[#1a307b] text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">

@@ -47,12 +47,9 @@ class TrainingSession extends Model
         return $this->hasMany(TrainingSessionSlot::class);
     }
 
-    /**
-     * Bookings across all slots
-     */
-    public function bookings()
+    public function attendances()
     {
-        return $this->hasManyThrough(SessionBooking::class, TrainingSessionSlot::class);
+        return $this->hasMany(Attendance::class, 'session_id');
     }
 
     /**

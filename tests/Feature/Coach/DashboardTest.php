@@ -21,18 +21,19 @@ class DashboardTest extends TestCase
         $coachProfile = Coach::factory()->create(['user_id' => $coachUser->id]);
 
         $trainingSession = TrainingSession::create([
-            'coach_id' => $coachProfile->id,
+            'created_by' => $coachUser->id,
             'date' => now()->toDateString(),
             'status' => TrainingSessionStatus::OPEN->value,
         ]);
 
         $sessionTimes = SessionTime::factory()->count(2)->create();
         foreach ($sessionTimes as $sessionTime) {
-            TrainingSessionSlot::create([
+            $slot = TrainingSessionSlot::create([
                 'training_session_id' => $trainingSession->id,
                 'session_time_id' => $sessionTime->id,
                 'max_participants' => 10,
             ]);
+            $slot->coaches()->attach($coachProfile->id);
         }
 
         $response = $this->actingAs($coachUser, 'sanctum')

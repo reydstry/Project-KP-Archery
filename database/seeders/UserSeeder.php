@@ -10,60 +10,84 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-class UserSeeder extends Seeder
+class TedSeeder extends Seeder
 {
   public function run(): void
   {
-    $admin = User::updateOrCreate(
-      ['email' => 'admin@panahan.com'],
-      [
-        'name' => 'Admin Club Panahan',
-        'password' => Hash::make('password'),
-        'role' => UserRoles::ADMIN,
-        'phone' => '081234567890',
-      ]
+    User::firstOrCreate(
+        ['email' => 'admin@clubpanahan.com'],
+        [
+            'name' => 'Admin Club Panahan',
+            'role' => UserRoles::ADMIN->value,
+            'phone' => '081234567890',
+            'password' => Hash::make('admin123'),
+        ]
     );
 
-    $coachUser = User::updateOrCreate(
-      ['email' => 'coach@panahan.com'],
+    User::firstOrCreate(
+      ['email' => 'coach@clubpanahan.com'],
       [
         'name' => 'Coach Budi',
         'password' => Hash::make('password'),
-        'role' => UserRoles::COACH,
+        'role' => UserRoles::COACH->value,
         'phone' => '081234567891',
       ]
     );
 
-    Coach::updateOrCreate(
-      ['user_id' => $coachUser->id],
-      [
-        'name' => $coachUser->name,
-        'phone' => $coachUser->phone,
-      ]
-    );
+    $defaultSessionTimes = [
+        ['name' => 'Sesi 1', 'start_time' => '07:30:00', 'end_time' => '09:00:00'],
+        ['name' => 'Sesi 2', 'start_time' => '09:00:00', 'end_time' => '10:30:00'],
+        ['name' => 'Sesi 3', 'start_time' => '10:30:00', 'end_time' => '12:00:00'],
+        ['name' => 'Sesi 4', 'start_time' => '13:30:00', 'end_time' => '15:00:00'],
+        ['name' => 'Sesi 5', 'start_time' => '15:00:00', 'end_time' => '16:30:00'],
+        ['name' => 'Sesi 6', 'start_time' => '16:30:00', 'end_time' => '18:00:00'],
+    ];
 
-    $memberUser = User::updateOrCreate(
-      ['email' => 'member@panahan.com'],
-      [
-        'name' => 'Member Dummy',
-        'password' => Hash::make('password'),
-        'role' => UserRoles::MEMBER,
-        'phone' => '081234567892',
-      ]
-    );
+    foreach ($defaultSessionTimes as $sessionTimeData) {
+        SessionTime::firstOrCreate(
+            ['name' => $sessionTimeData['name']],
+            array_merge($sessionTimeData, ['is_active' => true])
+        );
+    }
 
-    Member::updateOrCreate(
-      ['user_id' => $memberUser->id],
-      [
-        'registered_by' => $admin->id,
-        'name' => $memberUser->name,
-        'phone' => $memberUser->phone,
-        'is_self' => true,
-        'status' => StatusMember::STATUS_ACTIVE,
-        'is_active' => true,
-      ]
-    );
+    // Create Packages
+    $packages = [
+        [
+            'name' => 'Basic Package',
+            'description' => 'Perfect for beginners who want to learn archery fundamentals',
+            'price' => 500000,
+            'duration_days' => 30,
+            'session_count' => 8,
+        ],
+        [
+            'name' => 'Standard Package',
+            'description' => 'Ideal for intermediate archers looking to improve their skills',
+            'price' => 900000,
+            'duration_days' => 60,
+            'session_count' => 16,
+        ],
+        [
+            'name' => 'Premium Package',
+            'description' => 'Comprehensive training for serious archers with competition goals',
+            'price' => 1500000,
+            'duration_days' => 90,
+            'session_count' => 24,
+        ],
+        [
+            'name' => 'Professional Package',
+            'description' => 'Advanced training program for competitive archers',
+            'price' => 2500000,
+            'duration_days' => 180,
+            'session_count' => 48,
+        ],
+    ];
 
+    foreach ($packages as $packageData) {
+        Package::firstOrCreate(
+            ['name' => $packageData['name']],
+            $packageData
+        );
+    }
     $this->command->info('✅ Dummy users berhasil dibuat / diupdate!');
   }
 }

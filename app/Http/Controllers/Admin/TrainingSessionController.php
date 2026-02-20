@@ -2,38 +2,31 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\TrainingSessionStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Coach;
+use App\Models\SessionTime;
 use App\Models\TrainingSession;
 use App\Models\TrainingSessionSlot;
+use App\Services\Admin\TrainingManagementService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TrainingSessionController extends Controller
 {
+    public function __construct(
+        private readonly TrainingManagementService $trainingManagementService,
+    ) {
+    }
+
     /**
      * List training sessions (admin can see all coaches).
      */
     public function index(Request $request)
     {
-        $query = TrainingSession::with(['slots.sessionTime', 'slots.coaches', 'slots.confirmedBookings.memberPackage.member', 'createdBy']);
-
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->has('start_date')) {
-            $query->where('date', '>=', $request->start_date);
-        }
-
-        if ($request->has('end_date')) {
-            $query->where('date', '<=', $request->end_date);
-        }
-
-        $sessions = $query->orderBy('date')->paginate(15);
-
-        return response()->json($sessions);
+        return response()->json($this->trainingManagementService->list([
+            'status' => $request->input('status'),
+            'start_date' => $request->input('start_date'),
+            'end_date' => $request->input('end_date'),
+        ]));
     }
 
     /**
@@ -66,49 +59,9 @@ class TrainingSessionController extends Controller
             ]
         );
 
-        // Check for duplicate session times
-        $sessionTimeIds = collect($validated['slots'])->pluck('session_time_id');
-        if ($sessionTimeIds->count() !== $sessionTimeIds->unique()->count()) {
-            return response()->json([
-                'message' => 'Ada slot waktu yang dipilih lebih dari sekali.',
-            ], 422);
-        }
+        $result = $this->trainingManagementService->create($validated, auth()->id());
 
-        DB::beginTransaction();
-        try {
-            // Create training session
-            $trainingSession = TrainingSession::create([
-                'date' => $validated['date'],
-                'status' => TrainingSessionStatus::OPEN->value,
-                'created_by' => auth()->id(),
-            ]);
-
-            // Create slots and assign coaches
-            foreach ($validated['slots'] as $slotPayload) {
-                $slot = TrainingSessionSlot::create([
-                    'training_session_id' => $trainingSession->id,
-                    'session_time_id' => $slotPayload['session_time_id'],
-                    'max_participants' => $slotPayload['max_participants'],
-                ]);
-
-                // Attach coaches to this specific slot
-                $coachIds = collect($slotPayload['coach_ids'])->map(fn ($id) => (int) $id)->filter()->unique()->all();
-                $slot->coaches()->attach($coachIds);
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Training session created successfully',
-                'data' => $trainingSession->fresh()->load(['slots.sessionTime', 'slots.coaches', 'createdBy']),
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Failed to create training session',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json($result['body'], $result['status']);
     }
 
     /**
@@ -116,16 +69,7 @@ class TrainingSessionController extends Controller
      */
     public function show(TrainingSession $trainingSession)
     {
-        $trainingSession->applyAutoClose(now());
-
-        return response()->json(
-            $trainingSession->load([
-                'slots.sessionTime',
-                'slots.coaches',
-                'slots.confirmedBookings.memberPackage.member',
-                'createdBy',
-            ])
-        );
+        return response()->json($this->trainingManagementService->detail($trainingSession));
     }
 
     /**
@@ -142,41 +86,32 @@ class TrainingSessionController extends Controller
             'max_participants' => 'nullable|integer|min:1|max:50',
         ]);
 
-        $coachIds = collect($validated['coach_ids'])->map(fn ($id) => (int) $id)->filter()->unique()->values()->all();
-
-        $trainingSessionSlot->coaches()->sync($coachIds);
-
-        if (array_key_exists('max_participants', $validated) && $validated['max_participants'] !== null) {
-            $trainingSessionSlot->update([
-                'max_participants' => $validated['max_participants'],
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Coaches updated successfully',
-            'data' => $trainingSessionSlot->fresh()->load(['sessionTime', 'coaches']),
-        ]);
+        return response()->json($this->trainingManagementService->updateSlotCoaches($trainingSessionSlot, $validated));
     }
 
     public function destroy(TrainingSession $trainingSession)
     {
-        $hasBookings = $trainingSession->slots()->whereHas('confirmedBookings')->exists();
+        $result = $this->trainingManagementService->delete($trainingSession);
 
-        if ($hasBookings) {
-            return response()->json([
-                'message' => 'Cannot delete session that already has bookings',
-            ], 422);
-        }
+        return response()->json($result['body'], $result['status']);
+    }
 
-        $trainingSession->slots()->each(function (TrainingSessionSlot $slot) {
-            $slot->coaches()->detach();
-            $slot->delete();
-        });
-
-        $trainingSession->delete();
-
+    public function sessionTimes()
+    {
         return response()->json([
-            'message' => 'Training session deleted successfully',
+            'data' => SessionTime::query()
+                ->where('is_active', true)
+                ->orderBy('start_time')
+                ->get(['id', 'name', 'start_time', 'end_time']),
+        ]);
+    }
+
+    public function coaches()
+    {
+        return response()->json([
+            'data' => Coach::query()
+                ->orderBy('name')
+                ->get(['id', 'user_id', 'name']),
         ]);
     }
 }

@@ -35,59 +35,6 @@
         </div>
     </div>
 
-    <!-- Book for Member Modal -->
-    <div id="bookMemberModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Background overlay -->
-            <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75" onclick="closeBookMemberModal()"></div>
-            
-            <!-- Modal panel -->
-            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-6 pt-6 pb-4">
-                    <div class="flex items-start">
-                        <div class="mx-auto shrink-0 flex items-center justify-center h-16 w-16 rounded-full bg-blue-100">
-                            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="mt-5 text-center">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Book for Member</h3>
-                        <p class="text-gray-600 text-sm mb-5">Masukkan Member Package ID untuk booking</p>
-                        
-                        <div class="space-y-4 text-left">
-                            <div>
-                                <label for="memberPackageIdInput" class="block text-sm font-semibold text-slate-700 mb-2">
-                                    Member Package ID <span class="text-red-500">*</span>
-                                </label>
-                                <input type="number" id="memberPackageIdInput" 
-                                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                       placeholder="Contoh: 1"
-                                       min="1">
-                            </div>
-                            <div>
-                                <label for="bookNotesInput" class="block text-sm font-semibold text-slate-700 mb-2">
-                                    Notes (Opsional)
-                                </label>
-                                <textarea id="bookNotesInput" rows="3"
-                                          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                          placeholder="Catatan tambahan..."></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row gap-3 justify-center">
-                    <button type="button" onclick="closeBookMemberModal()" class="w-full sm:w-auto px-6 py-3 bg-white hover:bg-gray-100 text-gray-700 rounded-xl font-medium border border-gray-300 transition-all duration-200">
-                        Cancel
-                    </button>
-                    <button type="button" id="confirmBookBtn" onclick="confirmBookMember()" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 shadow-lg">
-                        Book Now
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Delete Session Confirmation Modal -->
     <div id="deleteSessionModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -107,7 +54,7 @@
                     <div class="mt-5 text-center">
                         <h3 class="text-2xl font-bold text-gray-900 mb-2">Delete Training Session</h3>
                         <p class="text-gray-600 mb-1" id="deleteSessionDate"></p>
-                        <p class="text-sm text-gray-500 mt-4">This will remove all slots. (Not allowed if there are bookings.)</p>
+                        <p class="text-sm text-gray-500 mt-4">This will remove all slots. (Not allowed if there is attendance data.)</p>
                     </div>
                 </div>
                 <div class="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row gap-3 justify-center">
@@ -146,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error(e);
         window.showToast(e?.message || 'Failed to load session', 'error');
         document.getElementById('slotsBody').innerHTML = `
-            <tr><td colspan="5" class="px-6 py-10 text-center text-slate-600">Failed to load session: ${escapeHtml(e?.message || 'Unknown error')}</td></tr>
+            <tr><td colspan="4" class="px-6 py-10 text-center text-slate-600">Failed to load session: ${escapeHtml(e?.message || 'Unknown error')}</td></tr>
         `;
     }
 });
@@ -155,7 +102,7 @@ function renderSlots(slots) {
     const tbody = document.getElementById('slotsBody');
 
     if (!Array.isArray(slots) || slots.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-10 text-center text-slate-600">No slots found for this session.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-10 text-center text-slate-600">No slots found for this session.</td></tr>`;
         return;
     }
 
@@ -165,12 +112,6 @@ function renderSlots(slots) {
         const st = slot.session_time || slot.sessionTime || {};
         const slotCoaches = Array.isArray(slot.coaches) ? slot.coaches.map(c => Number(c.id)) : [];
         const additionalCoaches = slotCoaches.filter(id => id !== myIdNum);
-        const bookings = Array.isArray(slot.confirmed_bookings) ? slot.confirmed_bookings : (Array.isArray(slot.confirmedBookings) ? slot.confirmedBookings : []);
-        const slotOptions = slots.map(s => {
-            const sTime = s.session_time || s.sessionTime || {};
-            const sLabel = `${escapeHtml(sTime.name || 'Slot')} (${escapeHtml(sTime.start_time || '')}${sTime.start_time && sTime.end_time ? ' - ' : ''}${escapeHtml(sTime.end_time || '')})`;
-            return `<option value="${s.id}">${sLabel}</option>`;
-        }).join('');
         
         return `
             <tr>
@@ -197,45 +138,11 @@ function renderSlots(slots) {
                     </div>
                 </td>
                 <td class="px-6 py-4">
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                        <button type="button" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 text-sm" onclick="updateQuota(${slot.id})">Update Quota</button>
-                        <button type="button" class="w-full sm:w-auto px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl font-medium border border-slate-200 transition-all duration-200 text-sm whitespace-nowrap" onclick="bookForMember(${slot.id})">Book for member</button>
-                    </div>
-                    <div class="mt-3 space-y-2">
-                        ${bookings.length > 0 ? bookings.map(booking => {
-                            const mp = booking.member_package || booking.memberPackage || {};
-                            const member = mp.member || {};
-                            return `
-                                <div class="p-2 bg-slate-50 rounded-lg border border-slate-200">
-                                    <p class="text-xs font-semibold text-slate-700 truncate">${escapeHtml(member.name || 'Member')}</p>
-                                    <div class="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                        <select id="move-slot-${booking.id}" class="sm:col-span-2 w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500">
-                                            ${slotOptions}
-                                        </select>
-                                        <div class="flex gap-2">
-                                            <button type="button" class="flex-1 px-2 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium" onclick="moveBooking(${booking.id})">Pindah</button>
-                                            <button type="button" class="flex-1 px-2 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-xs font-medium" onclick="removeBooking(${booking.id})">Hapus</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('') : '<p class="text-xs text-slate-500">Belum ada member booking</p>'}
-                    </div>
+                    <button type="button" class="w-full sm:w-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 text-sm" onclick="updateQuota(${slot.id})">Update Quota</button>
                 </td>
             </tr>
         `;
     }).join('');
-
-    // Set selected slot value for move selectors
-    slots.forEach(slot => {
-        const bookings = Array.isArray(slot.confirmed_bookings) ? slot.confirmed_bookings : (Array.isArray(slot.confirmedBookings) ? slot.confirmedBookings : []);
-        bookings.forEach(booking => {
-            const select = document.getElementById(`move-slot-${booking.id}`);
-            if (select) {
-                select.value = String(slot.id);
-            }
-        });
-    });
 }
 
 let currentSlotId = null;
@@ -425,96 +332,6 @@ async function confirmDeleteSession() {
         window.showToast(e?.message || 'Failed to delete session', 'error');
         btn.disabled = false;
         btn.textContent = 'Delete Session';
-    }
-}
-
-function bookForMember(slotId) {
-    CURRENT_SLOT_ID = slotId;
-    document.getElementById('memberPackageIdInput').value = '';
-    document.getElementById('bookNotesInput').value = '';
-    document.getElementById('bookMemberModal').classList.remove('hidden');
-    setTimeout(() => {
-        document.getElementById('memberPackageIdInput').focus();
-    }, 100);
-}
-
-function closeBookMemberModal() {
-    document.getElementById('bookMemberModal').classList.add('hidden');
-    CURRENT_SLOT_ID = null;
-}
-
-async function confirmBookMember() {
-    const memberPackageIdStr = document.getElementById('memberPackageIdInput').value;
-    const notes = document.getElementById('bookNotesInput').value.trim() || null;
-    
-    if (!memberPackageIdStr) {
-        window.showToast('Member Package ID is required', 'error');
-        return;
-    }
-    
-    const memberPackageId = Number(memberPackageIdStr);
-    if (!Number.isInteger(memberPackageId) || memberPackageId <= 0) {
-        window.showToast('Invalid Member Package ID', 'error');
-        return;
-    }
-    
-    const btn = document.getElementById('confirmBookBtn');
-    btn.disabled = true;
-    btn.textContent = 'Booking...';
-
-    try {
-        await window.API.post('/coach/bookings', {
-            training_session_slot_id: CURRENT_SLOT_ID,
-            member_package_id: memberPackageId,
-            notes,
-        });
-        window.showToast('Member booked successfully', 'success');
-        closeBookMemberModal();
-    } catch (e) {
-        console.error(e);
-        window.showToast(e?.message || 'Failed to book member', 'error');
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'Book Now';
-    }
-}
-
-async function moveBooking(bookingId) {
-    const targetSelect = document.getElementById(`move-slot-${bookingId}`);
-    const targetSlotId = Number(targetSelect?.value || 0);
-
-    if (!Number.isInteger(targetSlotId) || targetSlotId <= 0) {
-        window.showToast('Pilih slot tujuan yang valid', 'error');
-        return;
-    }
-
-    try {
-        await window.API.patch(`/coach/bookings/${bookingId}`, {
-            training_session_slot_id: targetSlotId,
-        });
-        window.showToast('Member berhasil dipindah slot', 'success');
-        const session = await window.API.get(`/coach/training-sessions/${SESSION_ID}`);
-        CURRENT_SESSION = session;
-        renderSlots(session.slots || []);
-    } catch (e) {
-        console.error(e);
-        window.showToast(e?.message || 'Gagal memindahkan member', 'error');
-    }
-}
-
-async function removeBooking(bookingId) {
-    const ok = confirm('Hapus member dari sesi ini?');
-    if (!ok) return;
-
-    try {
-        await window.API.delete(`/coach/bookings/${bookingId}`);
-        window.showToast('Member berhasil dihapus dari sesi', 'success');
-        const session = await window.API.get(`/coach/training-sessions/${SESSION_ID}`);
-        CURRENT_SESSION = session;
-        renderSlots(session.slots || []);
-    } catch (e) {
-        console.error(e);
-        window.showToast(e?.message || 'Gagal menghapus member dari sesi', 'error');
     }
 }
 

@@ -14,7 +14,6 @@ class DashboardTestDataSeeder extends Seeder
         $this->call([
             AdminTestDataSeeder::class,
             CoachTestDataSeeder::class,
-            MemberDashboardTestSeeder::class,
         ]);
 
         $this->command->info('');

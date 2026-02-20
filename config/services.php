@@ -47,4 +47,11 @@ return [
         'redirect' => env('GOOGLE_RESET_REDIRECT_URI'),
     ],
 
+    'whatsapp' => [
+        'mode' => env('WHATSAPP_MODE', 'local'),
+        'base_url' => env('WHATSAPP_BASE_URL'),
+        'token' => env('WHATSAPP_TOKEN'),
+        'log_channel' => env('WHATSAPP_LOG_CHANNEL', env('LOG_CHANNEL', 'stack')),
+    ],
+
 ];

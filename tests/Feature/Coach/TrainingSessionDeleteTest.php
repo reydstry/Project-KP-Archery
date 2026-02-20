@@ -2,11 +2,8 @@
 
 namespace Tests\Feature\Coach;
 
+use App\Models\Attendance;
 use App\Models\Coach;
-use App\Models\Member;
-use App\Models\MemberPackage;
-use App\Models\Package;
-use App\Models\SessionBooking;
 use App\Models\SessionTime;
 use App\Models\TrainingSession;
 use App\Models\TrainingSessionSlot;
@@ -17,22 +14,23 @@ class TrainingSessionDeleteTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_coach_can_delete_training_session_without_bookings()
+    public function test_coach_can_delete_training_session_without_attendance_records()
     {
         $coach = Coach::factory()->create();
 
         $trainingSession = TrainingSession::factory()->create([
-            'coach_id' => $coach->id,
+            'created_by' => $coach->user_id,
             'date' => now()->addDays(1),
             'status' => 'open',
         ]);
 
         $sessionTime = SessionTime::factory()->create();
-        TrainingSessionSlot::create([
+        $slot = TrainingSessionSlot::create([
             'training_session_id' => $trainingSession->id,
             'session_time_id' => $sessionTime->id,
             'max_participants' => 10,
         ]);
+        $slot->coaches()->attach($coach->id);
 
         $response = $this->actingAs($coach->user, 'sanctum')
             ->deleteJson('/api/coach/training-sessions/' . $trainingSession->id);
@@ -47,12 +45,12 @@ class TrainingSessionDeleteTest extends TestCase
         ]);
     }
 
-    public function test_coach_cannot_delete_training_session_with_bookings()
+    public function test_coach_cannot_delete_training_session_with_attendance_records()
     {
         $coach = Coach::factory()->create();
 
         $trainingSession = TrainingSession::factory()->create([
-            'coach_id' => $coach->id,
+            'created_by' => $coach->user_id,
             'date' => now()->addDays(1),
             'status' => 'open',
         ]);
@@ -63,28 +61,10 @@ class TrainingSessionDeleteTest extends TestCase
             'session_time_id' => $sessionTime->id,
             'max_participants' => 10,
         ]);
+        $slot->coaches()->attach($coach->id);
 
-        $member = Member::factory()->create();
-        $package = Package::factory()->create([
-            'session_count' => 10,
-            'duration_days' => 30,
-        ]);
-
-        $memberPackage = MemberPackage::factory()->create([
-            'member_id' => $member->id,
-            'package_id' => $package->id,
-            'total_sessions' => 10,
-            'used_sessions' => 0,
-            'is_active' => true,
-            'start_date' => now(),
-            'end_date' => now()->addDays(30),
-        ]);
-
-        SessionBooking::factory()->create([
-            'member_package_id' => $memberPackage->id,
-            'training_session_slot_id' => $slot->id,
-            'booked_by' => $coach->user->id,
-            'status' => 'confirmed',
+        Attendance::factory()->create([
+            'session_id' => $trainingSession->id,
         ]);
 
         $response = $this->actingAs($coach->user, 'sanctum')
@@ -92,7 +72,7 @@ class TrainingSessionDeleteTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJson([
-                'message' => 'Cannot delete session that already has bookings',
+                'message' => 'Cannot delete session that already has attendance records',
             ]);
 
         $this->assertDatabaseHas('training_sessions', [
@@ -106,10 +86,18 @@ class TrainingSessionDeleteTest extends TestCase
         $coachB = Coach::factory()->create();
 
         $trainingSession = TrainingSession::factory()->create([
-            'coach_id' => $coachB->id,
+            'created_by' => $coachB->user_id,
             'date' => now()->addDays(1),
             'status' => 'open',
         ]);
+
+        $sessionTime = SessionTime::factory()->create();
+        $slot = TrainingSessionSlot::create([
+            'training_session_id' => $trainingSession->id,
+            'session_time_id' => $sessionTime->id,
+            'max_participants' => 10,
+        ]);
+        $slot->coaches()->attach($coachB->id);
 
         $response = $this->actingAs($coachA->user, 'sanctum')
             ->deleteJson('/api/coach/training-sessions/' . $trainingSession->id);
