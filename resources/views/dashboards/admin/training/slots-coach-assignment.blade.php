@@ -6,9 +6,6 @@
 @section('content')
 <div class="w-full px-4 sm:px-6 lg:px-8 space-y-4"
      x-data="slotCoachPage()" x-init="init()">
-    <x-alert-box type="info" title="Catatan">
-        Assignment coach dan update kuota slot terhubung langsung ke endpoint admin yang sudah tersedia.
-    </x-alert-box>
 
     <div class="bg-white border border-slate-200 rounded-xl p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
         <div class="md:col-span-2">
