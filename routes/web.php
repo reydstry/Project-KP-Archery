@@ -142,10 +142,10 @@ Route::middleware('auth')->group(function () {
     });
     // Member routes
      Route::prefix('member')->name('member.')->middleware('role:member')->group(function () {
-        Route::get('/dashboard', fn() => view('components.dashboards.member.dashboard'))->name('dashboard');
-        Route::get('/profile', fn() => view('components.dashboards.member.profile'))->name('profile');
-        Route::get('/membership', fn() => view('components.dashboards.member.membership'))->name('membership');
-        Route::get('/achievements', fn() => view('components.dashboards.member.achievements'))->name('achievements');
+        Route::get('/dashboard', fn() => view('dashboards.member.dashboard'))->name('dashboard');
+        Route::get('/profile', fn() => view('dashboards.member.profile'))->name('profile');
+        Route::get('/membership', fn() => view('dashboards.member.membership'))->name('membership');
+        Route::get('/achievements', fn() => view('dashboards.member.achievements'))->name('achievements');
     });
 });
 
