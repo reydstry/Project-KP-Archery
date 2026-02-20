@@ -61,17 +61,17 @@
             ],
         ],
         [
-            'title' => 'Komunikasi',
+            'title' => 'WhatsApp',
             'items' => [
                 [
-                    'label' => 'WA Blast',
-                    'route' => 'admin.communication.wa-blast',
-                    'patterns' => ['admin.communication.wa-blast'],
+                    'label' => 'Broadcast Event',
+                    'route' => 'admin.whatsapp.broadcast.create',
+                    'patterns' => ['admin.whatsapp.broadcast.*'],
                 ],
                 [
-                    'label' => 'Log Pengiriman',
-                    'route' => 'admin.communication.logs',
-                    'patterns' => ['admin.communication.logs'],
+                    'label' => 'Log Broadcast',
+                    'route' => 'admin.whatsapp.logs.index',
+                    'patterns' => ['admin.whatsapp.logs.*'],
                 ],
             ],
         ],
@@ -82,11 +82,6 @@
                     'label' => 'Rekap Bulanan',
                     'route' => 'admin.reports.monthly',
                     'patterns' => ['admin.reports.monthly'],
-                ],
-                [
-                    'label' => 'Export Excel',
-                    'route' => 'admin.reports.export',
-                    'patterns' => ['admin.reports.export'],
                 ],
             ],
         ],
@@ -102,21 +97,6 @@
                     'label' => 'Achievements',
                     'route' => 'admin.achievements',
                     'patterns' => ['admin.achievements'],
-                ],
-            ],
-        ],
-        [
-            'title' => 'Pengaturan',
-            'items' => [
-                [
-                    'label' => 'WA API',
-                    'route' => 'admin.settings.wa-api',
-                    'patterns' => ['admin.settings.wa-api'],
-                ],
-                [
-                    'label' => 'Reminder Settings',
-                    'route' => 'admin.settings.reminder',
-                    'patterns' => ['admin.settings.reminder'],
                 ],
             ],
         ],
@@ -140,35 +120,50 @@
     @foreach ($menuGroups as $group)
         @php
             $groupKey = \Illuminate\Support\Str::slug($group['title']);
+            $isSingleItemGroup = count($group['items']) === 1;
+            $singleItem = $isSingleItemGroup ? $group['items'][0] : null;
             $groupActive = collect($group['items'])->contains(fn (array $item) => $isItemActive($item));
         @endphp
         <section class="space-y-1">
-            <button
-                type="button"
-                class="w-full flex items-center justify-between px-2 py-1.5 text-[11px] uppercase tracking-wide font-semibold {{ $groupActive ? 'text-white' : 'text-slate-400' }}"
-                @click="openGroups['{{ $groupKey }}'] = !openGroups['{{ $groupKey }}']"
-            >
-                <span>{{ $group['title'] }}</span>
-                <svg class="w-4 h-4 transition-transform" :class="openGroups['{{ $groupKey }}'] ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                </svg>
-            </button>
+            @if ($isSingleItemGroup)
+                @php
+                    $active = $singleItem ? $isItemActive($singleItem) : false;
+                @endphp
+                <a
+                    href="{{ route($singleItem['route']) }}"
+                    @click="if(isMobile) sidebarOpen = false"
+                    class="flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-[13px] lg:text-sm font-semibold transition-all {{ $active ? 'brand-active' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}"
+                >
+                    <span class="truncate">{{ $singleItem['label'] }}</span>
+                </a>
+            @else
+                <button
+                    type="button"
+                    class="w-full flex items-center justify-between px-3 lg:px-4 py-1.5 text-[11px] uppercase tracking-wide font-semibold {{ $groupActive ? 'text-white' : 'text-slate-300' }}"
+                    @click="openGroups['{{ $groupKey }}'] = !openGroups['{{ $groupKey }}']"
+                >
+                    <span>{{ $group['title'] }}</span>
+                    <svg class="w-4 h-4 transition-transform" :class="openGroups['{{ $groupKey }}'] ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
 
-            <div class="space-y-1" x-show="openGroups['{{ $groupKey }}']" x-collapse>
-                @foreach ($group['items'] as $item)
-                    @php
-                        $active = $isItemActive($item);
-                    @endphp
-                    <a
-                        href="{{ route($item['route']) }}"
-                        @click="if(isMobile) sidebarOpen = false"
-                        class="flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-[13px] lg:text-sm font-semibold transition-all {{ $active ? 'brand-active' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}"
-                    >
-                        <span class="w-1.5 h-1.5 rounded-full {{ $active ? 'bg-white' : 'bg-slate-500' }}"></span>
-                        <span class="truncate">{{ $item['label'] }}</span>
-                    </a>
-                @endforeach
-            </div>
+                <div class="space-y-1" x-show="openGroups['{{ $groupKey }}']" x-collapse>
+                    @foreach ($group['items'] as $item)
+                        @php
+                            $active = $isItemActive($item);
+                        @endphp
+                        <a
+                            href="{{ route($item['route']) }}"
+                            @click="if(isMobile) sidebarOpen = false"
+                            class="flex items-center gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-[13px] lg:text-sm font-semibold transition-all {{ $active ? 'brand-active' : 'text-slate-300 hover:bg-white/10 hover:text-white' }}"
+                        >
+                            <span class="w-1.5 h-1.5 rounded-full {{ $active ? 'bg-white' : 'bg-slate-500' }}"></span>
+                            <span class="truncate">{{ $item['label'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
         </section>
     @endforeach
 </nav>

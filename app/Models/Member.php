@@ -75,4 +75,17 @@ class Member extends Model
     {
         return $this->hasMany(Achievement::class);
     }
+
+    /**
+     * Get attendance records for this member.
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function broadcastLogs()
+    {
+        return $this->hasMany(BroadcastLog::class);
+    }
 }

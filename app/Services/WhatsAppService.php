@@ -18,12 +18,12 @@ class WhatsAppService
 
     public function sendMessage(string $phone, string $message): array
     {
-        $response = $this->gateway->sendMessage($this->normalizePhone($phone), $message);
-        $status = ($response['success'] ?? false) ? 'success' : 'failed';
+        $normalizedPhone = $this->normalizePhone($phone);
+        $payload = $this->gateway->sendMessage($normalizedPhone, $message);
 
-        $this->logResult($phone, $response, $status);
+        $this->logResult($normalizedPhone, $payload, $payload['success'] ? 'success' : 'failed');
 
-        return $response;
+        return $payload;
     }
 
     public function sendBulk(array $phones, string $message): array
@@ -133,4 +133,5 @@ class WhatsAppService
 
         return $digits;
     }
+
 }

@@ -10,7 +10,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
-class TedSeeder extends Seeder
+class TestingSeeder extends Seeder
 {
   public function run(): void
   {

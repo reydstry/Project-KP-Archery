@@ -8,11 +8,12 @@ use App\Http\Controllers\Auth\WebResetPasswordController;
 use App\Http\Controllers\Auth\WebSetPasswordController;
 use App\Http\Controllers\Auth\GoogleRedirectController;
 use App\Http\Controllers\Auth\GoogleCallbackController;
+use App\Http\Controllers\Admin\MonthlyReportController;
+use App\Http\Controllers\Admin\BroadcastController;
 use App\Http\Controllers\WebDashboardController;
 use App\Http\Controllers\LanguageController;
 use App\Modules\Admin\Attendance\Controllers\AttendancePageController as AdminAttendancePageController;
 use App\Modules\Admin\Member\Controllers\MemberPageController as AdminMemberPageController;
-use App\Modules\Admin\Report\Controllers\ReportPageController as AdminReportPageController;
 use App\Modules\Admin\Training\Controllers\TrainingPageController as AdminTrainingPageController;
 use App\Modules\Admin\WhatsApp\Controllers\WhatsAppPageController as AdminWhatsAppPageController;
 use App\Models\SessionTime;
@@ -88,10 +89,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/member-packages', [AdminMemberPageController::class, 'packages'])->name('member-packages');
 
         // Coach domain
-        Route::get('/coaches', fn() => view('admin.coach.coaches'))->name('coaches');
+        Route::get('/coaches', fn() => view('dashboards.admin.coach.coaches'))->name('coaches');
 
         // Package domain
-        Route::get('/packages', fn() => view('admin.package.packages'))->name('packages');
+        Route::get('/packages', fn() => view('dashboards.admin.package.packages'))->name('packages');
 
         // Training operations
         Route::get('/sessions', [AdminTrainingPageController::class, 'sessionsIndex'])->name('sessions.index');
@@ -109,9 +110,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/communication/wa-blast', [AdminWhatsAppPageController::class, 'waBlast'])->name('communication.wa-blast');
         Route::get('/communication/logs', [AdminWhatsAppPageController::class, 'waLogs'])->name('communication.logs');
 
+        Route::prefix('whatsapp')->name('whatsapp.')->group(function () {
+            Route::get('/broadcast', [BroadcastController::class, 'create'])->name('broadcast.create');
+            Route::post('/broadcast', [BroadcastController::class, 'store'])->name('broadcast.store');
+            Route::get('/logs', [BroadcastController::class, 'index'])->name('logs.index');
+            Route::get('/logs/{broadcast}', [BroadcastController::class, 'show'])->name('logs.show');
+        });
+
         // Reporting
-        Route::get('/reports/monthly', [AdminReportPageController::class, 'monthlyRecap'])->name('reports.monthly');
-        Route::get('/reports/export', [AdminReportPageController::class, 'exportExcel'])->name('reports.export');
+        Route::get('/reports/monthly', [MonthlyReportController::class, 'index'])->name('reports.monthly');
 
         // Settings
         Route::get('/settings/wa-api', [AdminWhatsAppPageController::class, 'waApiSettings'])->name('settings.wa-api');

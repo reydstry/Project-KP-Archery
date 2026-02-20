@@ -7,7 +7,7 @@ return [
 
     'drivers' => [
         'wablas' => [
-            'base_url' => env('WABLAS_BASE_URL', 'https://tx.wablas.com/api'),
+            'base_url' => env('WABLAS_URL', env('WABLAS_BASE_URL', 'https://tx.wablas.com/api')),
             'token' => env('WABLAS_TOKEN', ''),
             'secret_key' => env('WABLAS_SECRET_KEY', ''),
             'timeout' => env('WABLAS_TIMEOUT', 15),

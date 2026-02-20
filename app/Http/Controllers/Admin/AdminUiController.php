@@ -45,14 +45,9 @@ class AdminUiController extends Controller
         return view('dashboards.admin.whatsapp.wa-logs');
     }
 
-    public function monthlyRecap()
-    {
-        return view('dashboards.admin.report.monthly-recap');
-    }
-
     public function exportExcel()
     {
-        return view('dashboards.admin.report.export-excel');
+        return redirect()->route('admin.reports.monthly');
     }
 
     public function waApiSettings()

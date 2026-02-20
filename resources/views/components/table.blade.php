@@ -10,7 +10,7 @@
                 <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
                         @foreach($headers as $header)
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">{{ $header }}</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-600">{{ $header }}</th>
                         @endforeach
                     </tr>
                 </thead>
