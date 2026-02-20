@@ -136,7 +136,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/change-password', function() {
             $user = auth()->user();
             $coach = $user->coach;
-            return view('components.dashboards.coach.change-password', compact('user', 'coach'));
+            return view('dashboards.coach.change-password', compact('user', 'coach'));
         })->name('change-password');
         Route::post('/change-password', [\App\Http\Controllers\Coach\ProfileController::class, 'updatePassword'])->name('change-password.password');
     });

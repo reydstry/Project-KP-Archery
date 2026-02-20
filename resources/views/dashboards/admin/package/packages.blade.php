@@ -10,10 +10,10 @@
     <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
         <div class="flex-1 w-full">
             <input type="search" x-model="search" placeholder="Search packages..." 
-                   class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition">
+                   class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b]/30 focus:border-transparent outline-none transition">
         </div>
         <button @click="openAddModal()" 
-                class="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 text-sm bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap shrink-0">
+                class="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 text-sm bg-gradient-to-r from-[#1a307b] to-[#2a4a9f] text-white rounded-xl font-semibold hover:shadow-lg transition-all whitespace-nowrap shrink-0">
             <span class="flex items-center justify-center gap-2">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Add Package
@@ -126,7 +126,7 @@
                     
                     <!-- Action Button -->
                     <button @click="openEditModal(package)" 
-                        class="w-full px-3 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-lg text-xs font-semibold hover:shadow-lg transition-all">
+                        class="w-full px-3 py-2 bg-gradient-to-r from-[#1a307b] to-[#2a4a9f] text-white rounded-lg text-xs font-semibold hover:shadow-lg transition-all">
                         Edit Package
                     </button>
                 </div>
@@ -140,7 +140,7 @@
         <div @click.away="closeModal()" 
              class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
              x-transition>
-            <div class="sticky top-0 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+            <div class="sticky top-0 bg-gradient-to-r from-[#1a307b] to-[#2a4a9f] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
                 <h3 class="text-lg font-bold" x-text="editingPackage ? 'Edit Package' : 'Add New Package'"></h3>
                 <button @click="closeModal()" class="text-white/80 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -155,24 +155,24 @@
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Description *</label>
                     <textarea x-model="form.description" required rows="3"
-                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none"></textarea>
+                              class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b]/30 focus:border-transparent outline-none resize-none"></textarea>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Price (Rp) *</label>
                         <input type="number" x-model="form.price" required min="0" step="1000"
-                               class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none">
+                               class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b]/30 focus:border-transparent outline-none">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Duration (days) *</label>
                         <input type="number" x-model="form.duration_days" required min="1"
-                               class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none">
+                               class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b]/30 focus:border-transparent outline-none">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Session Count *</label>
                     <input type="number" x-model="form.session_count" required min="1"
-                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none">
+                           class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b]/30 focus:border-transparent outline-none">
                 </div>
                 <div class="flex gap-4 pt-4">
                     <template x-if="editingPackage">
@@ -187,7 +187,7 @@
                         Cancel
                     </button>
                     <button type="submit" :disabled="saving"
-                            class="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
+                            class="flex-1 px-4 py-3 bg-gradient-to-r from-[#1a307b] to-[#2a4a9f] text-white rounded-xl font-semibold hover:shadow-lg transition disabled:opacity-50">
                         <span x-text="saving ? 'Saving...' : 'Save'"></span>
                     </button>
                 </div>
@@ -216,6 +216,84 @@
             </div>
         </div>
     </div>
+
+    <!-- Success Modal -->
+    <div x-show="showSuccessModal" x-cloak @click.self="closeSuccessModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showSuccessModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <!-- Success Icon -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                    <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Berhasil Disimpan!</h3>
+                
+                <!-- Message -->
+                <p class="text-slate-600 mb-6" x-text="successMessage"></p>
+                
+                <!-- Button -->
+                <button @click="closeSuccessModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div x-show="showErrorModal" x-cloak @click.self="closeErrorModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showErrorModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <!-- Error Icon -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                    <svg class="h-10 w-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Terjadi Kesalahan!</h3>
+                
+                <!-- Message -->
+                <p class="text-slate-600 mb-6" x-text="errorMessage"></p>
+                
+                <!-- Button -->
+                <button @click="closeErrorModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -230,6 +308,10 @@ function packagesData() {
         deleting: false,
         showModal: false,
         showDeleteConfirm: false,
+        showSuccessModal: false,
+        showErrorModal: false,
+        successMessage: '',
+        errorMessage: '',
         editingPackage: null,
         packageToDelete: null,
         form: {
@@ -269,8 +351,8 @@ function packagesData() {
                 }
             } catch (error) {
                 console.error('Failed to load packages:', error);
-                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load packages data';
-                showToast(errorMsg, 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal memuat packages.';
+                this.showErrorMessage(errorMsg);
                 this.packages = [];
             } finally {
                 this.loading = false;
@@ -287,7 +369,7 @@ function packagesData() {
         openEditModal(pkg) {
             // Validate package object
             if (!pkg || !pkg.id) {
-                showToast('Invalid package data', 'error');
+                this.showErrorMessage('Data package tidak valid.');
                 return;
             }
             
@@ -308,6 +390,26 @@ function packagesData() {
             this.editingPackage = null;
         },
 
+        showSuccessMessage(message) {
+            this.successMessage = message;
+            this.showSuccessModal = true;
+        },
+
+        closeSuccessModal() {
+            this.showSuccessModal = false;
+            this.successMessage = '';
+        },
+
+        showErrorMessage(message) {
+            this.errorMessage = message;
+            this.showErrorModal = true;
+        },
+
+        closeErrorModal() {
+            this.showErrorModal = false;
+            this.errorMessage = '';
+        },
+
         async togglePackageActive() {
             if (!this.editingPackage || !this.editingPackage.id) {
                 showToast('Invalid package data', 'error');
@@ -326,18 +428,18 @@ function packagesData() {
                 
                 if (isInactive) {
                     response = await API.post(`/admin/packages/${this.editingPackage.id}/restore`);
-                    showToast('✓ ' + (response.message || 'Package activated successfully'), 'success');
+                    this.showSuccessMessage(response.message || 'Package berhasil diaktifkan.');
                 } else {
                     response = await API.delete(`/admin/packages/${this.editingPackage.id}`);
-                    showToast('✓ ' + (response.message || 'Package deactivated successfully'), 'success');
+                    this.showSuccessMessage(response.message || 'Package berhasil dinonaktifkan.');
                 }
 
                 await this.loadPackages();
                 this.editingPackage = this.packages.find(p => String(p.id) === String(this.editingPackage.id)) || this.editingPackage;
             } catch (error) {
                 console.error('Failed to toggle package:', error);
-                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to update package status';
-                showToast(errorMsg, 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal mengubah status package.';
+                this.showErrorMessage(errorMsg);
             } finally {
                 this.togglingActive = false;
             }
@@ -346,56 +448,56 @@ function packagesData() {
         async savePackage() {
             // Prevent double-submit
             if (this.saving) {
-                showToast('Saving in progress...', 'warning');
+                this.showErrorMessage('Operasi penyimpanan sedang berlangsung...');
                 return;
             }
             
             // Validate form
             if (!this.form.name || this.form.name.trim() === '') {
-                showToast('Package name is required', 'error');
+                this.showErrorMessage('Nama package wajib diisi.');
                 return;
             }
             
             if (this.form.name.trim().length < 3) {
-                showToast('Package name must be at least 3 characters', 'error');
+                this.showErrorMessage('Nama package minimal 3 karakter.');
                 return;
             }
             
             if (!this.form.description || this.form.description.trim() === '') {
-                showToast('Description is required', 'error');
+                this.showErrorMessage('Deskripsi wajib diisi.');
                 return;
             }
             
             if (!this.form.price || this.form.price === '') {
-                showToast('Price is required', 'error');
+                this.showErrorMessage('Harga wajib diisi.');
                 return;
             }
             
             const price = parseFloat(this.form.price);
             if (isNaN(price) || price <= 0) {
-                showToast('Price must be a valid positive number', 'error');
+                this.showErrorMessage('Harga harus berupa angka positif yang valid.');
                 return;
             }
             
             if (!this.form.duration_days || this.form.duration_days === '') {
-                showToast('Duration is required', 'error');
+                this.showErrorMessage('Durasi wajib diisi.');
                 return;
             }
             
             const duration = parseInt(this.form.duration_days);
             if (isNaN(duration) || duration <= 0) {
-                showToast('Duration must be a valid positive number', 'error');
+                this.showErrorMessage('Durasi harus berupa angka positif yang valid.');
                 return;
             }
             
             if (!this.form.session_count || this.form.session_count === '') {
-                showToast('Session count is required', 'error');
+                this.showErrorMessage('Jumlah sesi wajib diisi.');
                 return;
             }
             
             const sessions = parseInt(this.form.session_count);
             if (isNaN(sessions) || sessions <= 0) {
-                showToast('Session count must be a valid positive number', 'error');
+                this.showErrorMessage('Jumlah sesi harus berupa angka positif yang valid.');
                 return;
             }
             
@@ -424,7 +526,7 @@ function packagesData() {
                         await this.loadPackages();
                     }
                     
-                    showToast('✓ Package updated successfully', 'success');
+                    this.showSuccessMessage('Package berhasil diperbarui.');
                 } else {
                     response = await API.post('/admin/packages', this.form);
                     
@@ -434,14 +536,14 @@ function packagesData() {
                     }
                     
                     this.packages.unshift(response.data);
-                    showToast('✓ Package added successfully', 'success');
+                    this.showSuccessMessage('Package berhasil ditambahkan.');
                 }
                 
                 this.closeModal();
             } catch (error) {
                 console.error('Failed to save package:', error);
-                const errorMsg = error?.response?.data?.message || error?.message || 'Failed to save package';
-                showToast(errorMsg, 'error');
+                const errorMsg = error?.response?.data?.message || error?.message || 'Gagal menyimpan package.';
+                this.showErrorMessage(errorMsg);
             } finally {
                 this.saving = false;
             }
@@ -450,7 +552,7 @@ function packagesData() {
         confirmDelete(pkg) {
             // Validate package
             if (!pkg || !pkg.id) {
-                showToast('Invalid package data', 'error');
+                this.showErrorMessage('Data package tidak valid.');
                 return;
             }
             
@@ -461,14 +563,14 @@ function packagesData() {
         async deletePackage() {
             // Validate package
             if (!this.packageToDelete || !this.packageToDelete.id) {
-                showToast('Invalid package data', 'error');
+                this.showErrorMessage('Data package tidak valid.');
                 this.showDeleteConfirm = false;
                 return;
             }
             
             // Prevent double-submit
             if (this.deleting) {
-                showToast('Deletion in progress...', 'warning');
+                this.showErrorMessage('Operasi penghapusan sedang berlangsung...');
                 return;
             }
             
@@ -476,12 +578,12 @@ function packagesData() {
             try {
                 await API.delete(`/admin/packages/${this.packageToDelete.id}`);
                 this.packages = this.packages.filter(p => p.id !== this.packageToDelete.id);
-                showToast('✓ Package deleted successfully', 'success');
                 this.showDeleteConfirm = false;
                 this.packageToDelete = null;
+                this.showSuccessMessage('Package berhasil dihapus.');
             } catch (error) {
                 console.error('Failed to delete package:', error);
-                showToast(error.message || 'Failed to delete package', 'error');
+                this.showErrorMessage(error?.response?.data?.message || error?.message || 'Gagal menghapus package.');
             } finally {
                 this.deleting = false;
             }

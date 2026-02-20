@@ -45,7 +45,7 @@
             <div class="flex items-center gap-2">
                 <button type="button" @click="markAllPresent()" :disabled="submitting || members.length===0" class="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 text-xs font-semibold disabled:opacity-60">Mark all present</button>
                 <button type="button" @click="markAllAbsent()" :disabled="submitting || selectedMemberIds.length===0" class="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 text-xs font-semibold disabled:opacity-60">Mark all absent</button>
-                <button type="button" @click="submitAttendance()" :disabled="submitting" class="px-4 py-2.5 rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-sm font-semibold">
+                <button type="button" @click="submitAttendance()" :disabled="submitting" class="px-4 py-2.5 rounded-lg text-white bg-[#1a307b] hover:bg-[#152866] disabled:bg-slate-300 text-sm font-semibold">
                 <span x-show="!submitting">Simpan Kehadiran</span>
                 <span x-show="submitting">Menyimpan...</span>
             </button>
@@ -64,6 +64,47 @@
                     <p class="text-sm font-medium text-slate-800" x-text="attendance.member?.name || ('Member #' + attendance.member_id)"></p>
                 </div>
             </template>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div x-data="{ showModal: false }" @show-success-modal.window="showModal = true">
+    <div x-show="showModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm" 
+         @click.self="showModal = false"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <!-- Success Icon -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                    <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Berhasil Disimpan!</h3>
+                
+                <!-- Message -->
+                <p class="text-slate-600 mb-6">Attendance berhasil diperbarui.</p>
+                
+                <!-- Button -->
+                <button @click="showModal = false" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -117,7 +158,7 @@ function attendanceInputPage(sessionId) {
                     member_ids: this.selectedMemberIds.map(Number),
                 });
 
-                window.showToast('Attendance berhasil diperbarui', 'success');
+                window.dispatchEvent(new CustomEvent('show-success-modal'));
                 await this.loadAttendances();
             } catch (error) {
                 window.showToast(error?.message || 'Gagal menyimpan attendance', 'error');
