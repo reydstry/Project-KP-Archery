@@ -1,9 +1,7 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title', 'Create Training Session'); ?>
+<?php $__env->startSection('subtitle', 'Buat sesi berdasarkan tanggal dan status'); ?>
 
-@section('title', 'Create Training Session')
-@section('subtitle', 'Buat sesi berdasarkan tanggal dan status')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="w-full px-4 sm:px-6 lg:px-8 space-y-6"
      x-data="trainingSessionCreatePage()">
     
@@ -114,7 +112,7 @@
 
             <!-- Footer Actions -->
             <div class="px-6 sm:px-8 py-5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <a href="{{ route('admin.sessions.index') }}" 
+                <a href="<?php echo e(route('admin.sessions.index')); ?>" 
                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border-2 border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -206,9 +204,9 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 function trainingSessionCreatePage() {
     return {
@@ -230,7 +228,7 @@ function trainingSessionCreatePage() {
             this.showSuccessModal = false;
             this.successMessage = '';
             // Redirect after closing success modal
-            window.location.href = '{{ route('admin.sessions.index') }}';
+            window.location.href = '<?php echo e(route('admin.sessions.index')); ?>';
         },
         showErrorMessage(message) {
             this.errorMessage = message;
@@ -276,4 +274,6 @@ function trainingSessionCreatePage() {
     }
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laragon\www\Project-KP-Archery\resources\views/dashboards/admin/training/training-sessions-create.blade.php ENDPATH**/ ?>

@@ -1,10 +1,8 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title', 'Input Kehadiran'); ?>
+<?php $__env->startSection('subtitle', 'Catat member yang benar-benar hadir per sesi'); ?>
 
-@section('title', 'Input Kehadiran')
-@section('subtitle', 'Catat member yang benar-benar hadir per sesi')
-
-@section('content')
-<div class="space-y-4" x-data="attendanceInputPage({{ (int) $sessionId }})" x-init="init()">
+<?php $__env->startSection('content'); ?>
+<div class="space-y-4" x-data="attendanceInputPage(<?php echo e((int) $sessionId); ?>)" x-init="init()">
     <div class="bg-white border border-slate-200 rounded-xl p-4 sm:p-5">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
@@ -69,7 +67,7 @@
 </div>
 
 <!-- Success Modal -->
-<div x-data="{ showModal: false }" @show-success-modal.window="showModal = true">
+<div x-data="{ showModal: false }" <?php echo $__env->yieldSection(); ?>-success-modal.window="showModal = true">
     <div x-show="showModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm" 
          @click.self="showModal = false"
          x-transition:enter="transition ease-out duration-200"
@@ -108,9 +106,9 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 function attendanceInputPage(sessionId) {
     return {
@@ -176,4 +174,6 @@ function attendanceInputPage(sessionId) {
     }
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laragon\www\Project-KP-Archery\resources\views/dashboards/admin/attendance/sessions-attendance-input.blade.php ENDPATH**/ ?>

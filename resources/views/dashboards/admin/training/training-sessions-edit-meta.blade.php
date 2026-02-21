@@ -87,8 +87,8 @@
                     <select x-model="form.status" 
                             class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1a307b]/30 focus:border-[#1a307b] transition appearance-none bg-white text-slate-700"
                             :class="errors.status ? 'border-red-400 focus:border-red-500 focus:ring-red-500/30' : ''">
-                        <option value="open">Open</option>
-                        <option value="closed">Closed</option>
+                        <option value="open">Scheduled/Ongoing</option>
+                        <option value="closed">Completed</option>
                         <option value="canceled">Canceled</option>
                     </select>
                     <p x-show="errors.status" 

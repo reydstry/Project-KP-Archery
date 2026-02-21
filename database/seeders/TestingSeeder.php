@@ -6,6 +6,8 @@ use App\Enums\StatusMember;
 use App\Enums\UserRoles;
 use App\Models\Coach;
 use App\Models\Member;
+use App\Models\Package;
+use App\Models\SessionTime;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;

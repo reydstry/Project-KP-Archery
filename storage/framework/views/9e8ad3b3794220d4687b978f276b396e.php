@@ -1,9 +1,7 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title', 'Training Session'); ?>
+<?php $__env->startSection('subtitle', 'Kelola tanggal sesi dan status tanpa slot/attendance'); ?>
 
-@section('title', 'Training Session')
-@section('subtitle', 'Kelola tanggal sesi dan status tanpa slot/attendance')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="space-y-4 sm:space-y-6" x-data="trainingSessionsPage()" x-init="init()">
     
     <!-- Filter Card -->
@@ -44,7 +42,7 @@
 
     <!-- Add Button -->
     <div class="flex justify-end">
-        <a href="{{ route('admin.sessions.create') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-sm font-semibold shadow-lg hover:shadow-xl transition-all">
+        <a href="<?php echo e(route('admin.sessions.create')); ?>" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-sm font-semibold shadow-lg hover:shadow-xl transition-all">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
             Buat Session
         </a>
@@ -52,7 +50,16 @@
 
     <!-- Desktop Table View -->
     <div class="hidden lg:block">
-        <x-table :headers="['Tanggal', 'Status', 'Aksi']">
+        <?php if (isset($component)) { $__componentOriginal163c8ba6efb795223894d5ffef5034f5 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal163c8ba6efb795223894d5ffef5034f5 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.table','data' => ['headers' => ['Tanggal', 'Status', 'Aksi']]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('table'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['headers' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(['Tanggal', 'Status', 'Aksi'])]); ?>
             <template x-if="loading">
                 <tr>
                     <td colspan="3" class="px-6 py-12 text-center text-slate-400">
@@ -93,7 +100,16 @@
                     </td>
                 </tr>
             </template>
-        </x-table>
+         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal163c8ba6efb795223894d5ffef5034f5)): ?>
+<?php $attributes = $__attributesOriginal163c8ba6efb795223894d5ffef5034f5; ?>
+<?php unset($__attributesOriginal163c8ba6efb795223894d5ffef5034f5); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal163c8ba6efb795223894d5ffef5034f5)): ?>
+<?php $component = $__componentOriginal163c8ba6efb795223894d5ffef5034f5; ?>
+<?php unset($__componentOriginal163c8ba6efb795223894d5ffef5034f5); ?>
+<?php endif; ?>
     </div>
 
     <!-- Mobile Card View -->
@@ -277,9 +293,9 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 function trainingSessionsPage() {
     return {
@@ -388,4 +404,6 @@ function trainingSessionsPage() {
     }
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH D:\laragon\www\Project-KP-Archery\resources\views/dashboards/admin/training/training-sessions.blade.php ENDPATH**/ ?>
