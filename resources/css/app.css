@@ -241,3 +241,14 @@
 .menu-active-rose {
     box-shadow: 0 10px 15px -3px rgba(244, 63, 94, 0.3);
 }
+
+.nav-link {
+    @apply text-white hover:text-[#1a307b] font-bold transition relative text-base;
+}
+.nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-[#1a307b] transition-all duration-300;
+}
+.nav-link:hover::after {
+    @apply w-full;
+}

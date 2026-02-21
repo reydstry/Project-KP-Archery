@@ -1,5 +1,5 @@
 <section id="beranda"
-    class="relative min-h-screen overflow-hidden flex items-center justify-center">
+    class="relative min-h-screen overflow-hidden flex items-end justify-center pb-32 sm:pb-40">
 
     <!-- BACKGROUND IMAGE (ZOOM ANIMATION) -->
     <div class="absolute inset-0 z-0">
@@ -10,34 +10,45 @@
     </div>
 
     <!-- GRADIENT OVERLAY -->
-    <div class="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-black/40 to-black/60"></div>
+    <div class="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-black/40 to-[#1b2659]"></div>
 
     <!-- CONTENT -->
     <div class="relative z-20 max-w-4xl px-4 sm:px-6 text-center">
 
-        <h1 class="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight">
-            {{ __('home.hero_title_1') }}
-            <span class="block text-blue-500 mt-2 sm:mt-3">
-                {{ __('home.hero_title_2') }}
-            </span>
-        </h1>
-
-        <p class="mt-6 sm:mt-8 text-gray-100 text-base sm:text-lg md:text-xl leading-relaxed max-w-3xl mx-auto px-2">
+        <p class="text-gray-100 text-base sm:text-lg md:text-xl leading-relaxed max-w-3xl px-2">
             {!! __('home.hero_subtitle') !!}
         </p>
 
         <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4 max-w-xl mx-auto sm:max-w-none">
             <!-- PRIMARY BUTTON -->
             <a href="{{ route('login') }}"
-                class="w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 bg-gradient-to-r from-blue-500 to-red-500 text-white font-bold rounded-full text-sm sm:text-base md:text-lg
-                       hover:from-blue-600 hover:to-red-600 hover:scale-105 transition-all duration-300 shadow-xl text-center">
+                class="relative w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3
+                    bg-[#1a307b]/60 backdrop-blur-md border border-white/20 
+                    text-white font-bold rounded-full text-sm sm:text-base md:text-lg
+                    hover:bg-[#1a307b]/80 hover:scale-105 transition-all duration-300 shadow-xl text-center
+                    overflow-hidden group">
+                <!-- SHINE EFFECT -->
+                <span class="absolute inset-0 w-full h-full 
+                            bg-gradient-to-r from-transparent via-white/30 to-transparent
+                            -translate-x-full group-hover:translate-x-full 
+                            transition-transform duration-700 ease-in-out skew-x-12">
+                </span>
                 {{ __('home.register_now') }}
             </a>
 
             <!-- SECONDARY BUTTON -->
             <a href="{{ route('program') }}"
-                class="w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 bg-white text-gray-800 font-bold rounded-full text-sm sm:text-base md:text-lg
-                       hover:bg-gray-100 hover:scale-105 transition-all duration-300 shadow-xl text-center">
+                class="relative w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3
+                    bg-white/20 backdrop-blur-md border border-white/30 
+                    text-white font-bold rounded-full text-sm sm:text-base md:text-lg
+                    hover:bg-white/30 hover:scale-105 transition-all duration-300 shadow-xl text-center
+                    overflow-hidden group">
+                <!-- SHINE EFFECT -->
+                <span class="absolute inset-0 w-full h-full 
+                            bg-gradient-to-r from-transparent via-white/30 to-transparent
+                            -translate-x-full group-hover:translate-x-full 
+                            transition-transform duration-700 ease-in-out skew-x-12">
+                </span>
                 {{ __('home.view_program') }}
             </a>
         </div>

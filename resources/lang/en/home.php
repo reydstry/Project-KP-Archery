@@ -2,9 +2,7 @@
 
 return [
     // Hero Section
-    'hero_title_1' => 'Find Your',
-    'hero_title_2' => 'True Focus',
-    'hero_subtitle' => 'Learn archery with certified instructors.<br class="hidden sm:block">From beginners to professional athletes, we are ready to guide you.',
+    'hero_subtitle' => 'Find Your True Focus.<br class="hidden sm:block">From beginners to professional athletes, we are ready to guide you.',
     'register_now' => 'Register Now',
     'view_program' => 'View Program',
     'scroll' => 'Scroll',
@@ -13,7 +11,7 @@ return [
     'program_title' => 'Our Training Programs',
     'program_subtitle' => 'Find a program that suits your goals, from beginners to competitive athletes',
     
-    'program_1_title' => 'Club & Extracurricular Program',
+    'program_1_title' => 'Training Program',
     'program_1_desc' => 'Structured training for beginners to athletes, for individual athletes or institutions with competition systems.',
     'program_1_feature_1' => 'Training and target practice',
     'program_1_feature_2' => 'Competition system',
