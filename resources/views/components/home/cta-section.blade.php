@@ -15,8 +15,8 @@
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 px-4">
                 <a href="https://wa.me/6281952598200?text=Halo%2C%20saya%20tertarik%20dengan%20program%20FocusOnex%20Archery" target="_blank" 
                 class="w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4
-                 bg-[#a72320]/60 backdrop-blur-md border border-white/20  rounded-full shadow-xl shadow-black/20 
-                 hover:shadow-2xl hover:shadow-black/70 text-white font-bold hover:scale-105 text-sm sm:text-base transition-all duration-300 overflow-hidden group">
+                 bg-[#a72320]/40 backdrop-blur-[2px] border border-white/20  rounded-full shadow-xl shadow-black/20 
+                 hover:bg-[#a72320]/60 hover:shadow-2xl hover:shadow-black/70 text-white font-bold hover:scale-105 text-sm sm:text-base transition-all duration-300 overflow-hidden group">
                 <!-- SHINE EFFECT -->
                 <span class="absolute inset-0 w-full h-full 
                             bg-gradient-to-r from-transparent via-white/30 to-transparent
@@ -31,7 +31,7 @@
                 
                 <a href="{{ route('program') }}"
                 class="relative w-full sm:w-auto px-6 sm:px-8 py-3
-                    bg-white/20 backdrop-blur-md border border-white/30 
+                    bg-white/20 backdrop-blur-[2px] border border-white/30 
                     text-white font-bold rounded-full text-sm sm:text-base md:text-lg
                     hover:bg-white/30 hover:scale-105 transition-all duration-300 shadow-xl text-center
                     overflow-hidden group">

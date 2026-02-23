@@ -7,5 +7,4 @@
     @include('components.program.package-section')
     @include('components.program.instructor-section')
     @include('components.program.schedule-section')
-    @include('components.program.cta-section')
 @endsection

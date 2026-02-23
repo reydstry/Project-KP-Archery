@@ -1,9 +1,20 @@
-<!-- Testimonials Section -->
-<section class="py-12 sm:py-16 bg-gray-50">
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-8 sm:mb-10 md:mb-12">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">{{ __('about.achievements_title') }}</h2>
-            <p class="text-sm sm:text-base text-gray-600 px-4">{{ __('about.achievements_subtitle') }}</p>
+<!-- Achievements Section -->
+<section class="relative py-24 sm:py-32 bg-gradient-to-b from-[#273576] to-[#0f172a] overflow-hidden">
+
+    <!-- Background decorative blur -->
+    <div class="absolute top-10 right-10 w-72 h-72 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-10 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="container mx-auto px-6 relative z-10">
+
+        <!-- Section Header -->
+        <div class="text-center mb-12 sm:mb-16">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+                {{ __('about.achievements_title') }}
+            </h2>
+            <p class="text-gray-300 text-base sm:text-lg max-w-2xl mx-auto px-4">
+                {{ __('about.achievements_subtitle') }}
+            </p>
         </div>
 
         @php
@@ -31,30 +42,59 @@
                         ['medal' => '🥇', 'title' => 'Juara 1 Kejuaraan Nasional 2024'],
                         ['medal' => '🥈', 'title' => 'Juara 2 Turnamen Internal']
                     ]
-                ]
+                ],
             ];
         @endphp
 
-        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6">
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-12">
             @foreach($achievements as $achievement)
-            <div class="bg-white border border-gray-200 rounded-lg p-5 sm:p-6 hover:shadow-md transition-shadow">
-                <div class="flex items-center mb-4 sm:mb-5">
-                    <img src="{{ asset('asset/img/achievements/' . $achievement['photo']) }}" alt="{{ $achievement['name'] }}" 
-                         class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover mr-3">
-                    <div>
-                        <h4 class="font-bold text-gray-900">{{ $achievement['name'] }}</h4>
+            <div class="relative group">
+                <!-- Glow -->
+                <div class="absolute inset-0 bg-red-500/15 rounded-3xl blur-2xl scale-105 pointer-events-none"></div>
+
+                <!-- Card -->
+                <div class="relative h-full bg-[#a72320]/15 backdrop-blur-[2px] border border-white/20 rounded-2xl overflow-hidden
+                            shadow-xl shadow-black/30 hover:shadow-2xl hover:shadow-black/60
+                            transition-all duration-300 hover:-translate-y-2">
+
+                    <!-- Shine -->
+                    <span class="absolute inset-0 w-full h-full 
+                                bg-gradient-to-r from-transparent via-white/10 to-transparent
+                                -translate-x-full group-hover:translate-x-full 
+                                transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none">
+                    </span>
+
+                    <!-- Image -->
+                    <div class="h-48 overflow-hidden">
+                        <img src="{{ asset('asset/img/achievements/' . $achievement['photo']) }}" 
+                             alt="{{ $achievement['name'] }}" 
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        
                     </div>
-                </div>
-                <div class="space-y-2 text-gray-700 text-sm">
-                    @foreach($achievement['awards'] as $award)
-                    <div class="flex items-start">
-                        <span class="text-xl mr-2">{{ $award['medal'] }}</span>
-                        <span>{{ $award['title'] }}</span>
+
+                    <!-- Content -->
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h4 class="font-bold text-white text-base">{{ $achievement['name'] }}</h4>
+                            <p class="text-white/50 text-xs mb-4">Atlet FocusOnex</p>
+                        </div>
+                        <!-- Divider -->
+                        <div class="w-full h-px bg-[#a72320]/70 mb-4"></div>
+
+                        <!-- Awards -->
+                        <div class="space-y-3">
+                            @foreach($achievement['awards'] as $award)
+                            <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
+                                <span class="text-xl">{{ $award['medal'] }}</span>
+                                <span class="text-white/80 text-xs sm:text-sm leading-snug">{{ $award['title'] }}</span>
+                            </div>
+                            @endforeach
+                        </div>
                     </div>
-                    @endforeach
                 </div>
             </div>
             @endforeach
         </div>
+
     </div>
 </section>

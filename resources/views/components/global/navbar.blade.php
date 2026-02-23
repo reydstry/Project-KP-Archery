@@ -1,16 +1,18 @@
 <nav class="fixed top-4 left-6 right-6 z-50
-bg-white/40 backdrop-blur-md border border-white/30 rounded-full
+bg-white/35 backdrop-blur-[2px] border border-white/30 rounded-full
 shadow-md transition-all duration-300">
     <div class="w-full">
         <div class="flex items-center justify-between h-14 relative px-2 md:px-4 lg:px-4">
 
             <!-- Logo Desktop -->
-            <a href="/" class="hidden md:flex items-center">
-                <img src="{{ asset('asset/img/logofocus.png') }}" alt="FocusOnex Archery" class="h-7 w-auto">
+            <a href="/" class="hidden md:flex items-center rounded-full px-2 py-1">
+                <img src="{{ asset('asset/img/logofocus.png') }}" alt="FocusOnex Archery" 
+                class="h-7 w-auto ">
             </a>
 
             <!-- Logo Mobile - Centered -->
-            <a href="/" class="flex md:hidden items-center absolute left-1/2 transform -translate-x-1/2">
+            <a href="/" class="flex md:hidden items-center absolute left-1/2 transform -translate-x-1/2
+            ">
                 <img src="{{ asset('asset/img/logofocus.png') }}" alt="FocusOnex Archery" class="h-7 w-auto">
             </a>
 
@@ -30,13 +32,9 @@ shadow-md transition-all duration-300">
                 <div class="relative">
                     <button id="lang-toggle"
                         class="flex items-center gap-2 px-3 py-1.5
-                               bg-white/20 backdrop-blur-sm border border-white/30
-                               rounded-full hover:bg-white/30 transition-all duration-200 
-                               text-white font-semibold text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
-                        </svg>
+                              bg-[#1a307b]/70 backdrop-blur-sm border border-white/20
+                           text-white font-semibold text-sm rounded-full
+                           hover:bg-[#1a307b]/90 hover:scale-105 transition-all duration-300">
                         <span>{{ strtoupper(app()->getLocale()) }}</span>
                         <svg id="lang-chevron" class="w-3 h-3 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -45,18 +43,18 @@ shadow-md transition-all duration-300">
 
                     <!-- Dropdown -->
                     <div id="lang-menu"
-                        class="absolute right-0 mt-2 w-20 rounded-xl overflow-hidden shadow-xl
-                               border border-white/20 backdrop-blur-md bg-[#1a307b]/90
+                        class="absolute right-0 mt-2 p-1 overflow-hidden shadow-xl
+                            bg-[#1a307b]/90 backdrop-blur-[2px] border border-white/20 rounded-2xl
                                opacity-0 scale-95 pointer-events-none
                                transition-all duration-200 ease-out origin-top-right">
                         <a href="{{ route('language.switch', 'id') }}" 
-                           class="flex items-center gap-2 px-4 py-2.5 text-sm text-white hover:bg-white/20 transition-colors
-                                  {{ app()->getLocale() == 'id' ? 'bg-white/20 font-bold' : 'font-medium' }}">
+                           class="flex items-center justify-center px-4 py-2.5 text-sm text-white hover:bg-white/30 rounded-2xl transition-colors
+                                  {{ app()->getLocale() == 'id' ? 'bg-white/30 font-bold' : 'font-medium' }}">
                             ID
                         </a>
                         <a href="{{ route('language.switch', 'en') }}" 
-                           class="flex items-center gap-2 px-4 py-2.5 text-sm text-white hover:bg-white/20 transition-colors
-                                  {{ app()->getLocale() == 'en' ? 'bg-white/20 font-bold' : 'font-medium' }}">
+                           class="flex items-center justify-center px-4 py-2.5 text-sm text-white hover:bg-white/30 rounded-2xl transition-colors
+                                  {{ app()->getLocale() == 'en' ? 'bg-white/30 font-bold' : 'font-medium' }}">
                             EN
                         </a>
                     </div>
@@ -85,7 +83,7 @@ shadow-md transition-all duration-300">
             </div>
 
             <!-- Mobile Button -->
-            <button id="mobile-menu-button" class="md:hidden text-white">
+            <button id="mobile-menu-button" class="md:hidden text-white pl-2">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M4 6h16M4 12h16M4 18h16"/>

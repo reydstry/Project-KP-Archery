@@ -1,27 +1,21 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>@yield('title', 'FocusOneX Archery')</title>
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
+
     <!-- Tailwind CSS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
-    <!-- Additional Styles -->
-    <style>
-        .nav-link {
-            @apply text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium;
-        }
-        .nav-link.active {
-            @apply text-blue-600;
-        }
-    </style>
-    
     @stack('styles')
 </head>
-<body class="font-sans antialiased bg-white">
+<body class="font-sans antialiased">
     
     <!-- Navbar -->
     @include('components.global.navbar')
@@ -33,35 +27,6 @@
     
     <!-- Footer -->
     @include('components.global.footer')
-    
-    <!-- Scripts -->
-    <script>
-        // Mobile menu toggle (prevent redeclaration)
-        let menuToggle = window.menuToggle || document.getElementById('menu-toggle');
-        let mobileMenu = window.mobileMenu || document.getElementById('mobile-menu');
-        let menuClose = window.menuClose || document.getElementById('menu-close');
-        window.menuToggle = menuToggle;
-        window.mobileMenu = mobileMenu;
-        window.menuClose = menuClose;
-        if (menuToggle && mobileMenu) {
-            menuToggle.addEventListener('click', () => {
-                mobileMenu.classList.remove('hidden');
-            });
-        }
-        if (menuClose && mobileMenu) {
-            menuClose.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
-            });
-        }
-        // Active nav link
-        const currentPath = window.location.pathname;
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            if (link.getAttribute('href') === currentPath) {
-                link.classList.add('active');
-            }
-        });
-    </script>
     
     @stack('scripts')
 </body>

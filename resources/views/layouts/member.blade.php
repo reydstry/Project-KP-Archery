@@ -105,7 +105,7 @@
         <!-- Main Content -->
         <main class="flex-1 lg:ml-64 min-h-screen">
             <!-- Desktop Header -->
-            <div class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 px-8 py-4 shadow-sm">
+            <div class="sticky top-0 z-30 bg-white/90 backdrop-blur-[2px] border-b border-slate-200 px-8 py-4 shadow-sm">
                 <div class="flex items-center justify-between">
                     <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-slate-700 hover:text-slate-900">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
