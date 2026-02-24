@@ -122,8 +122,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('training-sessions', [AdminTrainingSessionController::class, 'index']);
         Route::post('training-sessions', [AdminTrainingSessionController::class, 'store']);
         Route::get('training-sessions/{trainingSession}', [AdminTrainingSessionController::class, 'show']);
+        Route::patch('training-sessions/{trainingSession}', [AdminTrainingSessionController::class, 'update']);
         Route::delete('training-sessions/{trainingSession}', [AdminTrainingSessionController::class, 'destroy']);
+        Route::patch('training-sessions/{trainingSession}/status', [AdminTrainingSessionController::class, 'updateStatus']);
+        Route::post('training-sessions/{trainingSession}/slots', [AdminTrainingSessionController::class, 'createSlot']);
+        Route::patch('training-session-slots/{trainingSessionSlot}', [AdminTrainingSessionController::class, 'updateSlot']);
         Route::patch('training-session-slots/{trainingSessionSlot}/coaches', [AdminTrainingSessionController::class, 'updateSlotCoaches']);
+        Route::delete('training-session-slots/{trainingSessionSlot}', [AdminTrainingSessionController::class, 'deleteSlot']);
 
         Route::get('attendance/active-members', [AdminAttendanceController::class, 'activeMembers']);
         Route::get('training-sessions/{trainingSession}/attendances', [AdminAttendanceController::class, 'index']);

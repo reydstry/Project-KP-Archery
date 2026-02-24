@@ -54,39 +54,50 @@ class TrainingManagementService
 
     public function create(array $payload, ?int $createdBy): array
     {
-        $sessionTimeIds = collect($payload['slots'])->pluck('session_time_id');
+        // Handle optional slots
+        $slots = $payload['slots'] ?? [];
+        
+        if (!empty($slots)) {
+            $sessionTimeIds = collect($slots)->pluck('session_time_id');
 
-        if ($sessionTimeIds->count() !== $sessionTimeIds->unique()->count()) {
-            return [
-                'error' => true,
-                'status' => 422,
-                'body' => ['message' => 'Ada slot waktu yang dipilih lebih dari sekali.'],
-            ];
+            if ($sessionTimeIds->count() !== $sessionTimeIds->unique()->count()) {
+                return [
+                    'error' => true,
+                    'status' => 422,
+                    'body' => ['message' => 'Ada slot waktu yang dipilih lebih dari sekali.'],
+                ];
+            }
         }
 
         try {
             DB::beginTransaction();
 
+            // Use status from payload if provided, otherwise default to OPEN
+            $status = $payload['status'] ?? TrainingSessionStatus::OPEN->value;
+            
             $trainingSession = TrainingSession::query()->create([
                 'date' => $payload['date'],
-                'status' => TrainingSessionStatus::OPEN->value,
+                'status' => $status,
                 'created_by' => $createdBy,
             ]);
 
-            foreach ($payload['slots'] as $slotPayload) {
-                $slot = TrainingSessionSlot::query()->create([
-                    'training_session_id' => $trainingSession->id,
-                    'session_time_id' => $slotPayload['session_time_id'],
-                    'max_participants' => $slotPayload['max_participants'],
-                ]);
+            // Only create slots if provided
+            if (!empty($slots)) {
+                foreach ($slots as $slotPayload) {
+                    $slot = TrainingSessionSlot::query()->create([
+                        'training_session_id' => $trainingSession->id,
+                        'session_time_id' => $slotPayload['session_time_id'],
+                        'max_participants' => $slotPayload['max_participants'],
+                    ]);
 
-                $coachIds = collect($slotPayload['coach_ids'])
-                    ->map(fn ($id) => (int) $id)
-                    ->filter()
-                    ->unique()
-                    ->all();
+                    $coachIds = collect($slotPayload['coach_ids'])
+                        ->map(fn ($id) => (int) $id)
+                        ->filter()
+                        ->unique()
+                        ->all();
 
-                $slot->coaches()->attach($coachIds);
+                    $slot->coaches()->attach($coachIds);
+                }
             }
 
             DB::commit();
@@ -187,5 +198,156 @@ class TrainingManagementService
             'status' => 200,
             'body' => ['message' => 'Training session deleted successfully'],
         ];
+    }
+
+    public function update(TrainingSession $trainingSession, array $data): array
+    {
+        try {
+            $updateData = [];
+            
+            if (isset($data['date'])) {
+                $updateData['date'] = $data['date'];
+            }
+            
+            if (isset($data['status'])) {
+                $updateData['status'] = $data['status'];
+            }
+            
+            if (empty($updateData)) {
+                return [
+                    'error' => true,
+                    'status' => 422,
+                    'body' => ['message' => 'Tidak ada data yang diupdate'],
+                ];
+            }
+
+            $trainingSession->update($updateData);
+
+            return [
+                'error' => false,
+                'status' => 200,
+                'body' => [
+                    'message' => 'Session berhasil diperbarui',
+                    'data' => $trainingSession->fresh(),
+                ],
+            ];
+        } catch (\Throwable $exception) {
+            return [
+                'error' => true,
+                'status' => 500,
+                'body' => [
+                    'message' => 'Gagal memperbarui session',
+                    'error' => $exception->getMessage(),
+                ],
+            ];
+        }
+    }
+
+    public function updateStatus(TrainingSession $trainingSession, string $status): array
+    {
+        try {
+            $trainingSession->update(['status' => $status]);
+
+            return [
+                'error' => false,
+                'status' => 200,
+                'body' => [
+                    'message' => 'Status berhasil diubah',
+                    'data' => $trainingSession->fresh(),
+                ],
+            ];
+        } catch (\Throwable $exception) {
+            return [
+                'error' => true,
+                'status' => 500,
+                'body' => [
+                    'message' => 'Gagal mengubah status',
+                    'error' => $exception->getMessage(),
+                ],
+            ];
+        }
+    }
+
+    public function createSlot(TrainingSession $trainingSession, array $payload): array
+    {
+        // Check if a slot with the same session_time_id already exists
+        $existingSlot = $trainingSession->slots()
+            ->where('session_time_id', $payload['session_time_id'])
+            ->exists();
+
+        if ($existingSlot) {
+            return [
+                'error' => true,
+                'status' => 422,
+                'body' => ['message' => 'Slot untuk waktu ini sudah ada pada sesi ini.'],
+            ];
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $slot = TrainingSessionSlot::query()->create([
+                'training_session_id' => $trainingSession->id,
+                'session_time_id' => $payload['session_time_id'],
+                'max_participants' => $payload['max_participants'],
+            ]);
+
+            $coachIds = collect($payload['coach_ids'])
+                ->map(fn ($id) => (int) $id)
+                ->filter()
+                ->unique()
+                ->all();
+
+            $slot->coaches()->attach($coachIds);
+
+            DB::commit();
+
+            return [
+                'error' => false,
+                'status' => 201,
+                'body' => [
+                    'message' => 'Slot berhasil ditambahkan',
+                    'data' => $slot->fresh()
+                        ->load(['sessionTime:id,name,start_time,end_time', 'coaches:id,name']),
+                ],
+            ];
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+
+            return [
+                'error' => true,
+                'status' => 500,
+                'body' => [
+                    'message' => 'Gagal menambahkan slot',
+                    'error' => $exception->getMessage(),
+                ],
+            ];
+        }
+    }
+
+    public function deleteSlot(TrainingSessionSlot $slot): array
+    {
+        try {
+            // Remove coach assignments first
+            $slot->coaches()->detach();
+            
+            // Delete the slot
+            $slot->delete();
+
+            return [
+                'error' => false,
+                'status' => 200,
+                'body' => ['message' => 'Slot berhasil dihapus'],
+            ];
+        } catch (\Throwable $exception) {
+            return [
+                'error' => true,
+                'status' => 500,
+                'body' => [
+                    'message' => 'Gagal menghapus slot',
+                    'error' => $exception->getMessage(),
+                ],
+            ];
+        }
     }
 }
