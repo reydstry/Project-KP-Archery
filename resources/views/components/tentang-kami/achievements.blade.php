@@ -50,10 +50,10 @@
             @foreach($achievements as $achievement)
             <div class="relative group">
                 <!-- Glow -->
-                <div class="absolute inset-0 bg-red-500/15 rounded-3xl blur-2xl scale-105 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-red-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                 <!-- Card -->
-                <div class="relative h-full bg-[#a72320]/15 backdrop-blur-[2px] border border-white/20 rounded-2xl overflow-hidden
+                <div class="relative h-full bg-white/5 backdrop-blur-[2px] border border-white/20 rounded-2xl overflow-hidden
                             shadow-xl shadow-black/30 hover:shadow-2xl hover:shadow-black/60
                             transition-all duration-300 hover:-translate-y-2">
 
@@ -78,9 +78,12 @@
                             <h4 class="font-bold text-white text-base">{{ $achievement['name'] }}</h4>
                             <p class="text-white/50 text-xs mb-4">Atlet FocusOnex</p>
                         </div>
-                        <!-- Divider -->
-                        <div class="w-full h-px bg-[#a72320]/70 mb-4"></div>
 
+                        <div class="flex justify-center">
+                            <!-- Divider -->
+                            <div class="w-25 h-px bg-red-500/70 mb-4"></div>
+                        </div>
+         
                         <!-- Awards -->
                         <div class="space-y-3">
                             @foreach($achievement['awards'] as $award)

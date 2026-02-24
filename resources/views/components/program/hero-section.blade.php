@@ -93,9 +93,9 @@ bg-gradient-to-b from-[#16213a] via-[#0f172a] to-[#1b2659] overflow-hidden">
                     <!-- Card Header -->
                     <div class="bg-{{ $program['color'] }}-500/20 border-b
                      border-white/10 px-6 py-5 flex items-center gap-3">
-                        <div class="w-11 h-11 bg-{{ $program['color'] }}/40 backdrop-blur-sm border border-white/20 
+                        <div class="w-11 h-11 backdrop-blur-sm border border-white/20 
                                     rounded-xl flex items-center justify-center text-white flex-shrink-0
-                                    shadow-lg shadow-{{ $program['color'] }}/20">
+                                    shadow-lg">
                             {!! $program['icon'] !!}
                         </div>
                         <h3 class="text-sm sm:text-base font-bold text-white leading-tight">

@@ -76,10 +76,10 @@ bg-gradient-to-b from-[#1b2659] via-[#0f172a] to-[#16213a] overflow-hidden">
             @foreach($programs as $program)
             <div class="relative group">
                 <!-- Glow -->
-                <div class="absolute inset-0 bg-red-500/15 rounded-3xl blur-2xl scale-105 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-red-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                 <!-- Card -->
-                <div class="relative h-full bg-{{ $program['color'] }}/15 backdrop-blur-[2px] border border-white/20 rounded-2xl overflow-hidden
+                <div class="relative h-full bg-white/5 backdrop-blur-[2px] border border-white/20 rounded-2xl overflow-hidden
                             shadow-xl shadow-black/30 hover:shadow-2xl hover:shadow-black/60
                             transition-all duration-300 hover:-translate-y-2">
 

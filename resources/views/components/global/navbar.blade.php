@@ -18,18 +18,21 @@ shadow-md transition-all duration-300">
 
             <!-- Desktop Menu -->
             <div class="hidden md:flex items-center space-x-8">
-                <a href="{{ route('beranda') }}" class="nav-link">{{ __('nav.home') }}</a>
-                <a href="{{ route('tentang-kami') }}" class="nav-link">{{ __('nav.about') }}</a>
-                <a href="{{ route('program') }}" class="nav-link">{{ __('nav.program') }}</a>
-                <a href="{{ route('galeri') }}" class="nav-link">{{ __('nav.gallery') }}</a>
-                <a href="{{ route('kontak') }}" class="nav-link">{{ __('nav.contact') }}</a>
+                <a href="{{ route('beranda') }}" 
+                class="nav-link {{ request()->routeIs('beranda') ? 'active' : '' }}">{{ __('nav.home') }}</a>
+                <a href="{{ route('tentang-kami') }}"
+                class="nav-link {{ request()->routeIs('tentang-kami') ? 'active' : '' }}">{{ __('nav.about') }}</a>
+                <a href="{{ route('program') }}" 
+                class="nav-link {{ request()->routeIs('program') ? 'active' : '' }}">{{ __('nav.program') }}</a>
+                <a href="{{ route('galeri') }}" class="nav-link {{ request()->routeIs('galeri') ? 'active' : '' }}">{{ __('nav.gallery') }}</a>
+                <a href="{{ route('kontak') }}" class="nav-link {{ request()->routeIs('kontak') ? 'active' : '' }}">{{ __('nav.contact') }}</a>
             </div>
 
             <!-- Right Desktop -->
             <div class="hidden md:flex items-center gap-3">
 
                 <!-- Language Dropdown -->
-                <div class="relative">
+                <div class="relative">  
                     <button id="lang-toggle"
                         class="flex items-center gap-2 px-3 py-1.5
                               bg-[#1a307b]/70 backdrop-blur-sm border border-white/20

@@ -1,5 +1,5 @@
 <!-- Header -->
-<section class="bg-gradient-to-br from-gray-50 to-white py-20 mt-20">
+<section class="bg-gradient-to-b     from-[#1a307b] to-[#0c1a4d] py-20 mt-20">
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
     <h1 class="text-4xl font-bold text-gray-900 mb-3">{{ __('gallery.header_title') }}</h1>
