@@ -2,8 +2,6 @@
 
 return [
     // Hero Section
-    'hero_title_1' => 'Temukan',
-    'hero_title_2' => 'Fokus Sejatimu',
     'hero_subtitle' => 'Belajar panahan dengan instruktur bersertifikat.<br class="hidden sm:block">Dari pemula hingga atlet profesional, kami siap membimbingmu.',
     'register_now' => 'Daftar Sekarang',
     'view_program' => 'Lihat Program',

@@ -88,7 +88,7 @@
         <!-- Main Content -->
         <main class="flex-1 ml-64 min-h-screen">
             <!-- Desktop Header -->
-            <div class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 px-8 py-4 shadow-sm">
+            <div class="sticky top-0 z-30 bg-white/90 backdrop-blur-[2px] border-b border-slate-200 px-8 py-4 shadow-sm">
                 <div class="flex items-center justify-between">
                     <!-- Page Title & Subtitle -->
                     <div>

@@ -3,6 +3,7 @@
 return [
     // Contact Page
     'page_title' => 'Contact Us',
+    'page_subtitle' => 'Have questions? We are ready to help you',
     'hero_title' => 'Contact Us',
     'hero_subtitle' => 'Have questions? We are ready to help you',
     
