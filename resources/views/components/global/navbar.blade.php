@@ -1,4 +1,5 @@
-<nav class="fixed top-4 left-6 right-6 z-50
+<nav id="navbar"
+class="fixed top-4 left-6 right-6 z-50
 bg-white/35 backdrop-blur-[2px] border border-white/30 rounded-full
 shadow-md transition-all duration-300">
     <div class="w-full">
@@ -181,5 +182,32 @@ shadow-md transition-all duration-300">
                 }
             });
         }
+    })();
+</script>
+<script>
+    (function () {
+        let lastScroll = 0;
+        const navbar = document.getElementById("navbar");
+
+        window.addEventListener("scroll", function () {
+            let currentScroll = window.pageYOffset;
+
+            // Kalau di paling atas → selalu tampil
+            if (currentScroll <= 0) {
+                navbar.style.transform = "translateY(0)";
+                return;
+            }
+
+            // Scroll ke bawah → sembunyikan
+            if (currentScroll > lastScroll) {
+                navbar.style.transform = "translateY(-150%)";
+            } 
+            // Scroll ke atas → tampilkan
+            else {
+                navbar.style.transform = "translateY(0)";
+            }
+
+            lastScroll = currentScroll;
+        });
     })();
 </script>

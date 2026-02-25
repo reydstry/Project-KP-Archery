@@ -1,16 +1,7 @@
 <?php $__env->startSection('title', __('gallery.page_title') . ' - FocusOneX Archery'); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="min-h-screen bg-gray-50 py-10 sm:py-12 mt-20">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <?php echo $__env->make('components.galeri.header', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-        
-        <?php echo $__env->make('components.galeri.gallery-content', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
-
-    </div>
-</div>
-
+<?php echo $__env->make('components.galeri.hero-section', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 <?php echo $__env->make('components.galeri.news-section', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <script>
@@ -23,8 +14,8 @@ function switchTab(tab) {
     
     // Remove active state from all buttons
     document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('active', 'border-blue-600', 'text-blue-600');
-        button.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+        button.classList.remove('active', 'border-white', 'text-white');
+        button.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-300', 'hover:border-gray-300');
     });
     
     // Show selected content
@@ -32,8 +23,8 @@ function switchTab(tab) {
     
     // Add active state to selected button
     const activeButton = document.getElementById('tab-' + tab);
-    activeButton.classList.add('active', 'border-blue-600', 'text-blue-600');
-    activeButton.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+    activeButton.classList.add('active', 'border-white', 'text-white');
+    activeButton.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-300', 'hover:border-gray-300');
 }
 
 // View Berita Function
@@ -49,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <style>
 .tab-button.active {
-    @apply border-blue-600 text-blue-600;
+    @apply border-white text-white;
 }
 
 .tab-button:not(.active) {

@@ -3,6 +3,7 @@
 return [
     // Contact Page
     'page_title' => 'Kontak',
+    'page_subtitle' => 'Ada pertanyaan? Kami siap membantu Anda',
     'hero_title' => 'Hubungi Kami',
     'hero_subtitle' => 'Ada pertanyaan? Kami siap membantu Anda',
     
@@ -23,6 +24,7 @@ return [
     'form_subtitle' => 'Isi formulir di bawah dan kami akan segera menghubungi Anda',
     'name' => 'Nama Lengkap',
     'name_placeholder' => 'Nama Anda',
+    'email' => 'Email',
     'email_placeholder' => 'email@anda.com',
     'subject' => 'Subjek',
     'subject_placeholder' => 'Subjek pesan',
@@ -52,7 +54,7 @@ return [
     'program_advanced' => 'Program Advanced',
     'program_competition' => 'Program Kompetisi',
     'program_private' => 'Les Privat',
-    'message_placeholder_alt' => 'Tuliskan pesan atau pertanyaan Anda...',
+    'message_placeholder' => 'Tuliskan pesan atau pertanyaan Anda...',
     'send_via_whatsapp' => 'Kirim via WhatsApp',
     
     // Location Map
