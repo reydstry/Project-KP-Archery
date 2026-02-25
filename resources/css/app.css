@@ -117,6 +117,16 @@
     }
 }
 
+@keyframes pulseSlow {
+    0%,100% { opacity: .5; transform: scale(1); }
+    50% { opacity: .8; transform: scale(1.1); }
+}
+
+@keyframes pulseSlower {
+    0%,100% { opacity: .4; transform: scale(1); }
+    50% { opacity: .7; transform: scale(1.15); }
+}
+
 /* ===============================
    Animation Utilities
 ================================ */
@@ -143,6 +153,14 @@
 
 .sidebar-animate {
     animation: slideIn 0.3s ease-out;
+}
+
+.animate-pulse-slow {
+    animation: pulseSlow 10s ease-in-out infinite;
+}
+
+.animate-pulse-slower {
+    animation: pulseSlower 14s ease-in-out infinite;
 }
 
 /* ===============================

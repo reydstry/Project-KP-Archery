@@ -7,7 +7,7 @@
 <div class="space-y-6" x-data="trainingSessionsPage()" x-init="init()">
 
     <!-- Filter -->
-    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div class="flex items-center gap-3 px-5 py-3.5  bg-[#1a307b] border-b border-slate-100">
             <svg class="w-4 h-4 text-white" fill="white" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
@@ -73,17 +73,17 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
             <!-- Total -->
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 flex items-center justify-between hover:shadow-md transition">
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center justify-between hover:shadow-md transition">
                 <div>
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">
                         Total Session
                     </p>
-                    <p class="text-2xl font-bold text-slate-800 mt-1"
+                    <p class="text-2xl font-bold text-[#1a307b] mt-1"
                     x-text="sessions.length"></p>
                 </div>
 
-                <div class="w-10 h-10 bg-[#1a307b]/10 rounded-xl flex items-center justify-center">
-                    <svg class="w-5 h-5 text-[#1a307b]" fill="none" stroke="currentColor" stroke-width="2"
+                <div class="w-10 h-10 bg-[#1a307b] rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -92,17 +92,21 @@
             </div>
 
             <!-- Scheduled -->
-            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 flex items-center justify-between hover:shadow-md transition">
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex items-center justify-between hover:shadow-md transition">
                 <div>
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">
                         Scheduled
                     </p>
-                    <p class="text-2xl font-bold text-emerald-600 mt-1"
+                    <p class="text-2xl font-bold text-[#1a307b] mt-1"
                     x-text="sessions.filter(s => s.status === 'open').length"></p>
                 </div>
 
-                <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
-                    <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                <div class="w-10 h-10 bg-[#1a307b] rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/>
+                    </svg>
                 </div>
             </div>
 
@@ -112,12 +116,12 @@
                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">
                         Completed
                     </p>
-                    <p class="text-2xl font-bold text-slate-700 mt-1"
+                    <p class="text-2xl font-bold text-[#1a307b] mt-1"
                     x-text="sessions.filter(s => s.status === 'closed').length"></p>
                 </div>
 
-                <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
-                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5"
+                <div class="w-10 h-10 bg-[#1a307b] rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M5 13l4 4L19 7"/>
@@ -130,10 +134,14 @@
 
 
     <!-- Desktop Table -->
-    <div class="hidden lg:block bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="hidden lg:block bg-white rounded-2xl shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-5 py-3.5 border-b border-slate-100 bg-[#1a307b]">
             <div class="flex items-center gap-2.5">
-                <div class="w-1.5 h-5 bg-white rounded-full"></div>
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                </svg>
                 <h3 class="text-sm font-semibold text-white">Daftar Session</h3>
             </div>
             <div class="flex">
@@ -153,10 +161,10 @@
 
         <!-- Column Header -->
         <div class="grid grid-cols-12 bg-slate-50/80 border-b border-slate-200 px-5 py-2.5">
-            <div class="col-span-1 text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">No</div>
-            <div class="col-span-2 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Tanggal</div>
-            <div class="col-span-6 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Status</div>
-            <div class="col-span-3 text-xs font-bold text-slate-400 uppercase tracking-wider pl-[160px]">Aksi</div>
+            <div class="col-span-1 text-xs font-bold text-slate-800 uppercase tracking-wider pl-1">No</div>
+            <div class="col-span-2 text-xs font-bold text-slate-800 uppercase tracking-wider text-center">Tanggal</div>
+            <div class="col-span-6 text-xs font-bold text-slate-800 uppercase tracking-wider text-center">Status</div>
+            <div class="col-span-3 text-xs font-bold text-slate-800 uppercase tracking-wider pl-[160px]">Aksi</div>
         </div>
 
         <!-- Loading -->
@@ -195,8 +203,7 @@
                 <!-- No -->
                 <div class="col-span-1">
                     <span class="w-7 h-7 flex items-center justify-center rounded-lg text-xs font-bold
-                                 bg-slate-100 text-slate-400 group-hover:bg-[#1a307b]/10 
-                                 group-hover:text-[#1a307b] transition-colors"
+                                 text-slate-800"
                           x-text="index + 1"></span>
                 </div>
 
