@@ -45,7 +45,7 @@ return [
     // Hero Section Details
     'hero_page_title' => 'Program Pelatihan',
     'hero_page_subtitle' => 'Pilih program yang sesuai dengan level dan tujuan Anda',
-    'program_club_title' => 'Program Klub & Eksekul',
+    'program_club_title' => 'Program Klub & Ekstrakurikuler',
     'program_club_desc' => 'Pelatihan panahan terstruktur untuk pemula hingga lanjutan, cocok untuk individu maupun institusi.',
     'program_club_feature_1' => 'Latihan rutin (Senin–Minggu)',
     'program_club_feature_2' => 'Sistem berjenjang & terarah',

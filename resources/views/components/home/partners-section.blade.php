@@ -50,19 +50,21 @@
         transform: translateX(0);
     }
     100% {
-        transform: translateX(-400%);
+        transform: translateX(-50%);
     }
 }
 
 /* Desktop */
 .animate-marquee {
-    animation: marquee 100s linear infinite;
+    display: flex;
+    width: max-content;
+    animation: marquee 20s linear infinite;
 }
 
 /* Mobile = lebih cepat */
 @media (max-width: 768px) {
     .animate-marquee {
-        animation-duration: 50s;
+        animation-duration: 30s;
     }
 }
 </style>
