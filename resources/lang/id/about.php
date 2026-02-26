@@ -34,9 +34,9 @@ return [
     
     // Hero Section Content
     'hero_main_title' => 'Tentang FocusOneX Archery',
-    'hero_paragraph_1' => 'Sejak 2017, FocusOneX Archery telah menjadi pusat pelatihan panahan terdepan di Balikpapan yang menghadirkan program komprehensif untuk semua kalangan—dari pemula yang baru ingin mencoba hingga atlet yang siap bersaing di level kompetisi.',
-    'hero_paragraph_2' => 'Keunggulan kami terletak pada tim instruktur bersertifikat yang tidak hanya memiliki kemampuan teknis tinggi tetapi juga berkompetisi sebagai atlet Panjam Balikpapan. Dengan fasilitas modern dan pengalaman bertahun-tahun, kami siap membimbing Anda menguasai seni panahan dengan cara yang aman, menyenangkan, dan efektif.',
-    'hero_paragraph_3' => 'Kami dipercaya oleh berbagai instansi termasuk Pertamina, TK Al Auliya Balikpapan, dan berbagai sekolah lainnya di Balikpapan. Lebih dari 8 partner telah mempercayai kami untuk program pelatihan panahan mereka, membuktikan komitmen kami dalam memberikan pengalaman pelatihan yang berkualitas.',
+    'hero_paragraph_1' => 'Sejak 2017, FocusOneX Archery telah menjadi pusat pelatihan panahan terdepan di Balikpapan yang menghadirkan program komprehensif untuk semua kalangan—mulai dari pemula yang baru ingin mencoba hingga atlet yang siap bersaing di level kompetisi.',
+    'hero_paragraph_2' => 'Keunggulan kami terletak pada tim instruktur bersertifikat yang tidak hanya memiliki kemampuan teknis tinggi, tetapi juga aktif berkompetisi sebagai atlet panahan di Balikpapan. Dengan fasilitas modern dan pengalaman bertahun-tahun, kami siap membimbing Anda menguasai seni panahan dengan cara yang aman, menyenangkan, dan efektif.',
+    'hero_paragraph_3' => 'Kami dipercaya oleh berbagai instansi, termasuk Pertamina, TK Al Auliya Balikpapan, Istiqomah YPAITB, serta berbagai sekolah lainnya di Balikpapan. Lebih dari 8 mitra telah mempercayakan program pelatihan panahan mereka kepada kami, membuktikan komitmen FocusOneX Archery dalam memberikan pengalaman pelatihan yang berkualitas.',
     'hero_since_2017' => 'Sejak 2017',
     'hero_serving_dedication' => 'Melayani dengan Dedikasi',
     

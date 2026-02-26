@@ -98,6 +98,11 @@
                     'route' => 'admin.achievements',
                     'patterns' => ['admin.achievements'],
                 ],
+                [
+                    'label' => 'Galleries',
+                    'route' => 'admin.galleries',
+                    'patterns' => ['admin.galleries'],
+                ],
             ],
         ],
     ];

@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Models\Achievement;
+use App\Models\Gallery;
 use App\Models\News;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -104,5 +105,48 @@ class ContentManagementService
         }
 
         $achievement->delete();
+    }
+
+    public function listGalleries()
+    {
+        return Gallery::query()
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+    }
+
+    public function createGallery(array $payload, ?UploadedFile $photo): Gallery
+    {
+        if ($photo) {
+            $payload['photo_path'] = $photo->store('galleries', 'public');
+        }
+
+        unset($payload['photo']);
+
+        return Gallery::query()->create($payload);
+    }
+
+    public function updateGallery(Gallery $gallery, array $payload, ?UploadedFile $photo): Gallery
+    {
+        if ($photo) {
+            if ($gallery->photo_path && Storage::disk('public')->exists($gallery->photo_path)) {
+                Storage::disk('public')->delete($gallery->photo_path);
+            }
+
+            $payload['photo_path'] = $photo->store('galleries', 'public');
+        }
+
+        unset($payload['photo']);
+        $gallery->update($payload);
+
+        return $gallery->fresh();
+    }
+
+    public function deleteGallery(Gallery $gallery): void
+    {
+        if ($gallery->photo_path && Storage::disk('public')->exists($gallery->photo_path)) {
+            Storage::disk('public')->delete($gallery->photo_path);
+        }
+
+        $gallery->delete();
     }
 }

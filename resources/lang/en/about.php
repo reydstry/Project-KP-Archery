@@ -34,9 +34,9 @@ return [
     
     // Hero Section Content
     'hero_main_title' => 'About FocusOneX Archery',
-    'hero_paragraph_1' => 'Since 2017, FocusOneX Archery has been Balikpapan\'s leading archery training center, offering comprehensive programs for all levels—from beginners looking to try archery to athletes ready to compete at competition levels.',
+    'hero_paragraph_1' => 'Since 2017, FocusOneX Archery has been Balikpapan leading archery training center, offering comprehensive programs for all levels—from beginners who are just starting out to athletes ready to compete at higher levels.',
     'hero_paragraph_2' => 'Our strength lies in our certified instructor team who not only have high technical skills but also compete as Panjam Balikpapan athletes. With modern facilities and years of experience, we are ready to guide you in mastering the art of archery in a safe, fun, and effective way.',
-    'hero_paragraph_3' => 'We are trusted by various institutions including Pertamina, TK Al Auliya Balikpapan, and various other schools in Balikpapan. More than 8 partners have trusted us for their archery training programs, proving our commitment to providing quality training experiences.',
+    'hero_paragraph_3' => 'We are trusted by various institutions including Pertamina, TK Al Auliya Balikpapan, Istiqomah YPAITB, and various other schools in Balikpapan. More than 8 partners have trusted us for their archery training programs, proving our commitment to providing quality training experiences.',
     'hero_since_2017' => 'Since 2017',
     'hero_serving_dedication' => 'Serving with Dedication',
     

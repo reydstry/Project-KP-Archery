@@ -105,6 +105,7 @@ Route::middleware('auth')->group(function () {
         // Website
         Route::get('/news', fn() => view('dashboards.admin.dashboard.news'))->name('news');
         Route::get('/achievements', fn() => view('dashboards.admin.dashboard.achievements'))->name('achievements');
+        Route::get('/galleries', fn() => view('dashboards.admin.dashboard.galleries'))->name('galleries');
 
         // Communication
         Route::get('/communication/wa-blast', [AdminWhatsAppPageController::class, 'waBlast'])->name('communication.wa-blast');

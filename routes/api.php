@@ -12,11 +12,13 @@ use App\Http\Controllers\Member\DashboardController;
 use App\Http\Controllers\Member\RegistrationController;
 use App\Http\Controllers\PublicSite\NewsController as PublicNewsController;
 use App\Http\Controllers\PublicSite\AchievementController as PublicAchievementController;
+use App\Http\Controllers\PublicSite\GalleryController as PublicGalleryController;
 use App\Modules\Admin\Attendance\Controllers\AttendanceController as AdminAttendanceController;
 use App\Modules\Admin\Coach\Controllers\CoachController;
 use App\Modules\Admin\Dashboard\Controllers\AchievementController as AdminAchievementController;
 use App\Modules\Admin\Dashboard\Controllers\DashboardController as AdminDashboardController;
 use App\Modules\Admin\Dashboard\Controllers\NewsController as AdminNewsController;
+use App\Modules\Admin\Dashboard\Controllers\GalleryController as AdminGalleryController;
 use App\Modules\Admin\Member\Controllers\MemberController as AdminMemberController;
 use App\Modules\Admin\Member\Controllers\MemberPackageController as AdminMemberPackageController;
 use App\Modules\Admin\Package\Controllers\PackageController;
@@ -37,6 +39,10 @@ Route::get('/news/{news}', [PublicNewsController::class, 'show']);
 
 // Public routes - Achievements (for company profile)
 Route::get('/achievements', [PublicAchievementController::class, 'index']);
+
+// Public routes - Galleries (for company profile)
+Route::get('/galleries', [PublicGalleryController::class, 'index']);
+Route::get('/galleries/{gallery}', [PublicGalleryController::class, 'show']);
 Route::get('/achievements/{achievement}', [PublicAchievementController::class, 'show']);
 
 // Protected routes (perlu login)
@@ -89,6 +95,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('packages/{package}/restore', [PackageController::class, 'restore']);
 
         // News
+
+        // Galleries
+        Route::apiResource('galleries', AdminGalleryController::class);
         Route::apiResource('news', AdminNewsController::class);
 
         // Achievements
