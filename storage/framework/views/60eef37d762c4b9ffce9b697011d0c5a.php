@@ -17,7 +17,7 @@
             <table class="w-full">
                 <thead class="bg-[#1a307b] border-b border-slate-200">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">No</th>
                         <th class="pl-14 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">Member</th>
                         <th class="pr-6 py-6 text-center text-xs font-semibold text-white uppercase tracking-wider">Package</th>
                         <th class="px-6 py-6 text-center text-xs font-semibold text-white uppercase tracking-wider">Sessions</th>

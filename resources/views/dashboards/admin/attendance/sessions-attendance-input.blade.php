@@ -127,6 +127,9 @@ function attendanceInputPage(sessionId) {
                 this.loadMembers(),
                 this.loadAttendances(),
             ]);
+            // Pre-select members who are already recorded for this session,
+            // so existing attendance is visible as checked boxes when the page loads.
+            this.selectedMemberIds = this.attendances.map(a => Number(a.member_id));
         },
 
         async loadMembers() {

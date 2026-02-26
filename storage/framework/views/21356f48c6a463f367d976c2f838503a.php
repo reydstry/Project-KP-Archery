@@ -36,20 +36,6 @@
 
             <!-- Form Content -->
             <div x-show="!loading" class="p-6 sm:p-8 space-y-6">
-                
-                <!-- Session ID (Read-only) -->
-                <div>
-                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
-                        <svg class="w-5 h-5 text-[#1a307b]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                        </svg>
-                        ID Session
-                    </label>
-                    <input type="text" 
-                           value="<?php echo e($id); ?>" 
-                           readonly
-                           class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl bg-slate-50 text-slate-600 font-semibold cursor-not-allowed">
-                </div>
 
                 <!-- Date Input -->
                 <div>
@@ -76,53 +62,125 @@
 
                 <!-- Status Select -->
                 <div>
-                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
                         <svg class="w-5 h-5 text-[#1a307b]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Status
+                        Status Awal
                     </label>
-                    <select x-model="form.status" 
-                            class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1a307b]/30 focus:border-[#1a307b] transition appearance-none bg-white text-slate-700"
-                            :class="errors.status ? 'border-red-400 focus:border-red-500 focus:ring-red-500/30' : ''">
-                        <option value="open">Scheduled/Ongoing</option>
-                        <option value="closed">Completed</option>
-                        <option value="canceled">Canceled</option>
-                    </select>
-                    <p x-show="errors.status" 
-                       x-transition
-                       class="mt-2 text-sm text-red-600 flex items-center gap-1">
+                    <div class="grid grid-cols-3 gap-3">
+                        <!-- Option: Scheduled -->
+                        <button type="button" @click="form.status = 'open'"
+                                class="relative flex flex-col items-start gap-2 p-4 rounded-xl border-2 transition-all duration-200 text-left"
+                                :class="form.status === 'open' 
+                                    ? 'border-[#1a307b] bg-[#1a307b]/5 shadow-md shadow-[#1a307b]/10' 
+                                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'">
+                            <div class="flex items-center justify-between w-full">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center"
+                                    :class="form.status === 'open' ? 'bg-emerald-100' : 'bg-slate-100'">
+                                    <svg class="w-5 h-5" :class="form.status === 'open' ? 'text-emerald-600' : 'text-slate-400'"
+                                        fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
+                                    :class="form.status === 'open' ? 'border-[#1a307b] bg-[#1a307b]' : 'border-slate-300'">
+                                    <svg x-show="form.status === 'open'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold" :class="form.status === 'open' ? 'text-[#1a307b]' : 'text-slate-700'">Scheduled</p>
+                                <p class="text-xs mt-0.5" :class="form.status === 'open' ? 'text-[#1a307b]/70' : 'text-slate-400'">Member dapat mendaftar</p>
+                            </div>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                :class="form.status === 'open' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'">
+                                <span class="w-1.5 h-1.5 rounded-full animate-pulse"
+                                    :class="form.status === 'open' ? 'bg-emerald-500' : 'bg-slate-400'"></span>
+                                Open
+                            </span>
+                        </button>
+
+                        <!-- Option: Completed -->
+                        <button type="button" @click="form.status = 'closed'"
+                                class="relative flex flex-col items-start gap-2 p-4 rounded-xl border-2 transition-all duration-200 text-left"
+                                :class="form.status === 'closed' 
+                                    ? 'border-[#1a307b] bg-[#1a307b]/5 shadow-md shadow-[#1a307b]/10' 
+                                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'">
+                            <div class="flex items-center justify-between w-full">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center"
+                                    :class="form.status === 'closed' ? 'bg-slate-200' : 'bg-slate-100'">
+                                    <svg class="w-5 h-5" :class="form.status === 'closed' ? 'text-slate-600' : 'text-slate-400'"
+                                        fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
+                                    :class="form.status === 'closed' ? 'border-[#1a307b] bg-[#1a307b]' : 'border-slate-300'">
+                                    <svg x-show="form.status === 'closed'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold" :class="form.status === 'closed' ? 'text-[#1a307b]' : 'text-slate-700'">Completed</p>
+                                <p class="text-xs mt-0.5" :class="form.status === 'closed' ? 'text-[#1a307b]/70' : 'text-slate-400'">Sesi telah selesai</p>
+                            </div>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                :class="form.status === 'closed' ? 'bg-slate-200 text-slate-700' : 'bg-slate-100 text-slate-500'">
+                                <span class="w-1.5 h-1.5 rounded-full"
+                                    :class="form.status === 'closed' ? 'bg-slate-500' : 'bg-slate-400'"></span>
+                                Closed
+                            </span>
+                        </button>
+
+                        <!-- Option: Canceled -->
+                        <button type="button" @click="form.status = 'canceled'"
+                                class="relative flex flex-col items-start gap-2 p-4 rounded-xl border-2 transition-all duration-200 text-left"
+                                :class="form.status === 'canceled' 
+                                    ? 'border-[#1a307b] bg-[#1a307b]/5 shadow-md shadow-[#1a307b]/10' 
+                                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'">
+                            <div class="flex items-center justify-between w-full">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center"
+                                    :class="form.status === 'canceled' ? 'bg-red-200' : 'bg-slate-100'">
+                                    <svg class="w-5 h-5" :class="form.status === 'canceled' ? 'text-red-600' : 'text-slate-400'"
+                                        fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
+                                    :class="form.status === 'canceled' ? 'border-[#1a307b] bg-[#1a307b]' : 'border-slate-300'">
+                                    <svg x-show="form.status === 'canceled'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold" :class="form.status === 'canceled' ? 'text-[#1a307b]' : 'text-slate-700'">Canceled</p>
+                                <p class="text-xs mt-0.5" :class="form.status === 'canceled' ? 'text-[#1a307b]/70' : 'text-slate-400'">Sesi telah dibatalkan</p>
+                            </div>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                :class="form.status === 'canceled' ? 'bg-red-200 text-red-700' : 'bg-slate-100 text-slate-500'">
+                                <span class="w-1.5 h-1.5 rounded-full"
+                                    :class="form.status === 'canceled' ? 'bg-red-500' : 'bg-slate-400'"></span>
+                                Canceled
+                            </span>
+                        </button>
+                    </div>
+
+                    <p x-show="errors.status" x-transition class="mt-2 text-sm text-red-600 flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
                         <span x-text="errors.status"></span>
                     </p>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-[#1a307b] rounded-xl p-4">
-                    <h3 class="text-sm font-semibold text-slate-800 mb-3 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#1a307b]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/>
+                    <p class="mt-2 text-xs text-slate-500 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Management Cepat
-                    </h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <a :href="`/admin/training/slots?session=${sessionId}`" 
-                           class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-[#1a307b]/20 bg-white hover:bg-[#1a307b]/5 text-sm font-semibold text-[#1a307b] transition shadow-sm hover:shadow">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Kelola Slot & Coach
-                        </a>
-                        <a :href="`/admin/sessions/${sessionId}/attendance`" 
-                           class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-[#1a307b]/20 bg-white hover:bg-[#1a307b]/5 text-sm font-semibold text-[#1a307b] transition shadow-sm hover:shadow">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/>
-                            </svg>
-                            Kelola Attendance
-                        </a>
-                    </div>
+                        Pilih "Scheduled" untuk session yang dapat diikuti member
+                    </p>
                 </div>
             </div>
 

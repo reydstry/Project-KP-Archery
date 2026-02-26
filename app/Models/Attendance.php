@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\StatusMember;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -46,9 +45,8 @@ class Attendance extends Model
     public function scopeOnlyActiveMembers($query)
     {
         return $query->whereHas('member', function ($memberQuery) {
-            $memberQuery
-                ->where('is_active', true)
-                ->where('status', StatusMember::STATUS_ACTIVE->value);
+            // Use eligibleForAttendance: is_active=true + has active package
+            $memberQuery->eligibleForAttendance();
         });
     }
 }

@@ -26,8 +26,7 @@ class WhatsAppController extends Controller
         $count = Member::query()
             ->whereNotNull('phone')
             ->when($target === 'active', function ($query) {
-                $query->where('is_active', true)
-                    ->where('status', StatusMember::STATUS_ACTIVE->value);
+                $query->withStatus(StatusMember::STATUS_ACTIVE->value);
             })
             ->count();
 
@@ -48,8 +47,7 @@ class WhatsAppController extends Controller
         $phones = Member::query()
             ->whereNotNull('phone')
             ->when($validated['target'] === 'active', function ($query) {
-                $query->where('is_active', true)
-                    ->where('status', StatusMember::STATUS_ACTIVE->value);
+                $query->withStatus(StatusMember::STATUS_ACTIVE->value);
             })
             ->pluck('phone')
             ->map(fn ($phone) => (string) $phone)

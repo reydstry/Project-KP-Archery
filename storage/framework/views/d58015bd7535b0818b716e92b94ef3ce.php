@@ -1,15 +1,10 @@
-@extends('layouts.coach')
+<?php $__env->startSection('title', 'Dashboard'); ?>
+<?php $__env->startSection('subtitle', 'Selamat datang, Coach ' . auth()->user()->name . '! Berikut ringkasan aktivitas latihan Anda.'); ?>
 
-@section('title', 'Dashboard')
-@section('subtitle', 'Selamat datang, Coach ' . auth()->user()->name . '! Berikut ringkasan aktivitas latihan Anda.')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div x-data="dashboardData()" x-init="loadData()" class="space-y-6">
 
-    {{-- =====================================================================
-         STAT CARDS — design tokens: navy icon, white card, emerald accent
-         Same structure as Admin dashboard for visual consistency.
-         ===================================================================== --}}
+    
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
         <!-- Sesi Hari Ini -->
@@ -55,13 +50,14 @@
         </div>
     </div>
 
-    {{-- ===================================================================== --}}
+    
 
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-150">
         <div class="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h3 class="font-bold text-slate-800">Jadwal Hari Ini</h3>
             <span class="px-4 py-2 bg-[#1a307b]/10 text-[#1a307b] rounded-xl text-sm font-semibold border border-[#1a307b]/20">
-                {{ now()->format('l, d F Y') }}
+                <?php echo e(now()->format('l, d F Y')); ?>
+
             </span>
         </div>
 
@@ -140,9 +136,9 @@
         </div>
     </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 function dashboardData() {
     return {
@@ -172,4 +168,6 @@ function dashboardData() {
     };
 }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.coach', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\Project\club-panahan\resources\views/dashboards/coach/dashboard.blade.php ENDPATH**/ ?>

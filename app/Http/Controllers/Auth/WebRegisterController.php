@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Enums\UserRoles;
-use App\Enums\StatusMember;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Member;
@@ -39,15 +38,14 @@ class WebRegisterController extends Controller
                 'role' => UserRoles::MEMBER,
             ]);
 
-            // Create member record with pending status
+            // Create member record — status computed automatically (no package → 'pending')
             Member::create([
-                'user_id' => $user->id,
+                'user_id'       => $user->id,
                 'registered_by' => $user->id,
-                'name' => $user->name,
-                'phone' => $user->phone,
-                'is_self' => true,
-                'is_active' => true,
-                'status' => StatusMember::STATUS_PENDING->value,
+                'name'          => $user->name,
+                'phone'         => $user->phone,
+                'is_self'       => true,
+                'is_active'     => true,
             ]);
 
             DB::commit();

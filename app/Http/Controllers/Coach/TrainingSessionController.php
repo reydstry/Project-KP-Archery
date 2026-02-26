@@ -423,8 +423,7 @@ class TrainingSessionController extends Controller
         $limit = max(1, min(300, (int) $request->query('limit', 200)));
 
         $query = Member::query()
-            ->where('is_active', true)
-            ->where('status', StatusMember::STATUS_ACTIVE->value)
+            ->eligibleForAttendance()  // is_active=true + has active package
             ->orderBy('name');
 
         if ($search !== '') {
@@ -436,7 +435,9 @@ class TrainingSessionController extends Controller
         }
 
         return response()->json([
-            'data' => $query->limit($limit)->get(['id', 'name', 'phone', 'status', 'is_active']),
+            // status excluded from select — eligibleForAttendance already ensures 'active',
+            // and including status without eager-loading memberPackages causes N+1.
+            'data' => $query->limit($limit)->get(['id', 'name', 'phone', 'is_active']),
         ]);
     }
 
@@ -488,18 +489,17 @@ class TrainingSessionController extends Controller
             ->unique()
             ->values();
 
-        $activeMembers = Member::query()
+        $eligibleMemberIds = Member::query()
             ->whereIn('id', $memberIds)
-            ->where('is_active', true)
-            ->where('status', StatusMember::STATUS_ACTIVE->value)
+            ->eligibleForAttendance()  // is_active=true + active package
             ->pluck('id');
 
-        $invalidMemberIds = $memberIds->diff($activeMembers)->values();
+        $invalidMemberIds = $memberIds->diff($eligibleMemberIds)->values();
         if ($invalidMemberIds->isNotEmpty()) {
             throw ValidationException::withMessages([
                 'member_ids' => [
-                    'Hanya member ACTIVE yang dapat dicatat kehadirannya.',
-                    'Member tidak valid: ' . $invalidMemberIds->implode(', '),
+                    'Hanya member ACTIVE (dengan paket aktif) yang dapat dicatat kehadirannya.',
+                    'Member tidak memenuhi syarat: ' . $invalidMemberIds->implode(', '),
                 ],
             ]);
         }

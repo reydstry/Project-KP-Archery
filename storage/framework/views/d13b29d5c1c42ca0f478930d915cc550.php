@@ -65,10 +65,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
 
         <!-- Pending Members — 2/5 -->
-        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
             <!-- Header -->
-            <div class="flex items-center justify-between px-5 py-4 bg-[#1a307b]">
+            <div class="flex items-center justify-between px-5 py-6 bg-[#1a307b]">
                 <div class="flex items-center gap-2.5">
                     <h3 class="text-sm font-bold text-white">Pending Approvals</h3>
                     <span class="text-xs bg-white/5 text-white border border-white/20 
@@ -117,10 +117,10 @@
         </div>
 
         <!-- Today's Schedule — 3/5 -->
-        <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div class="lg:col-span-3 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
             <!-- Header -->
-            <div class="flex items-center justify-between px-5 py-4 bg-[#1a307b]">
+            <div class="flex items-center justify-between px-5 py-[18px] bg-[#1a307b]">
                 <div class="flex items-center gap-2.5">
                     <h3 class="text-sm font-bold text-white">Jadwal Hari Ini</h3>
                     <span class="text-xs bg-white/10 text-white border border-white/20
@@ -128,7 +128,7 @@
                           x-text="todaySessions.length"></span>
                 </div>
                 <span class="text-xs text-white bg-white/5 border border-white/20
-                             px-3 py-1 rounded-lg font-medium">
+                             px-3 py-2 rounded-full font-medium">
                     <?php echo e(now()->translatedFormat('l, d M Y')); ?>
 
                 </span>

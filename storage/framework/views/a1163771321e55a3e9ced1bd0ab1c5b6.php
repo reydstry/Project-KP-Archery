@@ -20,19 +20,19 @@
     </div>
 
     <!-- Packages Table - Desktop View -->
-    <div class="card-animate hidden md:block bg-white rounded-2xl  shadow-sm overflow-hidden" style="animation-delay: 0.1s">
+    <div class="card-animate hidden md:block bg-white border border-slate-200 rounded-2xl  shadow-sm overflow-hidden" style="animation-delay: 0.1s">
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-[#1a307b] border-b border-slate-200">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">No</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Nama</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Deskripsi</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Harga</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Durasi</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Sesi</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">No</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">Nama</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">Deskripsi</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">Harga</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">Durasi</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">Sesi</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-6 text-right text-xs font-semibold text-white uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">

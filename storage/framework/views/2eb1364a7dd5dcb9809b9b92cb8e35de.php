@@ -4,21 +4,6 @@
 <?php $__env->startSection('content'); ?>
 <div class="w-full px-4 sm:px-6 lg:px-8 space-y-6"
      x-data="trainingSessionCreatePage()">
-    
-    <!-- Info Banner -->
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 rounded-xl p-4 shadow-sm">
-        <div class="flex items-start gap-3">
-            <div class="p-2 bg-blue-500 rounded-lg shrink-0">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <div class="flex-1">
-                <h3 class="text-sm font-semibold text-blue-900 mb-1">Catatan Penting</h3>
-                <p class="text-sm text-blue-700">Halaman ini untuk membuat metadata sesi (tanggal & status). Setelah membuat session, Anda dapat menambahkan slot dan assign coach di halaman management.</p>
-            </div>
-        </div>
-    </div>
 
     <!-- Main Form Card -->
     <div class="max-w-3xl mx-auto">
@@ -67,22 +52,81 @@
 
                 <!-- Status Select -->
                 <div>
-                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                    <label class="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
                         <svg class="w-5 h-5 text-[#1a307b]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         Status Awal
                     </label>
-                    <select x-model="form.status" 
-                            class="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-[#1a307b]/30 focus:border-[#1a307b] transition appearance-none bg-white text-slate-700"
-                            :class="errors.status ? 'border-red-400 focus:border-red-500 focus:ring-red-500/30' : ''">
-                        <option value="open">Scheduled/Ongoing</option>
-                        <option value="closed">Completed</option>
-                        <option value="canceled">Canceled</option>
-                    </select>
-                    <p x-show="errors.status" 
-                       x-transition
-                       class="mt-2 text-sm text-red-600 flex items-center gap-1">
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Option: Scheduled -->
+                        <button type="button" @click="form.status = 'open'"
+                                class="relative flex flex-col items-start gap-2 p-4 rounded-xl border-2 transition-all duration-200 text-left"
+                                :class="form.status === 'open' 
+                                    ? 'border-[#1a307b] bg-[#1a307b]/5 shadow-md shadow-[#1a307b]/10' 
+                                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'">
+                            <div class="flex items-center justify-between w-full">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center"
+                                    :class="form.status === 'open' ? 'bg-emerald-100' : 'bg-slate-100'">
+                                    <svg class="w-5 h-5" :class="form.status === 'open' ? 'text-emerald-600' : 'text-slate-400'"
+                                        fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
+                                    :class="form.status === 'open' ? 'border-[#1a307b] bg-[#1a307b]' : 'border-slate-300'">
+                                    <svg x-show="form.status === 'open'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold" :class="form.status === 'open' ? 'text-[#1a307b]' : 'text-slate-700'">Scheduled</p>
+                                <p class="text-xs mt-0.5" :class="form.status === 'open' ? 'text-[#1a307b]/70' : 'text-slate-400'">Member dapat mendaftar</p>
+                            </div>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                :class="form.status === 'open' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'">
+                                <span class="w-1.5 h-1.5 rounded-full animate-pulse"
+                                    :class="form.status === 'open' ? 'bg-emerald-500' : 'bg-slate-400'"></span>
+                                Open
+                            </span>
+                        </button>
+
+                        <!-- Option: Completed -->
+                        <button type="button" @click="form.status = 'closed'"
+                                class="relative flex flex-col items-start gap-2 p-4 rounded-xl border-2 transition-all duration-200 text-left"
+                                :class="form.status === 'closed' 
+                                    ? 'border-[#1a307b] bg-[#1a307b]/5 shadow-md shadow-[#1a307b]/10' 
+                                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'">
+                            <div class="flex items-center justify-between w-full">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center"
+                                    :class="form.status === 'closed' ? 'bg-slate-200' : 'bg-slate-100'">
+                                    <svg class="w-5 h-5" :class="form.status === 'closed' ? 'text-slate-600' : 'text-slate-400'"
+                                        fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all"
+                                    :class="form.status === 'closed' ? 'border-[#1a307b] bg-[#1a307b]' : 'border-slate-300'">
+                                    <svg x-show="form.status === 'closed'" class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold" :class="form.status === 'closed' ? 'text-[#1a307b]' : 'text-slate-700'">Completed</p>
+                                <p class="text-xs mt-0.5" :class="form.status === 'closed' ? 'text-[#1a307b]/70' : 'text-slate-400'">Sesi telah selesai</p>
+                            </div>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                :class="form.status === 'closed' ? 'bg-slate-200 text-slate-700' : 'bg-slate-100 text-slate-500'">
+                                <span class="w-1.5 h-1.5 rounded-full"
+                                    :class="form.status === 'closed' ? 'bg-slate-500' : 'bg-slate-400'"></span>
+                                Closed
+                            </span>
+                        </button>
+                    </div>
+
+                    <p x-show="errors.status" x-transition class="mt-2 text-sm text-red-600 flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                         </svg>
@@ -92,21 +136,8 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        Pilih "Scheduled/Ongoing" untuk session yang dapat diikuti member
+                        Pilih "Scheduled" untuk session yang dapat diikuti member
                     </p>
-                </div>
-
-                <!-- Info Card -->
-                <div class="bg-amber-50 border-l-4 border-amber-400 rounded-lg p-4">
-                    <div class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"/>
-                        </svg>
-                        <div class="text-sm text-amber-800">
-                            <p class="font-semibold mb-1">Langkah Selanjutnya</p>
-                            <p>Setelah session dibuat, Anda akan diarahkan ke halaman list session untuk menambahkan slot waktu dan assign coach.</p>
-                        </div>
-                    </div>
                 </div>
             </div>
 

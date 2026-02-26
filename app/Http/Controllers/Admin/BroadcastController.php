@@ -28,7 +28,7 @@ class BroadcastController extends Controller
 
         $members = Member::query()
             ->select(['id', 'phone'])
-            ->where('status', StatusMember::STATUS_ACTIVE->value)
+            ->withStatus(StatusMember::STATUS_ACTIVE->value)  // has active package
             ->whereNotNull('phone')
             ->where('phone', '!=', '')
             ->orderBy('id')
