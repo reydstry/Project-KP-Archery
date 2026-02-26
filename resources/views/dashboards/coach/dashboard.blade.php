@@ -58,9 +58,9 @@
     {{-- ===================================================================== --}}
 
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-150">
-        <div class="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <h3 class="font-bold text-slate-800">Jadwal Hari Ini</h3>
-            <span class="px-4 py-2 bg-[#1a307b]/10 text-[#1a307b] rounded-xl text-sm font-semibold border border-[#1a307b]/20">
+        <div class="px-6 py-4 rounded-t-2xl border-b bg-[#1a307b] border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h3 class="font-bold text-white">Jadwal Hari Ini</h3>
+            <span class="px-4 py-2 bg-[#1a307b]/10 text-white rounded-xl text-sm font-semibold border border-[#1a307b]/20">
                 {{ now()->format('l, d F Y') }}
             </span>
         </div>
@@ -84,9 +84,11 @@
             </template>
 
             <template x-if="!loading && !error && todaySessions.length > 0">
-                <div class="space-y-3">
+                <div class="grid grid-cols-1 gap-4">
                     <template x-for="slot in todaySessions" :key="slot.id">
-                        <div class="rounded-xl border border-slate-200 overflow-hidden" x-data="{ expanded: false }">
+                        <div class="rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition" x-data="{ expanded: false }">
+                            
+                            <!-- Card Header -->
                             <div @click="expanded = !expanded" class="flex items-center justify-between gap-4 p-4 hover:bg-slate-50 transition cursor-pointer">
                                 <div class="min-w-0">
                                     <p class="font-semibold text-slate-800 truncate" x-text="slot.session_time?.session_name || 'Training Session'"></p>
@@ -108,7 +110,10 @@
                                 </div>
                             </div>
 
+                            <!-- Card Body -->
                             <div x-show="expanded" x-collapse class="border-t border-slate-200 bg-slate-50 p-4 space-y-3">
+                                
+                                <!-- Coaches -->
                                 <div>
                                     <p class="text-xs font-semibold text-slate-600 mb-2">Coach (<span x-text="slot.coaches?.length || 0"></span>)</p>
                                     <template x-if="!slot.coaches || slot.coaches.length === 0">
@@ -121,6 +126,7 @@
                                     </div>
                                 </div>
 
+                                <!-- Members -->
                                 <div>
                                     <p class="text-xs font-semibold text-slate-600 mb-2">Member (<span x-text="slot.members?.length || 0"></span>)</p>
                                     <template x-if="!slot.members || slot.members.length === 0">
@@ -132,11 +138,17 @@
                                         </template>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </template>
                 </div>
-            </template>
+                </template>
+
+                <template x-if="!loading && !error && todaySessions.length === 0">
+                <div class="text-center py-12 text-slate-400">Tidak ada session hari ini.</div>
+                </template>
+
         </div>
     </div>
 </div>

@@ -37,7 +37,7 @@
     </style>
     <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
-<body class="bg-slate-50 min-h-screen" x-data="{ sidebarOpen: false, isMobile: window.innerWidth < 1024 }" @resize.window="isMobile = window.innerWidth < 1024; if(!isMobile) sidebarOpen = false">
+<body class="bg-gradient-to-b from-[#16213a] via-[#0f172a] to-[#1b2659] min-h-screen" x-data="{ sidebarOpen: false, isMobile: window.innerWidth < 1024 }" @resize.window="isMobile = window.innerWidth < 1024; if(!isMobile) sidebarOpen = false">
 
     <div x-show="sidebarOpen && isMobile"
          x-transition.opacity

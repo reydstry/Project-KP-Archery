@@ -1,9 +1,7 @@
-@extends('layouts.admin')
+<?php $__env->startSection('title', 'Achievements'); ?>
+<?php $__env->startSection('subtitle', 'Manage member and club achievements'); ?>
 
-@section('title', 'Achievements')
-@section('subtitle', 'Manage member and club achievements')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div x-data="achievementsData()" x-init="init()" class="space-y-6">
     
     <!-- Header Actions -->
@@ -187,7 +185,7 @@
     </div>
 </div>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
 function achievementsData() {
     return {
@@ -530,5 +528,6 @@ function achievementsData() {
     }
 }
 </script>
-@endpush
-@endsection
+<?php $__env->stopPush(); ?>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\Project\club-panahan\resources\views/dashboards/admin/dashboard/achievements.blade.php ENDPATH**/ ?>
