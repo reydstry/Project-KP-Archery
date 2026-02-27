@@ -1,10 +1,8 @@
-@extends('layouts.main')
+<?php $__env->startSection('title', __('gallery.page_title') . ' - FocusOneX Archery'); ?>
 
-@section('title', __('gallery.page_title') . ' - FocusOneX Archery')
-
-@section('content')
-@include('components.galeri.hero-section')
-@include('components.galeri.news-section')
+<?php $__env->startSection('content'); ?>
+<?php echo $__env->make('components.galeri.hero-section', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+<?php echo $__env->make('components.galeri.news-section', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
 
 <script>
 // Tab Switching
@@ -63,4 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
     overflow: hidden;
 }
 </style>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.main', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\Project-KP-Archery\resources\views/pages/galeri.blade.php ENDPATH**/ ?>

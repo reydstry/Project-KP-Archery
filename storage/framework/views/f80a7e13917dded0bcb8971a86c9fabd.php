@@ -11,14 +11,16 @@
         <!-- Section Header -->
         <div class="text-center mb-12 sm:mb-16">
             <h2 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
-                {{ __('gallery.news_title') }}
+                <?php echo e(__('gallery.news_title')); ?>
+
             </h2>
             <p class="text-gray-300 text-base sm:text-lg max-w-2xl mx-auto">
-                {{ __('gallery.news_subtitle') }}
+                <?php echo e(__('gallery.news_subtitle')); ?>
+
             </p>
         </div>
 
-        @php
+        <?php
             use App\Models\News;
             use App\Models\Achievement;
             
@@ -73,16 +75,16 @@
 
             // Merge both - 3 news first, then 3 achievements
             $allItems = $newsItems->concat($achievementItems);
-        @endphp
+        ?>
 
         <!-- News & Achievement Combined Section -->
         <div id="content-berita">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                @foreach($allItems as $item)
+                <?php $__currentLoopData = $allItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="relative group">
                     <!-- Glow - Different color for achievements -->
-                    <div class="absolute inset-0 {{ $item['type'] === 'achievement' ? 'bg-yellow-500/20' : 'bg-red-500/20' }} rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="absolute inset-0 <?php echo e($item['type'] === 'achievement' ? 'bg-yellow-500/20' : 'bg-red-500/20'); ?> rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                     <!-- Card -->
                     <div class="relative h-full bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden
@@ -97,12 +99,12 @@
                         </span>
 
                         <!-- Type Badge (Top Right Corner) -->
-                        @if($item['type'] === 'achievement')
+                        <?php if($item['type'] === 'achievement'): ?>
                         <div class="absolute top-4 right-4 z-20 bg-gradient-to-r from-yellow-500 to-amber-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
-                            <span>{{ $item['badge'] }}</span>
+                            <span><?php echo e($item['badge']); ?></span>
                             <span>Achievement</span>
                         </div>
-                        @else
+                        <?php else: ?>
                         <div class="absolute top-4 right-4 z-20 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
                             <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/>
@@ -110,12 +112,12 @@
                             </svg>
                             <span>News</span>
                         </div>
-                        @endif
+                        <?php endif; ?>
 
                         <!-- Image -->
                         <div class="relative h-52 overflow-hidden">
-                            <img src="{{ $item['image'] }}"
-                                 alt="{{ $item['title'] }}"
+                            <img src="<?php echo e($item['image']); ?>"
+                                 alt="<?php echo e($item['title']); ?>"
                                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                         </div>
@@ -129,60 +131,65 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                     </svg>
-                                    <span>{{ $item['date'] }}</span>
+                                    <span><?php echo e($item['date']); ?></span>
                                 </div>
-                                @if($item['type'] === 'achievement' && isset($item['member']))
+                                <?php if($item['type'] === 'achievement' && isset($item['member'])): ?>
                                 <div class="flex items-center gap-1 text-yellow-400/80">
                                     <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
                                     </svg>
-                                    <span class="truncate max-w-[120px]">{{ $item['member'] }}</span>
+                                    <span class="truncate max-w-[120px]"><?php echo e($item['member']); ?></span>
                                 </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
 
                             <!-- Title -->
                             <h3 class="text-base sm:text-lg font-bold text-white mb-2 line-clamp-2 leading-snug">
-                                {{ $item['title'] }}
+                                <?php echo e($item['title']); ?>
+
                             </h3>
 
                             <!-- Divider -->
-                            <div class="w-8 h-0.5 {{ $item['type'] === 'achievement' ? 'bg-yellow-400/60' : 'bg-red-400/60' }} rounded-full mb-3"></div>
+                            <div class="w-8 h-0.5 <?php echo e($item['type'] === 'achievement' ? 'bg-yellow-400/60' : 'bg-red-400/60'); ?> rounded-full mb-3"></div>
 
                             <!-- Excerpt -->
                             <p class="text-white/60 text-xs sm:text-sm mb-5 line-clamp-3 leading-relaxed">
-                                {{ $item['excerpt'] }}
+                                <?php echo e($item['excerpt']); ?>
+
                             </p>
 
                             <!-- Read more -->
-                            @if($item['type'] === 'achievement')
-                            <a href="{{ route('achievement.detail', $item['id']) }}"
+                            <?php if($item['type'] === 'achievement'): ?>
+                            <a href="<?php echo e(route('achievement.detail', $item['id'])); ?>"
                                     class="inline-flex items-center gap-2 text-yellow-400 hover:text-yellow-300
                                            font-semibold text-sm transition-colors duration-200 group/btn">
-                                {{ __('gallery.read_more') }}
+                                <?php echo e(__('gallery.read_more')); ?>
+
                                 <svg class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200"
                                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                 </svg>
                             </a>
-                            @else
-                            <a href="{{ route('news.detail', $item['id']) }}"
+                            <?php else: ?>
+                            <a href="<?php echo e(route('news.detail', $item['id'])); ?>"
                                     class="inline-flex items-center gap-2 text-red-400 hover:text-red-300
                                            font-semibold text-sm transition-colors duration-200 group/btn">
-                                {{ __('gallery.read_more') }}
+                                <?php echo e(__('gallery.read_more')); ?>
+
                                 <svg class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200"
                                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                 </svg>
                             </a>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
-                @endforeach
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
             </div>
         </div>
 
     </div>
 </div>
+<?php /**PATH C:\laragon\www\Project-KP-Archery\resources\views/components/galeri/news-section.blade.php ENDPATH**/ ?>

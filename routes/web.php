@@ -48,6 +48,12 @@ Route::get('/kontak', function () {
 use App\Http\Controllers\BeritaController;
 Route::get('/berita/{id}', [BeritaController::class, 'show'])->name('berita.detail');
 
+// News & Achievement Detail Pages
+use App\Http\Controllers\NewsDetailController;
+use App\Http\Controllers\AchievementDetailController;
+Route::get('/news/{news}', [NewsDetailController::class, 'show'])->name('news.detail');
+Route::get('/achievement/{achievement}', [AchievementDetailController::class, 'show'])->name('achievement.detail');
+
 // Guest only
 Route::middleware('guest')->group(function () {
     Route::get('/register', [WebRegisterController::class, 'create'])->name('register');
