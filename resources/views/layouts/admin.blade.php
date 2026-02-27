@@ -86,7 +86,117 @@
                 </div>
             </div>
 
-            @include('layouts.sidebar')
+            @php
+                $sidebarMenu ??= [
+                    [
+            'title' => 'Dashboard',
+            'items' => [
+                            [
+                                'label' => 'Dashboard',
+                                'route' => 'dashboard',
+                                'patterns' => ['dashboard'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Manajemen Pengguna',
+                        'items' => [
+                            [
+                                'label' => 'Member',
+                                'route' => 'admin.members',
+                                'patterns' => ['admin.members'],
+                            ],
+                            [
+                                'label' => 'Coach',
+                                'route' => 'admin.coaches',
+                                'patterns' => ['admin.coaches'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Paket',
+                        'items' => [
+                            [
+                                'label' => 'Master Paket',
+                                'route' => 'admin.packages',
+                                'patterns' => ['admin.packages'],
+                            ],
+                            [
+                                'label' => 'Assign Paket',
+                                'route' => 'admin.member-packages',
+                                'patterns' => ['admin.member-packages'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Training',
+                        'items' => [
+                            [
+                                'label' => 'Training Session',
+                                'route' => 'admin.sessions.index',
+                                'patterns' => ['admin.sessions.*'],
+                            ],
+                            [
+                                'label' => 'Slot & Coach Assignment',
+                                'route' => 'admin.training.slots',
+                                'patterns' => ['admin.training.slots'],
+                            ],
+                            [
+                                'label' => 'Attendance Management',
+                                'route' => 'admin.training.attendance',
+                                'patterns' => ['admin.training.attendance'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'WhatsApp',
+                        'items' => [
+                            [
+                                'label' => 'Broadcast Event',
+                                'route' => 'admin.whatsapp.broadcast.create',
+                                'patterns' => ['admin.whatsapp.broadcast.*'],
+                            ],
+                            [
+                                'label' => 'Log Broadcast',
+                                'route' => 'admin.whatsapp.logs.index',
+                                'patterns' => ['admin.whatsapp.logs.*'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Laporan',
+                        'items' => [
+                            [
+                                'label' => 'Rekap Bulanan',
+                                'route' => 'admin.reports.monthly',
+                                'patterns' => ['admin.reports.monthly'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Website',
+                        'items' => [
+                            [
+                                'label' => 'News',
+                                'route' => 'admin.news',
+                                'patterns' => ['admin.news'],
+                            ],
+                            [
+                                'label' => 'Achievements',
+                                'route' => 'admin.achievements',
+                                'patterns' => ['admin.achievements'],
+                            ],
+                            [
+                                'label' => 'Galleries',
+                                'route' => 'admin.galleries',
+                                'patterns' => ['admin.galleries'],
+                            ],
+                        ],
+                    ],
+                ];
+            @endphp
+
+            <x-global.sidebar-nav :menu-groups="$sidebarMenu" />
         </aside>
 
         <!-- Main Content -->

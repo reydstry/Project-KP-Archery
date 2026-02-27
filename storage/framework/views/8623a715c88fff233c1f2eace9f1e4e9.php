@@ -1,5 +1,5 @@
 <?php $__env->startSection('title', 'Attendance'); ?>
-<?php $__env->startSection('subtitle', 'Semua member yang booking otomatis hadir'); ?>
+<?php $__env->startSection('subtitle', 'Isi kehadiran member untuk setiap sesi latihan yang Anda latih.'); ?>
 
 <?php $__env->startSection('content'); ?>
 <div class="space-y-6">

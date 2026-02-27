@@ -105,7 +105,136 @@
                 </div>
             </div>
 
-            <?php echo $__env->make('layouts.sidebar', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            <?php
+                $sidebarMenu ??= [
+                    [
+            'title' => 'Dashboard',
+            'items' => [
+                            [
+                                'label' => 'Dashboard',
+                                'route' => 'dashboard',
+                                'patterns' => ['dashboard'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Manajemen Pengguna',
+                        'items' => [
+                            [
+                                'label' => 'Member',
+                                'route' => 'admin.members',
+                                'patterns' => ['admin.members'],
+                            ],
+                            [
+                                'label' => 'Coach',
+                                'route' => 'admin.coaches',
+                                'patterns' => ['admin.coaches'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Paket',
+                        'items' => [
+                            [
+                                'label' => 'Master Paket',
+                                'route' => 'admin.packages',
+                                'patterns' => ['admin.packages'],
+                            ],
+                            [
+                                'label' => 'Assign Paket',
+                                'route' => 'admin.member-packages',
+                                'patterns' => ['admin.member-packages'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Training',
+                        'items' => [
+                            [
+                                'label' => 'Training Session',
+                                'route' => 'admin.sessions.index',
+                                'patterns' => ['admin.sessions.*'],
+                            ],
+                            [
+                                'label' => 'Slot & Coach Assignment',
+                                'route' => 'admin.training.slots',
+                                'patterns' => ['admin.training.slots'],
+                            ],
+                            [
+                                'label' => 'Attendance Management',
+                                'route' => 'admin.training.attendance',
+                                'patterns' => ['admin.training.attendance'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'WhatsApp',
+                        'items' => [
+                            [
+                                'label' => 'Broadcast Event',
+                                'route' => 'admin.whatsapp.broadcast.create',
+                                'patterns' => ['admin.whatsapp.broadcast.*'],
+                            ],
+                            [
+                                'label' => 'Log Broadcast',
+                                'route' => 'admin.whatsapp.logs.index',
+                                'patterns' => ['admin.whatsapp.logs.*'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Laporan',
+                        'items' => [
+                            [
+                                'label' => 'Rekap Bulanan',
+                                'route' => 'admin.reports.monthly',
+                                'patterns' => ['admin.reports.monthly'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Website',
+                        'items' => [
+                            [
+                                'label' => 'News',
+                                'route' => 'admin.news',
+                                'patterns' => ['admin.news'],
+                            ],
+                            [
+                                'label' => 'Achievements',
+                                'route' => 'admin.achievements',
+                                'patterns' => ['admin.achievements'],
+                            ],
+                            [
+                                'label' => 'Galleries',
+                                'route' => 'admin.galleries',
+                                'patterns' => ['admin.galleries'],
+                            ],
+                        ],
+                    ],
+                ];
+            ?>
+
+            <?php if (isset($component)) { $__componentOriginal9b251931889f8782a8cadc1a1a1fd5c8 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9b251931889f8782a8cadc1a1a1fd5c8 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.global.sidebar-nav','data' => ['menuGroups' => $sidebarMenu]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('global.sidebar-nav'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['menu-groups' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($sidebarMenu)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9b251931889f8782a8cadc1a1a1fd5c8)): ?>
+<?php $attributes = $__attributesOriginal9b251931889f8782a8cadc1a1a1fd5c8; ?>
+<?php unset($__attributesOriginal9b251931889f8782a8cadc1a1a1fd5c8); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9b251931889f8782a8cadc1a1a1fd5c8)): ?>
+<?php $component = $__componentOriginal9b251931889f8782a8cadc1a1a1fd5c8; ?>
+<?php unset($__componentOriginal9b251931889f8782a8cadc1a1a1fd5c8); ?>
+<?php endif; ?>
         </aside>
 
         <!-- Main Content -->

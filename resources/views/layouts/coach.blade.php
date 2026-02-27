@@ -30,6 +30,20 @@
         .brand-primary-text { color: var(--brand-primary); }
 
         .card-animate { animation: fadeInUp .35s ease-out forwards; opacity: 0; }
+        
+        .brand-active {
+            background: var(--brand-primary);
+            color: #fff;
+            box-shadow: 0 10px 24px -12px rgba(26, 48, 123, 0.75);
+        }
+        .brand-btn {
+            background: var(--brand-primary);
+            color: #fff;
+        }
+        .brand-btn:hover {
+            background: #162a6b;
+        }
+
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -68,59 +82,89 @@
     </div>
 
     <div class="min-h-screen flex">
-        <aside class="fixed top-0 left-0 h-screen w-64 brand-dark-bg text-white border-r border-slate-800 z-50 transition-transform duration-300"
-               :class="(sidebarOpen || !isMobile) ? 'translate-x-0' : '-translate-x-full'">
-            <div class="h-full flex flex-col">
-                <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
-                    <img src="{{ asset('asset/img/logowhite.png') }}" alt="FocusOneX Archery" class="h-8 w-auto">
-                    <button @click="sidebarOpen = false" class="lg:hidden text-slate-300 hover:text-white">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    <!-- Sidebar -->
+        <aside class="fixed left-0 top-0 h-screen w-64 bg-[#0b0b0f] border-r border-slate-800 z-50 transition-transform duration-300 overflow-y-auto shadow-2xl"
+               :class="sidebarOpen || !isMobile ? 'translate-x-0' : '-translate-x-full'"
+               x-show="sidebarOpen || !isMobile"
+               x-transition:enter="transition ease-out duration-300"
+               x-transition:enter-start="-translate-x-full"
+               x-transition:enter-end="translate-x-0"
+               x-transition:leave="transition ease-in duration-300"
+               x-transition:leave-start="translate-x-0"
+               x-transition:leave-end="-translate-x-full">
+            
+            <!-- Logo -->
+            <div class="p-5 sm:p-6 border-b border-slate-800 sticky top-0 bg-[#0b0b0f]/95 backdrop-blur-sm z-10">
+                <div class="flex items-center justify-between gap-3">
+                    <img src="{{ asset('asset/img/logowhite.png') }}" alt="FocusOneX Archery" class="h-9 sm:h-10 w-auto">
+                    <button @click="sidebarOpen = false" class="lg:hidden text-slate-400 hover:text-white transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
                 </div>
-
-                <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
-                    <a href="{{ route('dashboard') }}" @click="if(isMobile) sidebarOpen = false"
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('dashboard') ? 'bg-[#1a307b] text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        <span>Dashboard</span>
-                    </a>
-                    <a href="{{ route('coach.attendance.index') }}" @click="if(isMobile) sidebarOpen = false"
-                       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition {{ request()->routeIs('coach.attendance.*') ? 'bg-[#1a307b] text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }}">
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                        <span>Kehadiran</span>
-                    </a>
-                </nav>
             </div>
+
+            @php
+                $sidebarMenu ??= [
+                    [
+                        'title' => 'Dashboard',
+                        'items' => [
+                            [
+                                'label' => 'Dashboard',
+                                'route' => 'dashboard',
+                                'patterns' => ['dashboard'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Attendance Management',
+                        'items' => [
+                            [
+                                'label' => 'Attendance Management',
+                                'route' => 'coach.attendance.index',
+                                'patterns' => ['coach.attendance.index'],
+                            ],
+                        ],
+                    ],
+                ];
+            @endphp
+
+            <x-global.sidebar-nav :menu-groups="$sidebarMenu" />
         </aside>
 
         <main class="flex-1 lg:ml-64 min-h-screen">
-            <header class="sticky top-0 z-30 bg-white border-b border-slate-200">
-                <div class="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-                    <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-slate-700 hover:text-slate-900">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                    </button>
-
-                    <div class="hidden lg:block">
-                        <h1 class="text-base font-semibold text-slate-900">Coach Panel</h1>
+        <!-- Desktop Header -->
+            <div class="hidden lg:block sticky top-0 z-30 bg-[#0b0b0f] px-8 py-[15px] border-b border-slate-800 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-white">@yield('title')</h2>
+                        <p class="text-slate-500 mt-0.5 text-xs sm:text-sm">@yield('subtitle')</p>
                     </div>
-
-                    <div x-data="{ profileOpen: false }" class="relative ml-auto">
-                        <button @click="profileOpen = !profileOpen" class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
-                            <div class="text-right">
-                                <p class="text-sm font-semibold text-slate-800 leading-tight">{{ auth()->user()->name }}</p>
-                                <p class="text-xs text-slate-500">Coach</p>
+                    <!-- User Profile Desktop -->
+                    <div x-data="{ profileOpen: false }" class="relative">
+                        <button @click="profileOpen = !profileOpen" class="flex items-center gap-3 px-4 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition-all shadow-sm border border-slate-200">
+                            <div class="text-left">
+                                <p class="text-slate-800 font-semibold text-sm leading-tight">{{ auth()->user()->name }}</p>
+                                <p class="text-slate-500 text-xs">Coach</p>
                             </div>
-                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-slate-400 transition-transform" :class="profileOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
-
-                        <div x-show="profileOpen" @click.away="profileOpen = false" x-transition x-cloak class="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg py-2">
-                            <div class="px-4 py-3 border-b border-slate-100">
+                        
+                        <!-- Dropdown Menu -->
+                        <div x-show="profileOpen" 
+                             @click.away="profileOpen = false"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-slate-200 py-2"
+                             x-cloak>
+                             <div class="px-4 py-3 border-b border-slate-100">
                                 <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-slate-500 mt-0.5">{{ auth()->user()->email }}</p>
                             </div>
@@ -132,15 +176,50 @@
                         </div>
                     </div>
                 </div>
-            </header>
+            </div>
+            <!-- Mobile Header -->
+            <div class="lg:hidden sticky top-0 z-30 bg-white border-b border-slate-200 px-4 py-3 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <button @click="sidebarOpen = !sidebarOpen" class="text-slate-600 hover:text-slate-900 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+
+                    <!-- Mobile Profile -->
+                    <div x-data="{ mobileProfileOpen: false }" class="relative">
+                        <button @click="mobileProfileOpen = !mobileProfileOpen" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 transition-all shadow-sm border border-slate-200">
+                            <div class="text-left">
+                                <p class="text-slate-800 font-semibold text-xs leading-tight">{{ auth()->user()->name }}</p>
+                                <p class="text-slate-500 text-[10px]">Coach</p>
+                            </div>
+                            <svg class="w-3 h-3 text-slate-400 transition-transform" :class="mobileProfileOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+                        
+                        <!-- Mobile Dropdown -->
+                        <div x-show="mobileProfileOpen" 
+                             @click.away="mobileProfileOpen = false"
+                             x-transition
+                             class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl border border-slate-200 py-2"
+                             x-cloak>
+                             <div class="px-4 py-3 border-b border-slate-100">
+                                <p class="text-sm font-semibold text-slate-800">{{ auth()->user()->name }}</p>
+                                <p class="text-xs text-slate-500 mt-0.5">{{ auth()->user()->email }}</p>
+                            </div>
+                            <a href="{{ route('coach.change-password') }}" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">Change Password</a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-[#d12823] hover:bg-red-50">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
                 <div class="max-w-7xl mx-auto space-y-4">
-                    <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">@yield('title')</h2>
-                        <p class="text-sm text-slate-500 mt-1">@yield('subtitle')</p>
-                    </div>
-
                     @yield('content')
                 </div>
             </div>

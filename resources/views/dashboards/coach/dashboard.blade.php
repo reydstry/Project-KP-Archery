@@ -144,11 +144,6 @@
                     </template>
                 </div>
                 </template>
-
-                <template x-if="!loading && !error && todaySessions.length === 0">
-                <div class="text-center py-12 text-slate-400">Tidak ada session hari ini.</div>
-                </template>
-
         </div>
     </div>
 </div>

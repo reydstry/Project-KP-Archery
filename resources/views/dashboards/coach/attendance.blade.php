@@ -1,7 +1,7 @@
 @extends('layouts.coach')
 
 @section('title', 'Attendance')
-@section('subtitle', 'Semua member yang booking otomatis hadir')
+@section('subtitle', 'Isi kehadiran member untuk setiap sesi latihan yang Anda latih.')
 
 @section('content')
 <div class="space-y-6">

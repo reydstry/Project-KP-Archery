@@ -363,7 +363,7 @@
 <?php endif; ?>
 <?php $component->withAttributes(['headers' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(['No', 'Nama', 'Paket', 'Kehadiran', 'Sisa Slot', 'Slot Terpakai'])]); ?>
             <?php $__empty_1 = true; $__currentLoopData = $rows; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $row): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                <tr class="<?php echo e($row['is_low_attendance'] ? '' : ''); ?> text-center">
+                <tr class="<?php echo e($row['is_low_attendance'] ? 'bg-white' : ''); ?> text-center">
                     <td class="px-4 py-3 text-slate-700"><?php echo e($index + 1); ?></td>
 
                     <td class="px-4 py-3">
