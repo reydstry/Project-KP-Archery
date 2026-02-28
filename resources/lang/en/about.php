@@ -62,4 +62,10 @@ return [
     'stats_total_area' => 'Total Facility Area',
     'stats_targets' => 'Archery Targets',
     'stats_equipment' => 'Premium Equipment',
+
+    //Store Details
+    'store_title' => 'Archery Store',
+    'store_desc' => 'We provide a variety of archery equipment and accessories to meet your needs, from beginner to professional level',
+
+
 ];
