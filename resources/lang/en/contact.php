@@ -60,4 +60,9 @@ return [
     // Location Map
     'location_title' => 'Location',
     'location_address' => 'Gunung Bahagia, Balikpapan Selatan, Balikpapan City, East Kalimantan 76114',
+    
+    // Google Maps Reviews
+    'google_reviews_title' => 'Our Reviews on Google Maps',
+    'google_reviews_subtitle' => 'See what our customers say directly from Google Maps',
+    'view_on_google_maps' => 'View on Google Maps',
 ];

@@ -65,27 +65,6 @@
         <div x-show="!loading && packages.length === 0" class="text-center py-12">
             <p class="text-white/60 text-lg">Belum ada paket tersedia saat ini.</p>
         </div>
-
-        <!-- Registration Fee -->
-        <div class="relative group max-w-lg mx-auto">
-            <!-- Glow -->
-            <div class="absolute inset-0 bg-red-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
-            <div class="relative bg-white/5 backdrop-blur-[2px] border border-white/20 rounded-2xl p-8 text-center
-                        shadow-xl shadow-black/30 overflow-hidden hover:scale-105">
-                
-                <!-- Shine -->
-                <span class="absolute inset-0 w-full h-full 
-                            bg-gradient-to-r from-transparent via-white/10 to-transparent
-                            -translate-x-full group-hover:translate-x-full 
-                            transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none">
-                </span>
-                <p class="text-white/60 text-sm font-semibold tracking-widest uppercase mb-2">
-                    Registration Fee
-                </p>
-                <p class="text-4xl sm:text-5xl font-bold text-white mb-2">
-                    Rp 200.000
-                </p>
             </div>
         </div>
     </div>

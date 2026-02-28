@@ -67,11 +67,11 @@
 
     <!-- Add/Edit Modal -->
     <div x-show="showModal" x-cloak @click.self="closeModal()"
-         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div @click.away="closeModal()" 
-             class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8"
+             class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8 max-h-[90vh] overflow-y-auto"
              x-transition>
-            <div class="sticky top-0 bg-[#1a307b] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+            <div class="sticky top-0 bg-[#1a307b] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between z-10">
                 <h3 class="text-lg font-bold" x-text="editingNews ? 'Edit News' : 'Add New News'"></h3>
                 <button @click="closeModal()" class="text-white/80 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -143,6 +143,84 @@
             </div>
         </div>
     </div>
+
+    <!-- Success Modal -->
+    <div x-show="showSuccessModal" x-cloak @click.self="closeSuccessModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showSuccessModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <!-- Success Icon -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                    <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Berhasil Disimpan!</h3>
+                
+                <!-- Message -->
+                <p class="text-slate-600 mb-6" x-text="successMessage"></p>
+                
+                <!-- Button -->
+                <button @click="closeSuccessModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div x-show="showErrorModal" x-cloak @click.self="closeErrorModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showErrorModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <!-- Error Icon -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                    <svg class="h-10 w-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Terjadi Kesalahan!</h3>
+                
+                <!-- Message -->
+                <p class="text-slate-600 mb-6" x-text="errorMessage"></p>
+                
+                <!-- Button -->
+                <button @click="closeErrorModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -156,6 +234,10 @@ function newsData() {
         deleting: false,
         showModal: false,
         showDeleteConfirm: false,
+        showSuccessModal: false,
+        showErrorModal: false,
+        successMessage: '',
+        errorMessage: '',
         editingNews: null,
         newsToDelete: null,
         photoFile: null,
@@ -181,6 +263,26 @@ function newsData() {
             return date.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
         },
         
+        showSuccessMessage(message) {
+            this.successMessage = message;
+            this.showSuccessModal = true;
+        },
+        
+        closeSuccessModal() {
+            this.showSuccessModal = false;
+            this.successMessage = '';
+        },
+        
+        showErrorMessage(message) {
+            this.errorMessage = message;
+            this.showErrorModal = true;
+        },
+        
+        closeErrorModal() {
+            this.showErrorModal = false;
+            this.errorMessage = '';
+        },
+        
         async loadNews() {
             if (this.loading) return; // Prevent multiple simultaneous loads
             
@@ -202,7 +304,7 @@ function newsData() {
             } catch (error) {
                 console.error('Failed to load news:', error);
                 const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load news data';
-                showToast(errorMsg, 'error');
+                this.showErrorMessage(errorMsg);
                 this.news = [];
             } finally {
                 this.loading = false;
@@ -222,7 +324,7 @@ function newsData() {
         openEditModal(article) {
             // Validate article object
             if (!article || !article.id) {
-                showToast('Invalid article data', 'error');
+                this.showErrorMessage('Invalid article data');
                 return;
             }
             
@@ -253,7 +355,7 @@ function newsData() {
             // Validate file type
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
             if (!validTypes.includes(file.type)) {
-                showToast('Only JPG, PNG, and GIF images are allowed', 'error');
+                this.showErrorMessage('Only JPG, PNG, and GIF images are allowed');
                 if (this.$refs.photoInput) {
                     this.$refs.photoInput.value = '';
                 }
@@ -263,7 +365,7 @@ function newsData() {
             // Validate file size (max 5MB)
             const maxSize = 5 * 1024 * 1024; // 5MB
             if (file.size > maxSize) {
-                showToast('Image size must be less than 5MB', 'error');
+                this.showErrorMessage('Image size must be less than 5MB');
                 if (this.$refs.photoInput) {
                     this.$refs.photoInput.value = '';
                 }
@@ -276,7 +378,7 @@ function newsData() {
                 this.photoPreview = e.target.result;
             };
             reader.onerror = () => {
-                showToast('Failed to read image file', 'error');
+                this.showErrorMessage('Failed to read image file');
                 this.photoFile = null;
                 this.photoPreview = null;
             };
@@ -294,40 +396,40 @@ function newsData() {
         async saveNews() {
             // Prevent double-submit
             if (this.saving) {
-                showToast('Saving in progress...', 'warning');
+                this.showErrorMessage('Saving in progress...');
                 return;
             }
             
             // Validate form
             if (!this.form.title || this.form.title.trim() === '') {
-                showToast('Title is required', 'error');
+                this.showErrorMessage('Title is required');
                 return;
             }
             
             if (this.form.title.trim().length < 5) {
-                showToast('Title must be at least 5 characters', 'error');
+                this.showErrorMessage('Title must be at least 5 characters');
                 return;
             }
             
             if (!this.form.content || this.form.content.trim() === '') {
-                showToast('Content is required', 'error');
+                this.showErrorMessage('Content is required');
                 return;
             }
             
             if (this.form.content.trim().length < 10) {
-                showToast('Content must be at least 10 characters', 'error');
+                this.showErrorMessage('Content must be at least 10 characters');
                 return;
             }
             
             if (!this.form.publish_date || this.form.publish_date.trim() === '') {
-                showToast('Publish date is required', 'error');
+                this.showErrorMessage('Publish date is required');
                 return;
             }
             
             // Validate date format
             const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
             if (!dateRegex.test(this.form.publish_date)) {
-                showToast('Invalid date format', 'error');
+                this.showErrorMessage('Invalid date format');
                 return;
             }
             
@@ -365,7 +467,7 @@ function newsData() {
                         await this.loadNews();
                     }
                     
-                    showToast('✓ News updated successfully', 'success');
+                    this.showSuccessMessage('News berhasil diperbarui');
                 } else {
                     result = await API.post('/admin/news', formData);
                     
@@ -375,14 +477,14 @@ function newsData() {
                     }
                     
                     this.news.unshift(result.data);
-                    showToast('✓ News added successfully', 'success');
+                    this.showSuccessMessage('News berhasil ditambahkan');
                 }
                 
                 this.closeModal();
             } catch (error) {
                 console.error('Failed to save news:', error);
                 const errorMsg = error?.response?.data?.message || error?.message || 'Failed to save news';
-                showToast(errorMsg, 'error');
+                this.showErrorMessage(errorMsg);
             } finally {
                 this.saving = false;
             }
@@ -391,7 +493,7 @@ function newsData() {
         confirmDelete(article) {
             // Validate article
             if (!article || !article.id) {
-                showToast('Invalid article data', 'error');
+                this.showErrorMessage('Invalid article data');
                 return;
             }
             
@@ -402,14 +504,14 @@ function newsData() {
         async deleteNews() {
             // Validate news
             if (!this.newsToDelete || !this.newsToDelete.id) {
-                showToast('Invalid article data', 'error');
+                this.showErrorMessage('Invalid article data');
                 this.showDeleteConfirm = false;
                 return;
             }
             
             // Prevent double-submit
             if (this.deleting) {
-                showToast('Deletion in progress...', 'warning');
+                this.showErrorMessage('Deletion in progress...');
                 return;
             }
             
@@ -417,13 +519,13 @@ function newsData() {
             try {
                 await API.delete(`/admin/news/${this.newsToDelete.id}`);
                 this.news = this.news.filter(n => n.id !== this.newsToDelete.id);
-                showToast('✓ News deleted successfully', 'success');
+                this.showSuccessMessage('News berhasil dihapus');
                 this.showDeleteConfirm = false;
                 this.newsToDelete = null;
             } catch (error) {
                 console.error('Failed to delete news:', error);
                 const errorMsg = error?.response?.data?.message || error?.message || 'Failed to delete news';
-                showToast(errorMsg, 'error');
+                this.showErrorMessage(errorMsg);
             } finally {
                 this.deleting = false;
             }

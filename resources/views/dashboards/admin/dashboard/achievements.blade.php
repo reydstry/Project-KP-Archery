@@ -90,11 +90,11 @@
 
     <!-- Add/Edit Modal -->
     <div x-show="showModal" x-cloak @click.self="closeModal()"
-         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div @click.away="closeModal()" 
-             class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8"
+             class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8 max-h-[90vh] overflow-y-auto"
              x-transition>
-            <div class="sticky top-0 bg-[#1a307b] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between">
+            <div class="sticky top-0 bg-[#1a307b] text-white px-6 py-4 rounded-t-2xl flex items-center justify-between z-10">
                 <h3 class="text-lg font-bold" x-text="editingAchievement ? 'Edit Achievement' : 'Add New Achievement'"></h3>
                 <button @click="closeModal()" class="text-white/80 hover:text-white">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -112,13 +112,60 @@
                 </div>
                 <div x-show="form.type === 'member'">
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Member *</label>
-                        <select x-model="form.member_id" :required="form.type === 'member'"
-                            class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none">
-                        <option value="">Select member...</option>
-                        <template x-for="member in members" :key="member.id">
-                            <option :value="member.id" x-text="member.name"></option>
-                        </template>
-                    </select>
+                    <div class="relative" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false; showMemberDropdown = false">
+                        <!-- Selected Member Display / Search Input -->
+                        <div @click="openMemberDropdown(); dropdownOpen = true" 
+                             class="w-full px-4 py-2 rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-[#1a307b] focus-within:border-transparent cursor-pointer bg-white flex items-center justify-between">
+                            <div class="flex-1">
+                                <span x-show="!form.member_id && !showMemberDropdown" class="text-slate-400">Select member...</span>
+                                <span x-show="form.member_id && !showMemberDropdown" x-text="selectedMemberName" class="text-slate-800"></span>
+                                <input x-show="showMemberDropdown" 
+                                       x-ref="memberSearchInput"
+                                       x-model="memberSearchQuery" 
+                                       @input="dropdownOpen = true"
+                                       type="text" 
+                                       placeholder="Search member..." 
+                                       class="w-full outline-none bg-transparent">
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button x-show="form.member_id" 
+                                        @click.stop="clearMemberSelection()" 
+                                        type="button"
+                                        class="text-slate-400 hover:text-slate-600 p-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </div>
+                        </div>
+                        
+                        <!-- Dropdown List -->
+                        <div x-show="dropdownOpen && showMemberDropdown" 
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute z-50 w-full mt-2 bg-white rounded-xl border border-slate-200 shadow-xl max-h-60 overflow-y-auto">
+                            <template x-if="filteredMembers.length === 0">
+                                <div class="px-4 py-3 text-sm text-slate-500 text-center">
+                                    <span x-text="memberSearchQuery ? 'No members found' : 'No members available'"></span>
+                                </div>
+                            </template>
+                            <template x-for="member in filteredMembers" :key="member.id">
+                                <div @click="selectMember(member); dropdownOpen = false" 
+                                     class="px-4 py-3 hover:bg-slate-50 cursor-pointer transition border-b border-slate-100 last:border-b-0">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="text-sm font-semibold text-slate-800" x-text="member.name"></div>
+                                            <div x-show="member.email" class="text-xs text-slate-500" x-text="member.email"></div>
+                                        </div>
+                                        <svg x-show="form.member_id == member.id" class="w-5 h-5 text-[#1a307b]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Title *</label>
@@ -185,6 +232,84 @@
             </div>
         </div>
     </div>
+
+    <!-- Success Modal -->
+    <div x-show="showSuccessModal" x-cloak @click.self="closeSuccessModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showSuccessModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <!-- Success Icon -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                    <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Berhasil Disimpan!</h3>
+                
+                <!-- Message -->
+                <p class="text-slate-600 mb-6" x-text="successMessage"></p>
+                
+                <!-- Button -->
+                <button @click="closeSuccessModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div x-show="showErrorModal" x-cloak @click.self="closeErrorModal()"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full mx-4 transform"
+             x-show="showErrorModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+            <div class="text-center">
+                <!-- Error Icon -->
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                    <svg class="h-10 w-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </div>
+                
+                <!-- Title -->
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Terjadi Kesalahan!</h3>
+                
+                <!-- Message -->
+                <p class="text-slate-600 mb-6" x-text="errorMessage"></p>
+                
+                <!-- Button -->
+                <button @click="closeErrorModal()" class="w-full px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl font-semibold transition-all duration-200 active:scale-95">
+                    Oke, Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
@@ -200,10 +325,16 @@ function achievementsData() {
         deleting: false,
         showModal: false,
         showDeleteConfirm: false,
+        showSuccessModal: false,
+        showErrorModal: false,
+        successMessage: '',
+        errorMessage: '',
         editingAchievement: null,
         achievementToDelete: null,
         photoFile: null,
         photoPreview: null,
+        memberSearchQuery: '',
+        showMemberDropdown: false,
         form: {
             type: '',
             member_id: '',
@@ -231,10 +362,45 @@ function achievementsData() {
             return filtered;
         },
         
+        get filteredMembers() {
+            if (!this.memberSearchQuery) return this.members;
+            const query = this.memberSearchQuery.toLowerCase();
+            return this.members.filter(m => 
+                m.name.toLowerCase().includes(query) ||
+                (m.email && m.email.toLowerCase().includes(query))
+            );
+        },
+        
+        get selectedMemberName() {
+            if (!this.form.member_id) return '';
+            const member = this.members.find(m => m.id == this.form.member_id);
+            return member ? member.name : '';
+        },
+        
         formatDate(dateString) {
             if (!dateString) return 'No date';
             const date = new Date(dateString);
             return date.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' });
+        },
+        
+        showSuccessMessage(message) {
+            this.successMessage = message;
+            this.showSuccessModal = true;
+        },
+        
+        closeSuccessModal() {
+            this.showSuccessModal = false;
+            this.successMessage = '';
+        },
+        
+        showErrorMessage(message) {
+            this.errorMessage = message;
+            this.showErrorModal = true;
+        },
+        
+        closeErrorModal() {
+            this.showErrorModal = false;
+            this.errorMessage = '';
         },
         
         async init() {
@@ -262,7 +428,7 @@ function achievementsData() {
             } catch (error) {
                 console.error('Failed to load achievements:', error);
                 const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load achievements';
-                showToast(errorMsg, 'error');
+                this.showErrorMessage(errorMsg);
                 this.achievements = [];
             } finally {
                 this.loading = false;
@@ -287,7 +453,7 @@ function achievementsData() {
             } catch (error) {
                 console.error('Failed to load members:', error);
                 const errorMsg = error?.response?.data?.message || error?.message || 'Failed to load members';
-                showToast(errorMsg, 'error');
+                this.showErrorMessage(errorMsg);
                 this.members = [];
             }
         },
@@ -298,6 +464,8 @@ function achievementsData() {
             this.form = { type: '', member_id: '', title: '', description: '', date: today };
             this.photoFile = null;
             this.photoPreview = null;
+            this.memberSearchQuery = '';
+            this.showMemberDropdown = false;
             this.saving = false; // Reset saving state
             this.showModal = true;
         },
@@ -305,7 +473,7 @@ function achievementsData() {
         openEditModal(achievement) {
             // Validate achievement object
             if (!achievement || !achievement.id) {
-                showToast('Invalid achievement data', 'error');
+                this.showErrorMessage('Invalid achievement data');
                 return;
             }
             
@@ -328,6 +496,27 @@ function achievementsData() {
             this.editingAchievement = null;
             this.photoFile = null;
             this.photoPreview = null;
+            this.memberSearchQuery = '';
+            this.showMemberDropdown = false;
+        },
+        
+        selectMember(member) {
+            this.form.member_id = member.id;
+            this.memberSearchQuery = '';
+            this.showMemberDropdown = false;
+        },
+        
+        openMemberDropdown() {
+            this.showMemberDropdown = true;
+            this.$nextTick(() => {
+                const input = this.$refs.memberSearchInput;
+                if (input) input.focus();
+            });
+        },
+        
+        clearMemberSelection() {
+            this.form.member_id = '';
+            this.memberSearchQuery = '';
         },
 
         handlePhotoChange(event) {
@@ -337,7 +526,7 @@ function achievementsData() {
             // Validate file type
             const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
             if (!validTypes.includes(file.type)) {
-                showToast('Only JPG, PNG, and GIF images are allowed', 'error');
+                this.showErrorMessage('Only JPG, PNG, and GIF images are allowed');
                 if (this.$refs.photoInput) {
                     this.$refs.photoInput.value = '';
                 }
@@ -347,7 +536,7 @@ function achievementsData() {
             // Validate file size (max 5MB)
             const maxSize = 5 * 1024 * 1024; // 5MB
             if (file.size > maxSize) {
-                showToast('Image size must be less than 5MB', 'error');
+                this.showErrorMessage('Image size must be less than 5MB');
                 if (this.$refs.photoInput) {
                     this.$refs.photoInput.value = '';
                 }
@@ -360,7 +549,7 @@ function achievementsData() {
                 this.photoPreview = e.target.result;
             };
             reader.onerror = () => {
-                showToast('Failed to read image file', 'error');
+                this.showErrorMessage('Failed to read image file');
                 this.photoFile = null;
                 this.photoPreview = null;
             };
@@ -378,50 +567,50 @@ function achievementsData() {
         async saveAchievement() {
             // Prevent double-submit
             if (this.saving) {
-                showToast('Saving in progress...', 'warning');
+                this.showErrorMessage('Saving in progress...');
                 return;
             }
             
             // Validate form
             if (!this.form.type || this.form.type === '') {
-                showToast('Achievement type is required', 'error');
+                this.showErrorMessage('Achievement type is required');
                 return;
             }
             
             if (this.form.type === 'member' && (!this.form.member_id || this.form.member_id === '')) {
-                showToast('Please select a member for member achievement', 'error');
+                this.showErrorMessage('Please select a member for member achievement');
                 return;
             }
             
             if (!this.form.title || this.form.title.trim() === '') {
-                showToast('Title is required', 'error');
+                this.showErrorMessage('Title is required');
                 return;
             }
             
             if (this.form.title.trim().length < 3) {
-                showToast('Title must be at least 3 characters', 'error');
+                this.showErrorMessage('Title must be at least 3 characters');
                 return;
             }
             
             if (!this.form.description || this.form.description.trim() === '') {
-                showToast('Description is required', 'error');
+                this.showErrorMessage('Description is required');
                 return;
             }
             
             if (this.form.description.trim().length < 10) {
-                showToast('Description must be at least 10 characters', 'error');
+                this.showErrorMessage('Description must be at least 10 characters');
                 return;
             }
             
             if (!this.form.date || this.form.date === '') {
-                showToast('Date is required', 'error');
+                this.showErrorMessage('Date is required');
                 return;
             }
             
             // Validate date format
             const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
             if (!dateRegex.test(this.form.date)) {
-                showToast('Invalid date format', 'error');
+                this.showErrorMessage('Invalid date format');
                 return;
             }
             
@@ -464,7 +653,7 @@ function achievementsData() {
                         await this.loadAchievements();
                     }
                     
-                    showToast('✓ Achievement updated successfully', 'success');
+                    this.showSuccessMessage('Achievement berhasil diperbarui');
                 } else {
                     result = await API.post('/admin/achievements', formData);
                     
@@ -474,14 +663,14 @@ function achievementsData() {
                     }
                     
                     this.achievements.unshift(result.data);
-                    showToast('✓ Achievement added successfully', 'success');
+                    this.showSuccessMessage('Achievement berhasil ditambahkan');
                 }
                 
                 this.closeModal();
             } catch (error) {
                 console.error('Failed to save achievement:', error);
                 const errorMsg = error?.response?.data?.message || error?.message || 'Failed to save achievement';
-                showToast(errorMsg, 'error');
+                this.showErrorMessage(errorMsg);
             } finally {
                 this.saving = false;
             }
@@ -490,7 +679,7 @@ function achievementsData() {
         confirmDelete(achievement) {
             // Validate achievement
             if (!achievement || !achievement.id) {
-                showToast('Invalid achievement data', 'error');
+                this.showErrorMessage('Invalid achievement data');
                 return;
             }
             
@@ -501,14 +690,14 @@ function achievementsData() {
         async deleteAchievement() {
             // Validate achievement
             if (!this.achievementToDelete || !this.achievementToDelete.id) {
-                showToast('Invalid achievement data', 'error');
+                this.showErrorMessage('Invalid achievement data');
                 this.showDeleteConfirm = false;
                 return;
             }
             
             // Prevent double-submit
             if (this.deleting) {
-                showToast('Deletion in progress...', 'warning');
+                this.showErrorMessage('Deletion in progress...');
                 return;
             }
             
@@ -516,13 +705,13 @@ function achievementsData() {
             try {
                 await API.delete(`/admin/achievements/${this.achievementToDelete.id}`);
                 this.achievements = this.achievements.filter(a => a.id !== this.achievementToDelete.id);
-                showToast('✓ Achievement deleted successfully', 'success');
+                this.showSuccessMessage('Achievement berhasil dihapus');
                 this.showDeleteConfirm = false;
                 this.achievementToDelete = null;
             } catch (error) {
                 console.error('Failed to delete achievement:', error);
                 const errorMsg = error?.response?.data?.message || error?.message || 'Failed to delete achievement';
-                showToast(errorMsg, 'error');
+                this.showErrorMessage(errorMsg);
             } finally {
                 this.deleting = false;
             }

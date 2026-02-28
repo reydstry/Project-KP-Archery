@@ -95,6 +95,24 @@ window.viewBerita = function(id) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing gallery page...');
     switchTab('latihan');
+    
+    // Smooth scroll to hash if present
+    if (window.location.hash) {
+        setTimeout(() => {
+            const element = document.querySelector(window.location.hash);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 300);
+    }
+});
+
+// Handle hash change for smooth scroll
+window.addEventListener('hashchange', function() {
+    const element = document.querySelector(window.location.hash);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 });
 </script>
 @endpush
