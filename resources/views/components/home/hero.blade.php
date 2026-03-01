@@ -23,33 +23,21 @@
             
             <!-- PRIMARY BUTTON -->
             <a href="{{ route('login') }}"
-                class="relative w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3
-                    bg-[#a72320]/40 backdrop-blur-[2px] border border-white/20 
-                    text-white font-bold rounded-full text-sm sm:text-base md:text-lg
-                    hover:bg-[#a72320]/60 hover:scale-105 transition-all duration-300 shadow-xl text-center
-                    overflow-hidden group">
-                <!-- SHINE EFFECT -->
-                <span class="absolute inset-0 w-full h-full 
-                            bg-gradient-to-r from-transparent via-white/30 to-transparent
-                            -translate-x-full group-hover:translate-x-full 
-                            transition-transform duration-700 ease-in-out skew-x-12">
-                </span>
+                class="liquid-btn btn-red flex items-center gap-2 px-6 sm:px-8 py-3 text-white font-bold text-sm sm:text-base md:text-lg text-center"
+                style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);"
+                onmouseenter="this.classList.add('is-hovered')"
+                onmouseleave="this.classList.remove('is-hovered')">
+                <span class="shine"></span>
                 {{ __('home.register_now') }}
             </a>
 
             <!-- SECONDARY BUTTON -->
             <a href="{{ route('program') }}"
-                class="relative w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3
-                    bg-white/10 backdrop-blur-[2px] border border-white/30 
-                    text-white font-bold rounded-full text-sm sm:text-base md:text-lg
-                    hover:bg-white/15 hover:scale-105 transition-all duration-300 shadow-xl text-center
-                    overflow-hidden group">
-                <!-- SHINE EFFECT -->
-                <span class="absolute inset-0 w-full h-full 
-                            bg-gradient-to-r from-transparent via-white/30 to-transparent
-                            -translate-x-full group-hover:translate-x-full 
-                            transition-transform duration-700 ease-in-out skew-x-12">
-                </span>
+                class="liquid-btn btn-white flex items-center gap-2 px-6 sm:px-8 py-3 text-white font-bold text-sm sm:text-base md:text-lg text-center"
+                style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);"
+                onmouseenter="this.classList.add('is-hovered')"
+                onmouseleave="this.classList.remove('is-hovered')">
+                <span class="shine"></span>
                 {{ __('home.view_program') }}
             </a>
         </div>

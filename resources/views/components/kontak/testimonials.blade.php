@@ -27,18 +27,15 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @foreach($testimonials as $t)
             <div class="relative group">
-                <div class="absolute inset-0 bg-yellow-500/10 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <!-- Card -->
+                    <div class="liquid-glass relative p-6 text-center transition-transform duration-300 hover:scale-105"
+                        style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);"
+                        onmouseenter="this.classList.add('is-hovered')"
+                        onmouseleave="this.classList.remove('is-hovered')">
 
-                <div class="relative h-full bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-6
-                            shadow-xl shadow-black/30 hover:shadow-2xl hover:shadow-black/60
-                            transition-all duration-300 hover:-translate-y-2 overflow-hidden">
+                        <!-- Shine -->
+                        <span class="shine"></span>
 
-                    <!-- Shine -->
-                    <span class="absolute inset-0 w-full h-full 
-                                bg-gradient-to-r from-transparent via-white/10 to-transparent
-                                -translate-x-full group-hover:translate-x-full 
-                                transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none z-10">
-                    </span>
 
                     <!-- Quote icon -->
                     <div class="text-yellow-400/30 text-6xl font-serif leading-none mb-2">"</div>

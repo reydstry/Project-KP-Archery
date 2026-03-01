@@ -22,22 +22,19 @@
         </div>
 
         <!-- Packages Cards -->
-        <div x-show="!loading && packages.length > 0" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+        <div x-show="!loading && packages.length > 0" class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto mb-16">
             <template x-for="(package, index) in packages" :key="package.id">
-                <div class="relative group">
-                    <!-- Glow -->
-                    <div class="absolute inset-0 bg-red-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="relative group w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]">
 
                     <!-- Card -->
-                    <div class="relative bg-white/5 backdrop-blur-[2px] border border-white/20 rounded-2xl p-8 text-center
-                            shadow-xl shadow-black/30 overflow-hidden transition-all duration-300 hover:scale-105">
+                    <div class="liquid-glass relative p-6 text-center transition-transform duration-300 hover:scale-105"
+                        style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);"
+                        onmouseenter="this.classList.add('is-hovered')"
+                        onmouseleave="this.classList.remove('is-hovered')">
 
                         <!-- Shine -->
-                        <span class="absolute inset-0 w-full h-full 
-                                    bg-gradient-to-r from-transparent via-white/10 to-transparent
-                                    -translate-x-full group-hover:translate-x-full 
-                                    transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none z-10">
-                        </span>
+                        <span class="shine"></span>
+
 
                         <!-- Card Header -->
                         <h3 class="text-white/60 text-sm font-semibold tracking-widest uppercase mb-2" x-text="package.name">
@@ -62,29 +59,6 @@
         <!-- Empty State -->
         <div x-show="!loading && packages.length === 0" class="text-center py-12">
             <p class="text-white/60 text-lg">Belum ada paket tersedia saat ini.</p>
-        </div>
-
-        <!-- Registration Fee -->
-        <div class="relative group max-w-lg mx-auto">
-            <!-- Glow -->
-            <div class="absolute inset-0 bg-red-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
-            <div class="relative bg-white/5 backdrop-blur-[2px] border border-white/20 rounded-2xl p-8 text-center
-                        shadow-xl shadow-black/30 overflow-hidden hover:scale-105">
-                
-                <!-- Shine -->
-                <span class="absolute inset-0 w-full h-full 
-                            bg-gradient-to-r from-transparent via-white/10 to-transparent
-                            -translate-x-full group-hover:translate-x-full 
-                            transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none">
-                </span>
-                <p class="text-white/60 text-sm font-semibold tracking-widest uppercase mb-2">
-                    Registration Fee
-                </p>
-                <p class="text-4xl sm:text-5xl font-bold text-white mb-2">
-                    Rp 200.000
-                </p>
-            </div>
         </div>
     </div>
 </section>

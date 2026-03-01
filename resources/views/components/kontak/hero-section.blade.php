@@ -21,8 +21,7 @@
         <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
 
             <!-- LEFT: Contact Form -->
-            <div class="relative bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-xl shadow-black/30">
-
+            <div class="liquid-glass p-8">
                 <h3 class="text-2xl font-bold text-white mb-2">{{ __('contact.send_message_title') }}</h3>
                 <div class="w-10 h-0.5 bg-blue-400/60 rounded-full mb-6"></div>
 
@@ -115,8 +114,8 @@
             </div>
 
             <!-- RIGHT: Contact Info -->
-            <div class="relative bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-8 shadow-xl shadow-black/30 h-full">
-
+            <div class="liquid-glass p-8 h-full">
+                
                 <h3 class="text-2xl font-bold text-white mb-2">{{ __('contact.contact_info') }}</h3>
                 <div class="w-10 h-0.5 bg-red-400/60 rounded-full mb-6"></div>
 
