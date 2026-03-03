@@ -3,73 +3,7 @@
 @section('title', __('gallery.highlights_page_title') . ' - FocusOneX Archery')
 
 @section('content')
-@php
-    use App\Models\Achievement;
-    use App\Models\News;
-
-    $activeType = request('type', 'all');
-
-    $newsItems = News::query()
-        ->published()
-        ->orderBy('publish_date', 'desc')
-        ->orderBy('id', 'desc')
-        ->limit(100)
-        ->get()
-        ->map(function ($news) {
-            return [
-                'id' => $news->id,
-                'type' => 'news',
-                'badge' => __('gallery.type_news'),
-                'badge_icon' => '📰',
-                'image' => $news->photo_url ?? asset('asset/img/latarbelakanglogin.jpeg'),
-                'title' => $news->title,
-                'date' => $news->publish_date?->format('d F Y'),
-                'timestamp' => $news->publish_date?->timestamp ?? 0,
-                'excerpt' => \Illuminate\Support\Str::limit(strip_tags($news->content), 180),
-                'url' => route('news.detail', $news->id),
-            ];
-        });
-
-    $achievementItems = Achievement::query()
-        ->published()
-        ->with('member')
-        ->orderBy('date', 'desc')
-        ->orderBy('id', 'desc')
-        ->limit(100)
-        ->get()
-        ->map(function ($achievement) {
-            $badgeIcon = '🏆';
-            $title = strtolower($achievement->title);
-
-            if (str_contains($title, 'juara 1') || str_contains($title, 'gold') || str_contains($title, '1st place')) {
-                $badgeIcon = '🥇';
-            } elseif (str_contains($title, 'juara 2') || str_contains($title, 'silver') || str_contains($title, '2nd place')) {
-                $badgeIcon = '🥈';
-            } elseif (str_contains($title, 'juara 3') || str_contains($title, 'bronze') || str_contains($title, '3rd place')) {
-                $badgeIcon = '🥉';
-            }
-
-            return [
-                'id' => $achievement->id,
-                'type' => 'achievement',
-                'badge' => __('gallery.type_achievement'),
-                'badge_icon' => $badgeIcon,
-                'image' => $achievement->photo_url ?? asset('asset/img/latarbelakanglogin.jpeg'),
-                'title' => $achievement->title,
-                'date' => $achievement->date?->format('d F Y'),
-                'timestamp' => $achievement->date?->timestamp ?? 0,
-                'excerpt' => \Illuminate\Support\Str::limit(strip_tags($achievement->description), 180),
-                'member' => $achievement->type === 'member' && $achievement->member ? $achievement->member->name : null,
-                'url' => route('achievement.detail', $achievement->id),
-            ];
-        });
-
-    $items = $newsItems->concat($achievementItems)->sortByDesc('timestamp')->values();
-
-    if (in_array($activeType, ['news', 'achievement'], true)) {
-        $items = $items->where('type', $activeType)->values();
-    }
-@endphp
+{{-- $items and $activeType passed from GalleryPageController@highlights --}}
 
 <div class="relative min-h-screen py-24 sm:py-28 bg-gradient-to-b from-[#1b2659] to-[#16213a]">
     <div class="container mx-auto px-6">

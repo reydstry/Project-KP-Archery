@@ -60,7 +60,7 @@
          class="fixed inset-0 bg-black/50 z-40 lg:hidden"
          x-cloak></div>
 
-    <x-toast-container />
+    <x-ui.toast-container />
 
     <div class="flex min-h-screen">
         <!-- Sidebar -->

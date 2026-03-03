@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="space-y-4">
-    <x-report-header
+    <x-stats.report-header
         title="Laporan Aktivitas Member"
         subtitle="Periode: {{ \Carbon\Carbon::createFromDate($filters['year'], $filters['month'], 1)->translatedFormat('F Y') }}"
     >
@@ -17,7 +17,7 @@
                 Export Excel
             </a>
         </x-slot:actions>
-    </x-report-header>
+    </x-stats.report-header>
 
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
         <div class=" rounded-t-2xl flex items-center justify-between gap-3 px-5 py-3.5 bg-[#1a307b] border-b border-slate-100">
@@ -30,7 +30,7 @@
         </div>
     
         <form method="GET" action="{{ route('admin.reports.monthly') }}" class=" p-4 grid grid-cols-1 md:grid-cols-6 gap-3">
-            <x-form-input
+            <x-form.input
                 label="Bulan"
                 name="month"
                 type="number"
@@ -39,7 +39,7 @@
                 value="{{ $filters['month'] }}"
             />
 
-            <x-form-input
+            <x-form.input
                 label="Tahun"
                 name="year"
                 type="number"
@@ -213,25 +213,25 @@
     
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <x-stat-card title="Total Members">
+        <x-stats.stat-card title="Total Members">
             <p class="mt-2 text-2xl font-bold text-slate-800">{{ $summary['total_members'] }}</p>
             <p class="text-xs text-slate-500 mt-1">Member aktif</p>
-        </x-stat-card>
+        </x-stats.stat-card>
 
-        <x-stat-card title="Total Sessions">
+        <x-stats.stat-card title="Total Sessions">
             <p class="mt-2 text-2xl font-bold text-slate-800">{{ $summary['total_sessions'] }}</p>
             <p class="text-xs text-slate-500 mt-1">Jumlah session pada periode</p>
-        </x-stat-card>
+        </x-stats.stat-card>
 
-        <x-stat-card title="Members Trained">
+        <x-stats.stat-card title="Members Trained">
             <p class="mt-2 text-2xl font-bold text-slate-800">{{ $summary['members_trained'] }}</p>
             <p class="text-xs text-slate-500 mt-1">Member yang sudah latihan</p>
-        </x-stat-card>
+        </x-stats.stat-card>
 
-        <x-stat-card title="Average Attendance">
+        <x-stats.stat-card title="Average Attendance">
             <p class="mt-2 text-2xl font-bold text-slate-800">{{ number_format($summary['average_attendance'], 1) }}%</p>
             <p class="text-xs text-slate-500 mt-1">Rata-rata kehadiran member</p>
-        </x-stat-card>
+        </x-stats.stat-card>
     </div>
 
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
@@ -243,7 +243,7 @@
                 <h3 class="text-sm font-semibold text-white">Informasi Broadcast</h3>
             </div>
         </div>
-        <x-table :headers="['No', 'Nama', 'Paket', 'Kehadiran', 'Sisa Slot', 'Slot Terpakai']">
+        <x-stats.table :headers="['No', 'Nama', 'Paket', 'Kehadiran', 'Sisa Slot', 'Slot Terpakai']">
             @forelse($rows as $index => $row)
                 <tr class="{{ $row['is_low_attendance'] ? 'bg-white' : '' }} text-center">
                     <td class="px-4 py-3 text-slate-700">{{ $index + 1 }}</td>
@@ -271,7 +271,7 @@
                     </td>
                 </tr>
             @endforelse
-        </x-table>
+        </x-stats.table>
     </div>
 </div>
 @endsection

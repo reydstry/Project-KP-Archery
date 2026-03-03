@@ -64,11 +64,6 @@ window.galleryTab = function(category) {
     };
 };
 
-// View Berita Function
-window.viewBerita = function(id) {
-    window.location.href = '/berita/' + id;
-};
-
 // Handle hash change for smooth scroll
 window.addEventListener('hashchange', function() {
     const element = document.querySelector(window.location.hash);

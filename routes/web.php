@@ -16,7 +16,7 @@ use App\Modules\Admin\Attendance\Controllers\AttendancePageController as AdminAt
 use App\Modules\Admin\Member\Controllers\MemberPageController as AdminMemberPageController;
 use App\Modules\Admin\Training\Controllers\TrainingPageController as AdminTrainingPageController;
 use App\Modules\Admin\WhatsApp\Controllers\WhatsAppPageController as AdminWhatsAppPageController;
-use App\Models\SessionTime;
+use App\Http\Controllers\PublicSite\GalleryPageController;
 use App\Models\Coach;
 use Illuminate\Support\Facades\Route;
 
@@ -35,22 +35,13 @@ Route::get('/program', function () {
     return view('pages.program');
 })->name('program');
 
-Route::get('/galeri', function () {
-    return view('pages.galeri');
-})->name('galeri');
-
-Route::get('/galeri/highlights', function () {
-    return view('pages.galeri-highlights');
-})->name('galeri.highlights');
+Route::get('/galeri', [GalleryPageController::class, 'index'])->name('galeri');
+Route::get('/galeri/highlights', [GalleryPageController::class, 'highlights'])->name('galeri.highlights');
 
 Route::get('/kontak', function () {
     return view('pages.kontak');
 })->name('kontak');
 
-
-// dummay data berita detail
-use App\Http\Controllers\BeritaController;
-Route::get('/berita/{id}', [BeritaController::class, 'show'])->name('berita.detail');
 
 // News & Achievement Detail Pages
 use App\Http\Controllers\NewsDetailController;

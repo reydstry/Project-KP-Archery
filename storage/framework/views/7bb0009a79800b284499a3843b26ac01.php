@@ -12,59 +12,39 @@
         </div>
 
         <?php
-            // PETUNJUK: Buka setiap link Google Review di bawah, lalu copy:
-            // 1. Nama reviewer
-            // 2. Teks review
-            // 3. Jumlah bintang (1-5)
-            // Format: ['name' => 'Nama dari Google', 'role' => 'Ulasan Google', 'stars' => 5, 'text' => 'Copy review dari Google', 'photo' => 'URL foto (optional)', 'link' => 'link review']
-            
             $testimonials = [
-                // Review 1 - https://share.google/EkwBqtTqDNigh9Sby
                 [
                     'name' => 'Coach Agus Supriyanto',
                     'role' => 'Ulasan Google', 
-                    'stars' => 5,  // Sesuaikan dengan rating di Google (1-5)
-                    'text' => 'Tempat latihan panahan yg sangat representative, lengkap banget peralatannya. Dari pemula sampai kelas atlet bisa di sini. Buat orang yg cuman pengen liat orang manah juga bisa di sini.
-                                Lapaaang dan luaaaass banget.',
-            'photo' => null,  // Optional: paste URL foto profil dari Google, atau biarkan null untuk avatar otomatis
+                    'stars' => 5,
+                    'text' => 'Tempat latihan panahan yg sangat representative, lengkap banget peralatannya. Dari pemula sampai kelas atlet bisa di sini. Buat orang yg cuman pengen liat orang manah juga bisa di sini. Lapaaang dan luaaaass banget.',
+                    'photo' => null,
                     'link' => 'https://share.google/EkwBqtTqDNigh9Sby'
                 ],
-                
-                // Review 2 - https://share.google/eHSthxKY5URynkvbg
                 [
                     'name' => 'Salira Bandung Batagor Kuah Balikpapan',
                     'role' => 'Ulasan Google',
                     'stars' => 5,
-                    'text' => 'Tempat latihan panahan profesional nih. Dari kelas pemula sampai dengan kelas "legolas" hahaha.
-                                Buat anak-anak sampai dengan dewasa bisa latihan di sini.
-                                Dari pagi sampai malam juga boleh.',
+                    'text' => 'Tempat latihan panahan profesional nih. Dari kelas pemula sampai dengan kelas "legolas" hahaha. Buat anak-anak sampai dengan dewasa bisa latihan di sini. Dari pagi sampai malam juga boleh.',
                     'photo' => null,
                     'link' => 'https://share.google/eHSthxKY5URynkvbg'
                 ],
-                
-
-                // Review 3 - https://maps.app.goo.gl/8gAEfCdf891RiZ9d7
                 [
                     'name' => 'Vicky Network',
                     'role' => 'Ulasan Google', 
-                    'stars' => 5,  // Sesuaikan dengan rating di Google (1-5)
+                    'stars' => 5,
                     'text' => 'Memanah juga merupakan cabang olahraga yang cukup popluer di era sekarang. Sehingga banyak ditemukan sekolah panahan dan tersebar hampir di seluruh kota-kota besar di Indonesia salah satunya balikpapan.',
-                    'photo' => null,  // Optional: paste URL foto profil dari Google, atau biarkan null untuk avatar otomatis
+                    'photo' => null,
                     'link' => 'https://maps.app.goo.gl/8gAEfCdf891RiZ9d7'
                 ],
-                
-                // Review 4 - https://share.google/pkURLlvNX7mUZfAeW
                 [
                     'name' => 'Yani Banjar',
                     'role' => 'Ulasan Google',
                     'stars' => 5,
-                    'text' => 'Tempat latihan memanah dan berkuda yg asek dan luas
-                                Para pelatih dan staf yg ramah ramah',
+                    'text' => 'Tempat latihan memanah dan berkuda yg asek dan luas. Para pelatih dan staf yg ramah ramah',
                     'photo' => null,
                     'link' => 'https://share.google/pkURLlvNX7mUZfAeW'
                 ],
-                
-                // Review 5 - https://share.google/FiXHLH9qTEdSHTjty
                 [
                     'name' => 'Tegar Septiyanto',
                     'role' => 'Ulasan Google',
@@ -73,21 +53,19 @@
                     'photo' => null,
                     'link' => 'https://share.google/FiXHLH9qTEdSHTjty'
                 ],
-                 // Review 6 - https://share.google/ZcySbC2yPBn03hVj2
                 [
                     'name' => 'Yuti Iban',
                     'role' => 'Ulasan Google',
                     'stars' => 5,
-                    'text' => 'Tempat latihan panahan yang bagus. Ada toilet dan mushola yg bersih, juga tempat menunggu yg nyaman.
-                    ',
+                    'text' => 'Tempat latihan panahan yang bagus. Ada toilet dan mushola yg bersih, juga tempat menunggu yg nyaman.',
                     'photo' => null,
                     'link' => 'https://share.google/ZcySbC2yPBn03hVj2'
                 ],
-                
             ];
         ?>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <?php $__currentLoopData = $testimonials; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <?php
                 $hasLink = isset($t['link']) && !empty($t['link']);
@@ -98,21 +76,20 @@
             <a href="<?php echo e($t['link']); ?>" target="_blank" class="relative group block">
             <?php else: ?>
             <div class="relative group">
-            <?php endif; ?>  
-                <!-- Card -->
-                    <div class="liquid-glass relative p-6 text-center transition-transform duration-300 hover:scale-105"
-                        style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);"
-                        onmouseenter="this.classList.add('is-hovered')"
-                        onmouseleave="this.classList.remove('is-hovered')">
+            <?php endif; ?>
+                
+                <div class="liquid-glass relative flex flex-col h-[340px] sm:h-[360px] p-5 sm:p-6 text-center transition-transform duration-300 hover:scale-[1.03]"
+                     style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);"
+                     onmouseenter="this.classList.add('is-hovered')"
+                     onmouseleave="this.classList.remove('is-hovered')">
 
-                        <!-- Shine -->
-                        <span class="shine"></span>
-
+                    
+                    <span class="shine"></span>
 
                     <?php if($isGoogleReview): ?>
-                    <!-- Google Badge -->
-                    <div class="flex items-center gap-1.5 mb-3">
-                        <svg class="w-4 h-4" viewBox="0 0 48 48" fill="none">
+                    
+                    <div class="flex items-center gap-1.5 mb-3 flex-shrink-0">
+                        <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 48 48" fill="none">
                             <path d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" fill="#FFC107"/>
                             <path d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z" fill="#FF3D00"/>
                             <path d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0124 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" fill="#4CAF50"/>
@@ -122,19 +99,19 @@
                     </div>
                     <?php endif; ?>
 
-                    <!-- Quote icon -->
-                    <div class="text-yellow-400/30 text-6xl font-serif leading-none mb-2">"</div>
+                    
+                    <div class="text-yellow-400/30 text-5xl font-serif leading-none mb-2 flex-shrink-0">&ldquo;</div>
 
-                    <!-- Text -->
-                    <p class="text-white/70 text-sm leading-relaxed mb-5 italic"><?php echo e($t['text']); ?></p>
+                    
+                    <p class="text-white/70 text-sm leading-relaxed italic flex-1 overflow-hidden line-clamp-5"><?php echo e($t['text']); ?></p>
 
-                    <!-- Divider -->
-                    <div class="w-full h-px bg-white/10 mb-4"></div>
+                    
+                    <div class="w-full h-px bg-white/10 my-4 flex-shrink-0"></div>
 
-                    <!-- Profile + Stars -->
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="relative">
+                    
+                    <div class="flex items-center justify-between flex-shrink-0">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="relative flex-shrink-0">
                                 <div class="absolute inset-0 bg-yellow-500/30 rounded-full blur-md scale-110 pointer-events-none"></div>
                                 <?php if(isset($t['photo']) && !empty($t['photo'])): ?>
                                     <img src="<?php echo e($t['photo']); ?>"
@@ -147,15 +124,15 @@
                                          class="relative w-10 h-10 rounded-full border-2 border-white/20">
                                 <?php endif; ?>
                             </div>
-                            <div>
-                                <p class="text-white font-semibold text-sm"><?php echo e($t['name']); ?></p>
+                            <div class="min-w-0">
+                                <p class="text-white font-semibold text-sm truncate"><?php echo e($t['name']); ?></p>
                                 <p class="text-white/40 text-xs"><?php echo e($t['role']); ?></p>
                             </div>
                         </div>
-                        <!-- Stars -->
-                        <div class="flex gap-0.5">
+                        
+                        <div class="flex gap-0.5 flex-shrink-0">
                             <?php for($i = 1; $i <= 5; $i++): ?>
-                            <svg class="w-4 h-4 <?php echo e($i <= $t['stars'] ? 'text-yellow-400' : 'text-white/20'); ?>" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 <?php echo e($i <= $t['stars'] ? 'text-yellow-400' : 'text-white/20'); ?>" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
                             <?php endfor; ?>
@@ -163,8 +140,8 @@
                     </div>
 
                     <?php if($hasLink): ?>
-                    <!-- Click to view full review -->
-                    <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    
+                    <div class="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
                         <div class="flex items-center gap-1 text-xs text-blue-400 font-semibold bg-blue-500/20 px-2 py-1 rounded-lg backdrop-blur-sm">
                             <span>Lihat lengkap</span>
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -174,13 +151,15 @@
                     </div>
                     <?php endif; ?>
                 </div>
-                <?php if($hasLink): ?>
-                </a>
-                <?php else: ?>
+
+            <?php if($hasLink): ?>
+            </a>
+            <?php else: ?>
             </div>
             <?php endif; ?>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?> 
         </div>
         
     </div>
-</div><?php /**PATH C:\laragon\www\Project\club-panahan\resources\views/components/kontak/testimonials.blade.php ENDPATH**/ ?>
+</div>
+<?php /**PATH C:\laragon\www\Project\club-panahan\resources\views/components/kontak/testimonials.blade.php ENDPATH**/ ?>
