@@ -17,14 +17,15 @@
     <div class="card-animate hidden lg:block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden" style="animation-delay: 0.3s">
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-slate-50 border-b border-slate-200">
+                <thead class="bg-[#1a307b] border-b border-slate-200">
                     <tr>
-                        <th class="pl-14 py-6 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Member</th>
-                        <th class="pr-6 py-6 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">Package</th>
-                        <th class="px-6 py-6 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">Sessions</th>
-                        <th class="px-6 py-6 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">Period</th>
-                        <th class="px-6 py-6 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-6 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">No</th>
+                        <th class="pl-14 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">Member</th>
+                        <th class="pr-6 py-6 text-center text-xs font-semibold text-white uppercase tracking-wider">Package</th>
+                        <th class="px-6 py-6 text-center text-xs font-semibold text-white uppercase tracking-wider">Sessions</th>
+                        <th class="px-6 py-6 text-center text-xs font-semibold text-white uppercase tracking-wider">Period</th>
+                        <th class="px-6 py-6 text-center text-xs font-semibold text-white uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-6 text-center text-xs font-semibold text-white uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
@@ -34,11 +35,17 @@
                     <template x-if="!loading && filteredRows.length === 0">
                         <tr><td colspan="7" class="px-6 py-12 text-center text-slate-400">No member packages found</td></tr>
                     </template>
-                    <template x-for="mp in filteredRows" :key="mp.id">
+                    <template x-for="(mp, index) in filteredRows" :key="mp.id">
                         <tr class="hover:bg-slate-50 transition">
                             <td class="pl-11 py-6 text-left">
                                 <div>
-                                    <p class="font-semibold text-slate-800" x-text="mp.member?.name"></p>
+                                    <p class="font-semibold text-slate-800" x-text="index + 1"></p>
+                                </div>
+                            </td>
+                            <td class="pl-14 py-6 text-left">
+                                <div>
+                                    <p class="font-semibold text-slate-800" x-text="mp.member?.name || '-'"></p>
+                                    <p class="text-sm text-slate-500" x-text="mp.member?.phone || '-'"></p>
                                 </div>
                             </td>
                             <td class="pr-6 py-6 text-center">

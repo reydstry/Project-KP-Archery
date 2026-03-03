@@ -2,7 +2,6 @@
 
 namespace App\Services\Admin;
 
-use App\Enums\StatusMember;
 use App\Models\Attendance;
 use App\Models\Member;
 use App\Models\TrainingSession;
@@ -15,7 +14,7 @@ class AttendanceService
     {
         return Attendance::query()
             ->with([
-                'member:id,name,phone,status,is_active',
+                'member:id,name,phone',   // status excluded: not displayed in attendance list
             ])
             ->where('session_id', $trainingSession->id)
             ->latest('id')
@@ -36,22 +35,23 @@ class AttendanceService
             ]);
         }
 
-        $activeMembers = Member::query()
+        $eligibleIds = Member::query()
+            ->eligibleForAttendance()          // is_active=true + active package
             ->whereIn('id', $memberIds)
-            ->where('is_active', true)
-            ->where('status', StatusMember::STATUS_ACTIVE->value)
             ->pluck('id');
 
-        $invalidMemberIds = $memberIds->diff($activeMembers)->values();
+        $invalidMemberIds = $memberIds->diff($eligibleIds)->values();
         if ($invalidMemberIds->isNotEmpty()) {
             throw ValidationException::withMessages([
                 'member_ids' => [
-                    'Hanya member ACTIVE yang dapat dicatat kehadirannya.',
-                    'Member tidak valid: ' . $invalidMemberIds->implode(', '),
+                    'Hanya member ACTIVE (dengan paket aktif) yang dapat dicatat kehadirannya.',
+                    'Member tidak memenuhi syarat: ' . $invalidMemberIds->implode(', '),
                 ],
             ]);
         }
 
+        // Unique constraint (session_id, member_id) already enforces this at DB level,
+        // but we detect duplicates early to give a clean validation error.
         $existingMemberIds = Attendance::query()
             ->where('session_id', $trainingSession->id)
             ->whereIn('member_id', $memberIds)
@@ -91,18 +91,17 @@ class AttendanceService
             ->unique()
             ->values();
 
-        $activeMembers = Member::query()
+        $eligibleIds = Member::query()
+            ->eligibleForAttendance()
             ->whereIn('id', $memberIds)
-            ->where('is_active', true)
-            ->where('status', StatusMember::STATUS_ACTIVE->value)
             ->pluck('id');
 
-        $invalidMemberIds = $memberIds->diff($activeMembers)->values();
+        $invalidMemberIds = $memberIds->diff($eligibleIds)->values();
         if ($invalidMemberIds->isNotEmpty()) {
             throw ValidationException::withMessages([
                 'member_ids' => [
-                    'Hanya member ACTIVE yang dapat dicatat kehadirannya.',
-                    'Member tidak valid: ' . $invalidMemberIds->implode(', '),
+                    'Hanya member ACTIVE (dengan paket aktif) yang dapat dicatat kehadirannya.',
+                    'Member tidak memenuhi syarat: ' . $invalidMemberIds->implode(', '),
                 ],
             ]);
         }
@@ -148,8 +147,8 @@ class AttendanceService
     public function activeMembers(string $search = '', int $limit = 100)
     {
         $query = Member::query()
-            ->where('is_active', true)
-            ->where('status', StatusMember::STATUS_ACTIVE->value)
+            ->eligibleForAttendance()   // is_active=true + has active package
+            ->with(['memberPackages' => fn ($q) => $q->active()])  // eagerly load for N+1-free accessor
             ->orderBy('name');
 
         if ($search !== '') {
@@ -160,6 +159,6 @@ class AttendanceService
             });
         }
 
-        return $query->limit($limit)->get(['id', 'name', 'phone', 'status', 'is_active']);
+        return $query->limit($limit)->get(['id', 'name', 'phone', 'is_active']);
     }
 }

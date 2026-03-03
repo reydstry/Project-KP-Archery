@@ -46,7 +46,7 @@
     </style>
     @stack('styles')
 </head>
-<body class="bg-slate-100 min-h-screen overflow-x-hidden" x-data="{ sidebarOpen: false, isMobile: window.innerWidth < 1024 }" @resize.window="isMobile = window.innerWidth < 1024">
+<body class="bg-gradient-to-b from-[#16213a] via-[#0f172a] to-[#1b2659] min-h-screen overflow-x-hidden" x-data="{ sidebarOpen: false, isMobile: window.innerWidth < 1024 }" @resize.window="isMobile = window.innerWidth < 1024">
 
     <!-- Mobile Overlay -->
     <div x-show="sidebarOpen && isMobile" 
@@ -86,16 +86,126 @@
                 </div>
             </div>
 
-            @include('layouts.sidebar')
+            @php
+                $sidebarMenu ??= [
+                    [
+            'title' => 'Dashboard',
+            'items' => [
+                            [
+                                'label' => 'Dashboard',
+                                'route' => 'dashboard',
+                                'patterns' => ['dashboard'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Manajemen Pengguna',
+                        'items' => [
+                            [
+                                'label' => 'Member',
+                                'route' => 'admin.members',
+                                'patterns' => ['admin.members'],
+                            ],
+                            [
+                                'label' => 'Coach',
+                                'route' => 'admin.coaches',
+                                'patterns' => ['admin.coaches'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Paket',
+                        'items' => [
+                            [
+                                'label' => 'Master Paket',
+                                'route' => 'admin.packages',
+                                'patterns' => ['admin.packages'],
+                            ],
+                            [
+                                'label' => 'Assign Paket',
+                                'route' => 'admin.member-packages',
+                                'patterns' => ['admin.member-packages'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Training',
+                        'items' => [
+                            [
+                                'label' => 'Training Session',
+                                'route' => 'admin.sessions.index',
+                                'patterns' => ['admin.sessions.*'],
+                            ],
+                            [
+                                'label' => 'Slot & Coach Assignment',
+                                'route' => 'admin.training.slots',
+                                'patterns' => ['admin.training.slots'],
+                            ],
+                            [
+                                'label' => 'Attendance Management',
+                                'route' => 'admin.training.attendance',
+                                'patterns' => ['admin.training.attendance'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'WhatsApp',
+                        'items' => [
+                            [
+                                'label' => 'Broadcast Event',
+                                'route' => 'admin.whatsapp.broadcast.create',
+                                'patterns' => ['admin.whatsapp.broadcast.*'],
+                            ],
+                            [
+                                'label' => 'Log Broadcast',
+                                'route' => 'admin.whatsapp.logs.index',
+                                'patterns' => ['admin.whatsapp.logs.*'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Laporan',
+                        'items' => [
+                            [
+                                'label' => 'Rekap Bulanan',
+                                'route' => 'admin.reports.monthly',
+                                'patterns' => ['admin.reports.monthly'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Website',
+                        'items' => [
+                            [
+                                'label' => 'News',
+                                'route' => 'admin.news',
+                                'patterns' => ['admin.news'],
+                            ],
+                            [
+                                'label' => 'Achievements',
+                                'route' => 'admin.achievements',
+                                'patterns' => ['admin.achievements'],
+                            ],
+                            [
+                                'label' => 'Galleries',
+                                'route' => 'admin.galleries',
+                                'patterns' => ['admin.galleries'],
+                            ],
+                        ],
+                    ],
+                ];
+            @endphp
+
+            <x-global.sidebar-nav :menu-groups="$sidebarMenu" />
         </aside>
 
         <!-- Main Content -->
         <main class="flex-1 lg:ml-64 min-h-screen">
             <!-- Desktop Header -->
-            <div class="hidden lg:block sticky top-0 z-30 bg-white border-b border-slate-200 px-8 py-4 shadow-sm">
+            <div class="hidden lg:block sticky top-0 z-30 bg-[#0b0b0f] px-8 py-[15px] border-b border-slate-800 shadow-sm">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-[#1a307b]">@yield('title')</h2>
+                        <h2 class="text-lg sm:text-2xl lg:text-3xl font-bold text-white">@yield('title')</h2>
                         <p class="text-slate-500 mt-0.5 text-xs sm:text-sm">@yield('subtitle')</p>
                     </div>
                     <!-- User Profile Desktop -->

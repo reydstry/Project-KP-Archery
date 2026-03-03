@@ -2,7 +2,6 @@
 
 namespace App\Modules\Admin\Member\Services;
 
-use App\Enums\StatusMember;
 use App\Enums\UserRoles;
 use App\Models\Attendance;
 use App\Models\Member;
@@ -24,7 +23,6 @@ class MemberManagementService
                 'name',
                 'phone',
                 'is_self',
-                'status',
                 'is_active',
                 'created_at',
                 'updated_at',
@@ -32,6 +30,8 @@ class MemberManagementService
             ->with([
                 'user:id,name,email,phone,role',
                 'registeredBy:id,name,email,phone',
+                // Eager-load for N+1-free getStatusAttribute() computation
+                'memberPackages' => fn ($q) => $q->select(['id', 'member_id', 'is_active', 'end_date']),
             ])
             ->latest('created_at')
             ->get();
@@ -112,27 +112,21 @@ class MemberManagementService
 
     public function deactivate(Member $member): array
     {
-        $member->update([
-            'is_active' => false,
-            'status' => StatusMember::STATUS_INACTIVE->value,
-        ]);
+        // Only toggle is_active — status is computed dynamically by Member::getStatusAttribute()
+        $member->update(['is_active' => false]);
 
-        return [
-            'message' => 'Member berhasil dinonaktifkan',
-        ];
+        return ['message' => 'Member berhasil dinonaktifkan'];
     }
 
     public function restore(int $memberId): array
     {
         $member = Member::query()->findOrFail($memberId);
-        $member->update([
-            'is_active' => true,
-            'status' => StatusMember::STATUS_ACTIVE->value,
-        ]);
+        // Only toggle is_active — status resolves to 'active' or 'pending' based on packages
+        $member->update(['is_active' => true]);
 
         return [
             'message' => 'Member berhasil diaktifkan kembali',
-            'data' => $member->fresh(['user', 'registeredBy']),
+            'data'    => $member->fresh(['user', 'registeredBy']),
         ];
     }
 

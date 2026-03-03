@@ -109,13 +109,11 @@ class PackageManagementService
 
     public function assignPackageToMember(Member $member, int $packageId, string $startDate, ?int $validatorId): array
     {
-        if (!$member->is_active || $member->status === StatusMember::STATUS_INACTIVE->value) {
+        if (! $member->is_active) {
             return [
-                'error' => true,
+                'error'  => true,
                 'status' => 422,
-                'body' => [
-                    'message' => 'Member is inactive',
-                ],
+                'body'   => ['message' => 'Member is inactive'],
             ];
         }
 
@@ -157,15 +155,10 @@ class PackageManagementService
             $memberPackage->validated_at = now();
             $memberPackage->save();
 
-            if (
-                !$member->is_active
-                || $member->status === StatusMember::STATUS_PENDING->value
-                || $member->status === StatusMember::STATUS_INACTIVE->value
-            ) {
-                $member->update([
-                    'is_active' => true,
-                    'status' => StatusMember::STATUS_ACTIVE->value,
-                ]);
+            // Activate the member if deactivated; status (pending/active) is computed
+            // automatically by Member::getStatusAttribute() based on active packages.
+            if (! $member->is_active) {
+                $member->update(['is_active' => true]);
             }
 
             DB::commit();

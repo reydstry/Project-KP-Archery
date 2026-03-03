@@ -8,7 +8,7 @@
     
     <!-- Header Actions -->
     <div class="card-animate flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
-        <div class="flex-1 w-full sm:max-w-md">
+        <div class="flex-1 w-full">
                  <input type="search" x-model="search" placeholder="Search news..." 
                      class="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-transparent outline-none transition">
         </div>
@@ -22,38 +22,36 @@
     </div>
 
     <!-- News List -->
-    <div class="space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <template x-if="loading">
-            <div class="text-center py-12 text-slate-400">Loading...</div>
+            <div class="col-span-full text-center py-12 text-slate-400">Loading...</div>
         </template>
         <template x-if="!loading && filteredNews.length === 0">
-            <div class="text-center py-12 text-slate-400">No news found</div>
+            <div class="col-span-full text-center py-12 text-slate-400">No news found</div>
         </template>
         <template x-for="article in filteredNews" :key="article.id">
             <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg transition-all overflow-hidden">
-                <div class="p-4 sm:p-6">
-                    <div class="flex items-start gap-3 sm:gap-6">
-                        <template x-if="article.photo_url">
-                            <img :src="article.photo_url" :alt="article.title" 
-                                 class="w-20 h-16 sm:w-32 sm:h-24 object-cover rounded-xl shrink-0">
-                        </template>
-                        <template x-if="!article.photo_url">
-                            <div class="w-20 h-16 sm:w-32 sm:h-24 bg-[#1a307b]/10 rounded-xl shrink-0 flex items-center justify-center">
-                                <svg class="w-8 h-8 sm:w-12 sm:h-12 text-[#1a307b]/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"/></svg>
-                            </div>
-                        </template>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between gap-2 sm:gap-4 mb-1 sm:mb-2">
-                                <h3 class="font-bold text-slate-800 text-sm sm:text-lg" x-text="article.title"></h3>
-                                <div class="text-[10px] sm:text-xs text-slate-500 shrink-0" x-text="formatDate(article.publish_date)"></div>
-                            </div>
-                            <p class="text-xs sm:text-sm text-slate-600 line-clamp-2" x-text="article.content"></p>
-                        </div>
+                <template x-if="article.photo_url">
+                    <img :src="article.photo_url" :alt="article.title" 
+                            class="w-full h-48 object-cover">
+                </template>
+                <template x-if="!article.photo_url">
+                    <div class="w-full h-48 bg-[#1a307b]/10 flex items-center justify-center">
+                        <svg class="w-20 h-20 text-[#1a307b]/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z"/></svg>
+                    </div>
+                </template>
+                <div class="p-5 space-y-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <h3 class="font-bold text-slate-800 text-lg leading-tight" x-text="article.title"></h3>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-600 line-clamp-2" x-text="article.content"></p>
+                    <div class="flex items-center gap-4 text-xs text-slate-500 pt-2 border-t border-slate-100">
+                        <div class="text-[10px] sm:text-xs text-slate-500 shrink-0" x-text="formatDate(article.publish_date)"></div>
                     </div>
                 </div>
-                <div class="px-4 py-3 sm:px-6 sm:py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
+                <div class="px-4 py-3 sm:px-6 sm:py-4 bg-[#1a307b] border-t border-slate-100 flex items-center justify-end gap-2">
                         <button @click="openEditModal(article)" 
-                            class="px-3 py-1.5 sm:px-4 sm:py-2 text-[#1a307b] hover:bg-[#1a307b]/10 rounded-lg font-medium text-xs sm:text-sm transition">
+                            class="px-3 py-1.5 sm:px-4 sm:py-2 text-white hover:bg-white/20 rounded-lg font-medium text-xs sm:text-sm transition">
                         Edit
                     </button>
                     <button @click="confirmDelete(article)" 

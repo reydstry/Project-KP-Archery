@@ -22,14 +22,15 @@
     </div>
 
     <!-- Coaches Table - Desktop View -->
-    <div class="card-animate hidden md:block bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" style="animation-delay: 0.1s">
+    <div class="card-animate hidden md:block bg-white border border-slate-200 rounded-2xl  shadow-sm overflow-hidden" style="animation-delay: 0.1s">
         <div class="overflow-x-auto">
             <table class="w-full">
-                <thead class="bg-slate-50 border-b border-slate-200">
+                <thead class="bg-[#1a307b] border-b border-slate-200">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Name</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Phone</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">No</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-6 text-left text-xs font-semibold text-white uppercase tracking-wider">Phone</th>
+                        <th class="px-6 py-6 text-right text-xs font-semibold text-white uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -43,8 +44,15 @@
                             <td colspan="3" class="px-6 py-12 text-center text-slate-400">No coaches found</td>
                         </tr>
                     </template>
-                    <template x-for="coach in filteredCoaches" :key="coach.id">
+                    <template x-for="(coach, index) in filteredCoaches" :key="coach.id">
                         <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div>
+                                        <p class="font-semibold text-slate-800" x-text="index + 1"></p>
+                                    </div>
+                                </div>
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div>

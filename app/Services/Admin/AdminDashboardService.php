@@ -65,9 +65,10 @@ class AdminDashboardService
             $todayDate = $today->toDateString();
 
             return [
-                'total_members' => Member::query()->count(),
-                'active_members' => Member::query()->where('status', StatusMember::STATUS_ACTIVE)->count(),
-                'pending_members' => Member::query()->where('status', StatusMember::STATUS_PENDING)->count(),
+                'total_members'  => Member::query()->count(),
+                // Use DB-level scope (scopeWithStatus) since status accessor is virtual
+                'active_members'  => Member::query()->withStatus(StatusMember::STATUS_ACTIVE->value)->count(),
+                'pending_members' => Member::query()->withStatus(StatusMember::STATUS_PENDING->value)->count(),
                 'total_coaches' => Coach::query()->count(),
                 'total_packages' => Package::query()->count(),
                 'total_news' => News::query()->count(),
@@ -92,16 +93,16 @@ class AdminDashboardService
     private function getRecentPendingMembers(): array
     {
         return Member::query()
-            ->pending()
+            ->withStatus(StatusMember::STATUS_PENDING->value)  // has no active package
             ->latest('created_at')
             ->limit(5)
-            ->get(['id', 'name', 'phone', 'status', 'created_at'])
+            ->get(['id', 'name', 'phone', 'created_at', 'is_active'])
             ->map(fn (Member $member) => [
                 'id' => $member->id,
                 'name' => $member->name,
                 'phone' => $member->phone,
-                'status' => $member->status,
                 'created_at' => $member->created_at,
+                'is_active' => $member->is_active,
             ])
             ->all();
     }

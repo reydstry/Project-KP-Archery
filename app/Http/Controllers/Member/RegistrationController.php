@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use App\Models\Member;
-use App\Enums\StatusMember;
 use Illuminate\Http\Request;
 
 class RegistrationController extends Controller
@@ -34,13 +33,12 @@ class RegistrationController extends Controller
         ]);
 
         $member = Member::create([
-            'user_id' => $user->id,
+            'user_id'       => $user->id,
             'registered_by' => $user->id,
-            'name' => $data['name'],
-            'phone' => $data['phone'] ?? null,
-            'is_self' => true,
-            'status' => StatusMember::STATUS_PENDING,
-            'is_active' => true,
+            'name'          => $data['name'],
+            'phone'         => $data['phone'] ?? null,
+            'is_self'       => true,
+            'is_active'     => true,  // pending status auto-computed (no active package yet)
         ]);
 
         return response()->json([
@@ -73,13 +71,12 @@ class RegistrationController extends Controller
         ]);
 
         $member = Member::create([
-            'user_id' => $user->id,
+            'user_id'       => $user->id,
             'registered_by' => $user->id,
-            'name' => $data['name'],
-            'phone' => $data['phone'] ?? null,
-            'is_self' => false,
-            'status' => StatusMember::STATUS_PENDING,
-            'is_active' => true,
+            'name'          => $data['name'],
+            'phone'         => $data['phone'] ?? null,
+            'is_self'       => false,
+            'is_active'     => true,  // pending status auto-computed (no active package yet)
         ]);
 
         return response()->json([

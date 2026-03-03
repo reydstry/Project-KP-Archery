@@ -5,25 +5,62 @@
 
 @section('content')
 <div x-data="dashboardData()" x-init="loadData()" class="space-y-6">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="card-animate bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
-            <p class="text-sm font-medium text-slate-500">Sesi Hari Ini</p>
-            <p class="text-3xl font-bold text-[#1a307b] mt-2" x-text="statistics.today_sessions || 0"></p>
+
+    {{-- =====================================================================
+         STAT CARDS — design tokens: navy icon, white card, emerald accent
+         Same structure as Admin dashboard for visual consistency.
+         ===================================================================== --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+        <!-- Sesi Hari Ini -->
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow duration-150">
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sesi Hari Ini</p>
+                <p class="text-3xl font-bold text-slate-800 mt-0.5 leading-none" x-text="statistics.today_sessions ?? 0"></p>
+                <p class="text-xs text-slate-400 mt-1.5">Jadwal aktif hari ini</p>
+            </div>
+            <div class="w-12 h-12 bg-[#1a307b] rounded-2xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            </div>
         </div>
-        <div class="card-animate bg-white rounded-2xl p-5 border border-slate-200 shadow-sm" style="animation-delay: 0.1s">
-            <p class="text-sm font-medium text-slate-500">Sesi Mendatang</p>
-            <p class="text-3xl font-bold text-[#1a307b] mt-2" x-text="statistics.upcoming_sessions || 0"></p>
+
+        <!-- Sesi Mendatang -->
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow duration-150">
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sesi Mendatang</p>
+                <p class="text-3xl font-bold text-slate-800 mt-0.5 leading-none" x-text="statistics.upcoming_sessions ?? 0"></p>
+                <p class="text-xs text-slate-400 mt-1.5">Dijadwalkan ke depan</p>
+            </div>
+            <div class="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
         </div>
-        <div class="card-animate bg-white rounded-2xl p-5 border border-slate-200 shadow-sm" style="animation-delay: 0.2s">
-            <p class="text-sm font-medium text-slate-500">Total Sesi</p>
-            <p class="text-3xl font-bold text-[#1a307b] mt-2" x-text="statistics.total_sessions || 0"></p>
+
+        <!-- Total Sesi -->
+        <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 flex items-center gap-4 hover:shadow-md transition-shadow duration-150">
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Sesi</p>
+                <p class="text-3xl font-bold text-slate-800 mt-0.5 leading-none" x-text="statistics.total_sessions ?? 0"></p>
+                <p class="text-xs text-slate-400 mt-1.5">Sepanjang masa</p>
+            </div>
+            <div class="w-12 h-12 bg-slate-700 rounded-2xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+            </div>
         </div>
     </div>
 
-    <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm" style="animation-delay: 0.3s">
-        <div class="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <h3 class="font-bold text-slate-800">Jadwal Hari Ini</h3>
-            <span class="px-4 py-2 bg-[#1a307b]/10 text-[#1a307b] rounded-xl text-sm font-semibold border border-[#1a307b]/20">
+    {{-- ===================================================================== --}}
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-150">
+        <div class="px-6 py-4 rounded-t-2xl border-b bg-[#1a307b] border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h3 class="font-bold text-white">Jadwal Hari Ini</h3>
+            <span class="px-4 py-2 bg-[#1a307b]/10 text-white rounded-xl text-sm font-semibold border border-[#1a307b]/20">
                 {{ now()->format('l, d F Y') }}
             </span>
         </div>
@@ -47,9 +84,11 @@
             </template>
 
             <template x-if="!loading && !error && todaySessions.length > 0">
-                <div class="space-y-3">
+                <div class="grid grid-cols-1 gap-4">
                     <template x-for="slot in todaySessions" :key="slot.id">
-                        <div class="rounded-xl border border-slate-200 overflow-hidden" x-data="{ expanded: false }">
+                        <div class="rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition" x-data="{ expanded: false }">
+                            
+                            <!-- Card Header -->
                             <div @click="expanded = !expanded" class="flex items-center justify-between gap-4 p-4 hover:bg-slate-50 transition cursor-pointer">
                                 <div class="min-w-0">
                                     <p class="font-semibold text-slate-800 truncate" x-text="slot.session_time?.session_name || 'Training Session'"></p>
@@ -71,7 +110,10 @@
                                 </div>
                             </div>
 
+                            <!-- Card Body -->
                             <div x-show="expanded" x-collapse class="border-t border-slate-200 bg-slate-50 p-4 space-y-3">
+                                
+                                <!-- Coaches -->
                                 <div>
                                     <p class="text-xs font-semibold text-slate-600 mb-2">Coach (<span x-text="slot.coaches?.length || 0"></span>)</p>
                                     <template x-if="!slot.coaches || slot.coaches.length === 0">
@@ -84,6 +126,7 @@
                                     </div>
                                 </div>
 
+                                <!-- Members -->
                                 <div>
                                     <p class="text-xs font-semibold text-slate-600 mb-2">Member (<span x-text="slot.members?.length || 0"></span>)</p>
                                     <template x-if="!slot.members || slot.members.length === 0">
@@ -95,11 +138,12 @@
                                         </template>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </template>
                 </div>
-            </template>
+                </template>
         </div>
     </div>
 </div>

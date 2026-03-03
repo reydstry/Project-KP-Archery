@@ -5,7 +5,7 @@
 
 @php
     $statusClasses = [
-        'pending' => 'bg-slate-100 text-slate-700',
+        'pending' => 'bg-blue-100 border border-blue-200 text-slate-700',
         'processing' => 'bg-yellow-100 text-yellow-700',
         'completed' => 'bg-emerald-100 text-emerald-700',
         'failed' => 'bg-red-100 text-red-700',
@@ -26,8 +26,16 @@
         </div>
     @endif
 
-    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between gap-3 px-5 py-3.5 bg-[#1a307b] border-b border-slate-100">
+            <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-white" fill="white" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                </svg>
+                <h3 class="text-sm font-semibold text-white">Informasi Broadcast</h3>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm p-5">
             <div>
                 <p class="text-slate-500">Judul</p>
                 <p class="font-semibold text-slate-800">{{ $broadcast->title }}</p>
@@ -56,7 +64,7 @@
             </div>
         </div>
 
-        <div class="mt-4">
+        <div class="p-5">
             <p class="text-slate-500 text-sm mb-1">Pesan</p>
             <div class="rounded-xl bg-slate-50 border border-slate-200 p-3 text-sm text-slate-700 whitespace-pre-line">{{ $broadcast->message }}</div>
         </div>
@@ -65,8 +73,9 @@
     <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
-                <thead class="bg-slate-50">
-                    <tr class="text-left text-slate-600">
+                <thead class="bg-[#1a307b]">
+                    <tr class="text-left text-white">
+                        <th class="px-4 py-3 font-semibold">No</th>
                         <th class="px-4 py-3 font-semibold">Member</th>
                         <th class="px-4 py-3 font-semibold">Phone</th>
                         <th class="px-4 py-3 font-semibold">Status</th>
@@ -77,6 +86,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($broadcast->logs as $log)
                         <tr class="text-slate-700 align-top">
+                            <td class="px-4 py-3">{{ $loop->iteration }}</td>
                             <td class="px-4 py-3">{{ $log->member?->name ?? '-' }}</td>
                             <td class="px-4 py-3">{{ $log->phone_number }}</td>
                             <td class="px-4 py-3">

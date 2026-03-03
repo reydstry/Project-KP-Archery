@@ -1,122 +1,133 @@
 @extends('layouts.coach')
 
 @section('title', 'Attendance')
-@section('subtitle', 'Semua member yang booking otomatis hadir')
+@section('subtitle', 'Isi kehadiran member untuk setiap sesi latihan yang Anda latih.')
 
 @section('content')
 <div class="space-y-6">
     <!-- Session Filter Card -->
-    <div class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm">
-        <div class="p-3 sm:p-6 space-y-4 sm:space-y-6">
-            <!-- Pilih Training Session -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between gap-3 px-5 py-3.5 bg-[#1a307b] border-b border-slate-100">
+            <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-white" fill="white" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                </svg>
+                <h3 class="text-sm font-semibold text-white">Pilih Training Session</h3>
+            </div>
+        </div>
+
+        <div class="p-4 sm:p-6 space-y-6">
             <div>
-                <div class="flex items-center justify-between mb-3">
-                    <label class="block text-sm font-semibold text-slate-700">Pilih Training Session</label>
-                    <span class="text-xs text-slate-500" id="loadingSessionsText" style="display:none;">Memuat...</span>
-                </div>
-                
-                <div id="sessionsContainer" class="min-h-[80px] transition-all duration-200">
-                    <div class="px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 text-sm">
+                <div id="sessionsContainer">
+                    <div class="px-4 py-3  text-slate-500  text-center text-sm">
                         Memuat training session...
                     </div>
                 </div>
             </div>
 
-            <!-- Pilih Slot Waktu -->
-            <div id="slotsSection" class="hidden">
-                <label class="block text-sm font-semibold text-slate-700 mb-3">Pilih Slot Waktu</label>
-                <div id="slotsContainer" class="min-h-[80px] transition-all duration-200">
-                    <p class="text-sm text-slate-500">Pilih training session terlebih dahulu</p>
-                </div>
+           
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between gap-3 px-5 py-3.5 bg-[#1a307b] border-b border-slate-100">
+            <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-white" fill="white" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                </svg>
+                <h3 class="text-sm font-semibold text-white">Pilih Slot Waktu</h3>
+            </div>
+        </div>
+
+        <div id="slotsSection" class="p-4 sm:p-6 space-y-6">
+            <div id="slotsContainer">
+                <p class="text-sm text-slate-500 text-center">Pilih training session terlebih dahulu</p>
             </div>
         </div>
     </div>
 
     <!-- Member Attendance List -->
-    <div id="sessionDetailsCard" class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm hidden">
-        <div class="p-3 sm:p-6 space-y-4 sm:space-y-6">
-            <!-- Session Header -->
-            <div class="pb-4 sm:pb-6 border-b border-slate-200">
-                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 sm:gap-4">
-                    <div>
-                        <h2 class="text-base sm:text-lg font-bold text-slate-900 mb-1" id="sessionTitle">Sesi Latihan</h2>
-                        <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-slate-600">
-                            <div class="flex items-center gap-1.5">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <span id="sessionDateTime">-</span>
-                            </div>
-                            <div class="flex items-center gap-1.5">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span id="sessionLocation">-</span>
-                            </div>
-                        </div>
+    <div id="sessionDetailsCard" class="bg-white rounded-2xl border border-slate-200 shadow-sm hidden overflow-hidden">
+        <div class="flex items-center justify-between gap-3 px-5 py-3.5 bg-[#1a307b] border-b border-slate-100">
+            <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-white" fill="white" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                </svg>
+                <h3 class="text-sm font-semibold text-white">Daftar Member</h3>
+            </div>
+        </div>
+        <div class="p-4 sm:p-6 space-y-5">
+            <div class="pb-5 border-b border-slate-200">
+                <div class="flex items-center   gap-4">
+
+                    <!-- Input (ambil sisa space) -->
+                    <div class="flex-1">
+                        <h3 class="text-sm font-semibold text-[#1a307b] mb-3" id="sessionTitle">Sesi Latihan</h3>
+                        <input type="text"
+                            id="searchParticipant"
+                            placeholder="Cari nama member..."
+                            oninput="filterParticipants()"
+                            class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-[#1a307b] text-sm">
                     </div>
-                    
-                    <!-- Quick Stats -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 lg:w-auto w-full">
-                        <div class="text-center px-3 py-2 sm:px-4 sm:py-3 bg-slate-50 rounded-xl border border-slate-200">
-                            <p class="text-xl sm:text-2xl font-bold text-green-600" id="presentCount">0</p>
-                            <p class="text-xs sm:text-sm text-green-700 font-semibold">Member Hadir</p>
+
+                    <!-- Stats (width mengikuti isi) -->
+                    <div class="flex gap-3">
+
+                        <div class="px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 text-center whitespace-nowrap">
+                            <p class="text-lg font-bold text-[#1a307b]" id="presentCount">0</p>
+                            <p class="text-xs text-[#2a4a9f] font-semibold">Member Hadir</p>
                         </div>
-                        <div class="text-center px-3 py-2 sm:px-4 sm:py-3 bg-slate-50 rounded-xl border border-slate-200">
-                            <p class="text-xl sm:text-2xl font-bold text-slate-600" id="totalCount">0</p>
-                            <p class="text-xs sm:text-sm text-slate-700 font-semibold">Total Booking</p>
+
+                        <div class="px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 text-center whitespace-nowrap">
+                            <p class="text-lg font-bold text-slate-600" id="totalCount">0</p>
+                            <p class="text-xs text-slate-700 font-semibold">Member Aktif</p>
                         </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                <h3 class="text-sm font-bold text-slate-900 mb-1">Daftar Member Aktif</h3>
+                <p class="text-xs text-slate-600 mb-3">Klik badge untuk ubah status hadir/tidak hadir.</p>
+                <div id="participantsContainer" class="space-y-2 max-h-[60vh] sm:max-h-96 overflow-y-auto">
+                    <div id="loadingState" class="text-center py-8">
+                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-slate-600 mx-auto mb-3"></div>
+                        <p class="text-slate-600 text-sm text-center">Memuat daftar member...</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Search Only -->
-            <div>
-                <label class="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">Cari Member</label>
-                <input type="text" id="searchParticipant" placeholder="Cari nama member..." 
-                       oninput="filterParticipants()"
-                       class="w-full px-3 sm:px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-[#1a307b] focus:border-[#1a307b] text-sm">
-            </div>
-
-            <!-- Member List -->
-            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 sm:p-4">
-                <h3 class="text-xs sm:text-sm font-bold text-slate-900 mb-1">Daftar Member</h3>
-                <p class="text-xs text-slate-600 mb-2 sm:mb-3">Klik badge <span> Hadir</span> untuk ubah status kehadiran.</p>
-                <div id="participantsContainer" class="space-y-2 max-h-[60vh] sm:max-h-80 overflow-y-auto transition-all duration-200">
-                    <!-- Loading state -->
-                    <div id="loadingState" class="text-center py-12">
-                        <div class="animate-spin rounded-full h-12 w-12 border-4 border-slate-200 border-t-slate-600 mx-auto mb-3"></div>
-                        <p class="text-slate-600 text-sm">Memuat daftar member...
-                    </div>
-                </div>
-            </div>
-
-            <!-- Save Button -->
             <div class="flex justify-end">
-                <button onclick="saveAttendance()" id="saveBtn" 
-                        class="w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl text-sm font-medium transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
-                    <span>Simpan Kehadiran</span>
+                <button onclick="saveAttendance()" id="saveBtn"
+                        class="w-full sm:w-auto px-6 py-3 bg-[#1a307b] hover:bg-[#152866] text-white rounded-xl text-sm font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed">
+                    Simpan Kehadiran
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Empty State -->
-    <div id="emptyState" class="card-animate bg-white rounded-2xl border border-slate-200 shadow-sm">
+    <div id="emptyState" class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between gap-3 px-5 py-3.5 bg-[#1a307b] border-b border-slate-100">
+            <div class="flex items-center gap-2.5">
+                <svg class="w-4 h-4 text-white" fill="white" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                </svg>
+                <h3 class="text-sm font-semibold text-white">Kehadiran Member</h3>
+            </div>
+        </div>
         <div class="p-8 text-center">
             <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 mb-4">
                 <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/>
                 </svg>
             </div>
             <h3 class="text-xl font-bold text-slate-900 mb-2">Pilih Sesi Dulu</h3>
-            <p class="text-sm text-slate-600">Pilih training session dan slot waktu di atas untuk melihat daftar member</p>
+            <p class="text-sm text-slate-600">Pilih training session dan slot waktu di atas untuk melihat daftar member.</p>
         </div>
     </div>
-
 </div>
 
 <!-- Success Modal -->

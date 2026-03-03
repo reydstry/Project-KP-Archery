@@ -74,9 +74,9 @@
                         </template>
                     </div>
                 </div>
-                <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
+                <div class="px-5 py-4 bg-[#1a307b] border-t border-slate-100 flex items-center justify-end gap-2">
                         <button @click="openEditModal(achievement)" 
-                            class="px-4 py-2 text-[#1a307b] hover:bg-[#1a307b]/10 rounded-lg font-medium text-sm transition">
+                            class="px-4 py-2 text-white hover:bg-white/20 rounded-lg font-medium text-sm transition">
                         Edit
                     </button>
                     <button @click="confirmDelete(achievement)" 

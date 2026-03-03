@@ -70,7 +70,7 @@ class AdminTestDataSeeder extends Seeder
 
         // Generate 47 more coaches using faker (total 50)
         $faker = \Faker\Factory::create('id_ID');
-        for ($i = 4; $i <= 50; $i++) {
+        for ($i = 4; $i <= 10; $i++) {
             User::firstOrCreate(
                 ['email' => "coach{$i}@clubpanahan.com"],
                 [
@@ -186,15 +186,14 @@ class AdminTestDataSeeder extends Seeder
                     'name' => $user->name,
                     'phone' => $user->phone,
                     'is_self' => true,
-                    'is_active' => true,
-                    'status' => $index < 3 ? StatusMember::STATUS_ACTIVE->value : StatusMember::STATUS_PENDING->value,
+                    'is_active' => true
                 ]
             );
         }
 
         // Generate 94 more members using faker (total 100)
         // 40% will be active with packages, 60% will be pending
-        for ($i = 7; $i <= 100; $i++) {
+        for ($i = 7; $i <= 20; $i++) {
             $user = User::firstOrCreate(
                 ['email' => "member{$i}@example.com"],
                 [
@@ -216,8 +215,7 @@ class AdminTestDataSeeder extends Seeder
                     'name' => $user->name,
                     'phone' => $user->phone,
                     'is_self' => true,
-                    'is_active' => $isActive,
-                    'status' => $isActive ? StatusMember::STATUS_ACTIVE->value : StatusMember::STATUS_PENDING->value,
+                    'is_active' => $isActive
                 ]
             );
         }
