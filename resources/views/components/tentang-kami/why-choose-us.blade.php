@@ -1,12 +1,5 @@
 <!-- Why Choose Us Section -->
-<section class="relative py-24 sm:py-32 bg-gradient-to-b
- from-[#273576] via-[#1b2659] 
- to-[#0f172a] overflow-hidden">
-
-    <!-- Background decorative blur -->
-    <div class="absolute top-10 right-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-10 left-10 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
+<section class="relative py-24 sm:py-32 bg-gradient-to-b from-[#16213a] to-[#1b2659] overflow-hidden">
     <div class="container mx-auto px-6 relative z-10">
 
         <!-- Section Header -->
@@ -19,7 +12,6 @@
 
         <!-- Cards -->
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
-
             @php
                 $cards = [
                     [
@@ -42,27 +34,21 @@
 
             @foreach($cards as $card)
             <div class="relative group">
-                <!-- Glow -->
-                <div class="absolute inset-0 bg-red-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
                 <!-- Card -->
-                <div class="relative h-full bg-white/5 backdrop-blur-[2px] border border-white/20 rounded-2xl overflow-hidden
-                            shadow-xl shadow-black/30 hover:shadow-2xl hover:shadow-black/60
-                            transition-all duration-300 hover:-translate-y-2">
+                <div class="liquid-glass relative h-full transition-transform duration-500 hover:scale-105"
+                        style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);"
+                        onmouseenter="this.classList.add('is-hovered')"
+                        onmouseleave="this.classList.remove('is-hovered')">
 
                     <!-- Shine -->
-                    <span class="absolute inset-0 w-full h-full 
-                                bg-gradient-to-r from-transparent via-white/10 to-transparent
-                                -translate-x-full group-hover:translate-x-full 
-                                transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none">
-                    </span>
+                    <span class="shine"></span>
 
                     
-                    <div class="bg-red-500/30 border-b
+                    <div class="bg-red-500/20 border-b
                      border-white/10 px-6 py-5 flex items-center gap-3">
                         <!-- Icon -->
                         <div class="w-11 h-11 backdrop-blur-sm border border-white/20 rounded-2xl 
-                                    flex items-center justify-center shadow-lg shadow-red-500/30">
+                                    flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $card['icon'] }}"/>
                             </svg>

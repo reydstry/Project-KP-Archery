@@ -1,0 +1,104 @@
+.liquid-glass {
+  position: relative;
+  background: transparent;
+  backdrop-filter: blur(20px);
+  border-radius: 1rem;
+  isolation: isolate;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+      from var(--angle) at 50% 50%,
+      rgba(255,255,255,0.06) 0deg,
+      rgba(255,255,255,0.06) 50deg,
+      rgba(255,255,255,0.35) 80deg,
+      rgba(255,255,255,0.40) 90deg,
+      rgba(255,255,255,0.35) 100deg,
+      rgba(255,255,255,0.06) 130deg,
+      rgba(255,255,255,0.06) 230deg,
+      rgba(255,255,255,0.20) 260deg,
+      rgba(255,255,255,0.25) 270deg,
+      rgba(255,255,255,0.20) 280deg,
+      rgba(255,255,255,0.06) 310deg,
+      rgba(255,255,255,0.06) 360deg
+  );
+  -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+  animation: border-to-normal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.liquid-glass.wide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+      from var(--angle-btn) at 50% 50%,
+      rgba(255,255,255,0.06) 0deg,
+      rgba(255,255,255,0.06) 60deg,
+      rgba(255,255,255,0.35) 85deg,
+      rgba(255,255,255,0.45) 95deg,
+      rgba(255,255,255,0.35) 105deg,
+      rgba(255,255,255,0.06) 140deg,
+      rgba(255,255,255,0.06) 230deg,
+      rgba(255,255,255,0.25) 260deg,
+      rgba(255,255,255,0.35) 270deg,
+      rgba(255,255,255,0.25) 280deg,
+      rgba(255,255,255,0.06) 320deg,
+      rgba(255,255,255,0.06) 360deg
+  );
+  -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+  animation: border-btn-to-normal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.liquid-glass.wide.is-hovered::before {
+  animation: border-btn-to-hover 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.liquid-glass.is-hovered::before {
+  animation: border-to-hover 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.shine {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: screen;
+  filter: blur(8px);
+
+  background: linear-gradient(
+      to right,
+      transparent,
+      rgba(255,255,255,0.1),
+      transparent
+  );
+
+  transform: translateX(-100%) skewX(12deg);
+  transition: transform 700ms ease-in-out;
+}
+
+.liquid-glass:hover .shine {
+  transform: translateX(100%) skewX(12deg);
+}

@@ -1,0 +1,19 @@
+.animate-scroll        { animation: scroll-left 30s linear infinite; }
+.animate-marquee       { animation: marquee 30s linear infinite; }
+.animate-slow-zoom     { animation: slow-zoom 20s ease-in-out infinite alternate; }
+.animate-float-rotate  { animation: float-rotate 4s ease-in-out infinite; }
+.animate-pulse-slow    { animation: pulseSlow 10s ease-in-out infinite; }
+.animate-pulse-slower  { animation: pulseSlower 14s ease-in-out infinite; }
+
+.card-animate {
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.sidebar-animate {
+    animation: slideIn 0.3s ease-out;
+}
+
+@media (max-width: 1024px) { .animate-marquee { animation-duration: 25s; } }
+@media (max-width: 768px)  { .animate-marquee { animation-duration: 20s; } }
+@media (max-width: 480px)  { .animate-marquee { animation-duration: 15s; } }

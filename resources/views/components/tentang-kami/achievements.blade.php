@@ -1,10 +1,5 @@
 <!-- Achievements Section -->
-<section class="relative py-24 sm:py-32 bg-gradient-to-b from-[#273576] to-[#0f172a] overflow-hidden">
-
-    <!-- Background decorative blur -->
-    <div class="absolute top-10 right-10 w-72 h-72 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-10 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
+<section class="relative py-24 sm:py-32 bg-gradient-to-b from-[#1b2659] to-[#0f172a] overflow-hidden">
     <div class="container mx-auto px-6 relative z-10">
 
         <!-- Section Header -->
@@ -59,67 +54,23 @@
                 ->take(10); // Limit to 10 members (show 3, scroll for more)
         @endphp
 
-        @if($memberAchievements->isEmpty())
-        <div class="text-center py-12">
-            <p class="text-white/60 text-lg">Belum ada prestasi member yang tersedia saat ini.</p>
-        </div>
-        @else
-        <!-- Carousel Container with Alpine.js -->
-        <div x-data="{ 
-            scrollAchievements(direction) {
-                const container = $refs.achievementsContainer;
-                const scrollAmount = container.offsetWidth * 0.8;
-                container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-            }
-        }">
-            <!-- Header with View All Button -->
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <h3 class="text-xl sm:text-2xl font-bold text-white mb-1">Prestasi Member Terbaik</h3>
-                    <p class="text-gray-400 text-sm">Atlet-atlet berprestasi FocusOneX</p>
-                </div>
-                <a href="{{ route('galeri') }}" 
-                   class="group flex items-center gap-2 px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-400/30 rounded-xl text-yellow-300 hover:text-yellow-200 font-semibold text-sm transition-all duration-200">
-                    <span>Lihat Semua</span>
-                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                    </svg>
-                </a>
-            </div>
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-12">
+            @foreach($achievements as $achievement)
+            <div class="relative group">
+                <!-- Glow -->
+                <div class="absolute inset-0 bg-red-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-            <!-- Carousel -->
-            <div class="relative">
-                <!-- Left Arrow -->
-                @if($memberAchievements->count() > 3)
-                <button @click="scrollAchievements(-1)" 
-                        class="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-yellow-500/80 hover:bg-yellow-500 text-white rounded-full shadow-xl hover:scale-110 transition-all duration-200 flex items-center justify-center -translate-x-1/2">
-                    <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                </button>
-                @endif
+                <!-- Card -->
+                <div class="relative h-full bg-white/5 backdrop-blur-[2px] border border-white/20 rounded-2xl overflow-hidden
+                            shadow-xl shadow-black/30 hover:shadow-2xl hover:shadow-black/60
+                            transition-all duration-300 hover:-translate-y-2">
 
-                <!-- Scrollable Container -->
-                <div x-ref="achievementsContainer" 
-                     class="flex gap-6 sm:gap-8 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth pb-4"
-                     style="scrollbar-width: none; -ms-overflow-style: none;">
-                    @foreach($memberAchievements as $achievement)
-                    <div class="flex-shrink-0 w-full sm:w-[calc(50%-16px)] lg:w-[calc(33.333%-22px)] snap-start">
-                        <div class="relative group h-full">
-                            <!-- Glow -->
-                            <div class="absolute inset-0 bg-red-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                            <!-- Card -->
-                            <div class="relative h-full bg-white/5 backdrop-blur-[2px] border border-white/20 rounded-2xl overflow-hidden
-                                        shadow-xl shadow-black/30 hover:shadow-2xl hover:shadow-black/60
-                                        transition-all duration-300 hover:-translate-y-2">
-
-                                <!-- Shine -->
-                                <span class="absolute inset-0 w-full h-full 
-                                            bg-gradient-to-r from-transparent via-white/10 to-transparent
-                                            -translate-x-full group-hover:translate-x-full 
-                                            transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none">
-                                </span>
+                    <!-- Shine -->
+                    <span class="absolute inset-0 w-full h-full 
+                                bg-gradient-to-r from-transparent via-white/10 to-transparent
+                                -translate-x-full group-hover:translate-x-full 
+                                transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none">
+                    </span>
 
                                 <!-- Image -->
                                 <div class="h-48 overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
@@ -144,26 +95,25 @@
                                         <p class="text-white/50 text-xs mb-4">Atlet FocusOnex</p>
                                     </div>
 
-                                    <div class="flex justify-center">
-                                        <!-- Divider -->
-                                        <div class="w-25 h-px bg-red-500/70 mb-4"></div>
-                                    </div>
-             
-                                    <!-- Awards -->
-                                    <div class="space-y-3">
-                                        @foreach($achievement['awards'] as $award)
-                                        <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
-                                            <span class="text-xl">{{ $award['medal'] }}</span>
-                                            <span class="text-white/80 text-xs sm:text-sm leading-snug">{{ $award['title'] }}</span>
-                                        </div>
-                                        @endforeach
-                                    </div>
-                                </div>
+                        <div class="flex justify-center">
+                            <!-- Divider -->
+                            <div class="w-25 h-px bg-red-500/70 mb-4"></div>
+                        </div>
+         
+                        <!-- Awards -->
+                        <div class="space-y-3">
+                            @foreach($achievement['awards'] as $award)
+                            <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
+                                <span class="text-xl">{{ $award['medal'] }}</span>
+                                <span class="text-white/80 text-xs sm:text-sm leading-snug">{{ $award['title'] }}</span>
                             </div>
+                            @endforeach
                         </div>
                     </div>
-                    @endforeach
                 </div>
+            </div>
+            @endforeach
+        </div>
 
                 <!-- Right Arrow -->
                 @if($memberAchievements->count() > 3)

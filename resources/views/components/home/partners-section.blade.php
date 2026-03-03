@@ -9,6 +9,9 @@
 
         <!-- Partners Logo Slider -->
         <div class="relative">
+    
+            <!-- Glow behind image -->
+            <div class="absolute inset-0 bg-blue-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none"></div>
             <div class="flex animate-marquee">
                 @php
                     $partners = [

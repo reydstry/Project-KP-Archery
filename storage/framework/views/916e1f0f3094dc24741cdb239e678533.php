@@ -62,28 +62,6 @@ window.galleryTab = function(category) {
     };
 };
 
-// Tab Switching
-window.switchTab = function(tab) {
-    // Hide all content
-    document.querySelectorAll('.tab-content').forEach(content => {
-        content.classList.add('hidden');
-    });
-    
-    // Remove active state from all buttons
-    document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('active', 'border-white', 'text-white');
-        button.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-300', 'hover:border-gray-300');
-    });
-    
-    // Show selected content
-    document.getElementById('content-' + tab).classList.remove('hidden');
-    
-    // Add active state to selected button
-    const activeButton = document.getElementById('tab-' + tab);
-    activeButton.classList.add('active', 'border-white', 'text-white');
-    activeButton.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-300', 'hover:border-gray-300');
-};
-
 // View Berita Function
 window.viewBerita = function(id) {
     window.location.href = '/berita/' + id;
@@ -93,24 +71,6 @@ window.viewBerita = function(id) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing gallery page...');
     switchTab('latihan');
-    
-    // Smooth scroll to hash if present
-    if (window.location.hash) {
-        setTimeout(() => {
-            const element = document.querySelector(window.location.hash);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 300);
-    }
-});
-
-// Handle hash change for smooth scroll
-window.addEventListener('hashchange', function() {
-    const element = document.querySelector(window.location.hash);
-    if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
 });
 </script>
 <?php $__env->stopPush(); ?>

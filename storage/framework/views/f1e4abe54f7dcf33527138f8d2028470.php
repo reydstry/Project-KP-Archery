@@ -1,4 +1,5 @@
 <!-- Berita Section -->
+<<<<<<< HEAD
 <div class="relative min-h-screen py-24 sm:py-32
     bg-gradient-to-b from-[#1b2659] via-[#0f172a] to-[#16213a] overflow-hidden">
 
@@ -6,6 +7,10 @@
     <div class="absolute top-10 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute bottom-10 right-10 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
+=======
+<div class="relative min-h-screen py-24 sm:py-32 
+    bg-gradient-to-b from-[#1b2659] to-[#16213a] overflow-hidden">
+>>>>>>> 5b278b43985a902e03c97d66198c6ed40b8d9a06
     <div class="container mx-auto px-6 relative z-10">
 
         <!-- Section Header -->
@@ -210,6 +215,7 @@
                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <?php $__currentLoopData = $newsItems; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div class="relative group">
+<<<<<<< HEAD
                     <!-- Glow -->
                     <div class="absolute inset-0 bg-blue-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
@@ -217,13 +223,15 @@
                     <div class="relative h-full bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden
                                 shadow-xl shadow-black/30 hover:shadow-2xl hover:shadow-black/60
                                 transition-all duration-300 hover:-translate-y-2">
+=======
+                    <div class="liquid-glass relative h-full transition-transform duration-500 hover:scale-105"
+                            style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);"
+                            onmouseenter="this.classList.add('is-hovered')"
+                            onmouseleave="this.classList.remove('is-hovered')">
+>>>>>>> 5b278b43985a902e03c97d66198c6ed40b8d9a06
 
                         <!-- Shine -->
-                        <span class="absolute inset-0 w-full h-full 
-                                    bg-gradient-to-r from-transparent via-white/10 to-transparent
-                                    -translate-x-full group-hover:translate-x-full 
-                                    transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none z-10">
-                        </span>
+                        <span class="shine"></span>
 
                         <!-- Type Badge -->
                         <div class="absolute top-4 right-4 z-20 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">

@@ -111,7 +111,7 @@
                 </div>
             </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
->>>>>>> e2398d387bee565a67bfc9447e3e48776e8d1d36
+>>>>>>> 5b278b43985a902e03c97d66198c6ed40b8d9a06
         </div>
         <?php else: ?>
         <!-- Carousel Container with Alpine.js -->

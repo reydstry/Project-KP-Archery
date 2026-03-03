@@ -1,0 +1,11 @@
+@property --angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 45deg;
+}
+
+@property --angle-btn {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 15deg;
+}

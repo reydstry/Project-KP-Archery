@@ -1,10 +1,7 @@
 <!-- Hero Section -->
 <section class="relative min-h-screen bg-gradient-to-b 
-from-[#0f172a] to-[#273576] flex items-center pt-15 overflow-hidden">
+from-[#1b2659] to-[#16213a] flex items-center pt-15 overflow-hidden">
 
-    <!-- Background decorative blur -->
-    <div class="absolute top-20 left-10 w-72 h-72 bg-blue-500/40 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-20 right-10 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="container mx-auto px-6 relative z-10">
         <div class="grid md:grid-cols-2 gap-12 items-center">
@@ -35,18 +32,6 @@ from-[#0f172a] to-[#273576] flex items-center pt-15 overflow-hidden">
 
                     <!-- Gradient overlay bottom -->
                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-
-                    <!-- Caption Glass Card -->
-                    <div class="absolute bottom-4 left-4 right-4
-                                bg-white/10 backdrop-blur-[2px] border border-white/20 
-                                rounded-xl px-5 py-4">
-                        <h3 class="text-lg sm:text-xl font-bold text-white">
-                            {{ __('about.hero_since_2017') }}
-                        </h3>
-                        <p class="text-white/70 text-xs sm:text-sm mt-1">
-                            {{ __('about.hero_serving_dedication') }}
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>

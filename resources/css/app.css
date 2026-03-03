@@ -1,16 +1,20 @@
 @import "tailwindcss";
+@import "./properties/angle.css";
+@import "./base/scrollbar.css";
+@import "./base/alpine.css";
+@import "./animations/keyframes.css";
+@import "./animations/utilities.css";
+@import "./components/admin.css";
+@import "./components/navbar.css";
+@import "./components/liquidGlass.css";
+@import "./components/button.css";
+@import "./components/tab.css";
 
-/* ===============================
-   Laravel Source Files
-================================ */
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 @source "../../storage/framework/views/*.php";
 @source "../**/*.blade.php";
 @source "../**/*.js";
 
-/* ===============================
-   Theme Configuration
-================================ */
 @theme {
     --font-sans:
         "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
@@ -21,11 +25,6 @@
 /* ===============================
    Global & Base Styles
 ================================ */
-
-/* Smooth scroll */
-html {
-    scroll-behavior: smooth;
-}
 
 /* Scrollbar */
 ::-webkit-scrollbar {
@@ -44,16 +43,6 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
-}
-
-/* Hide scrollbar for carousel */
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
-}
-
-.scrollbar-hide {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
 }
 
 /* Alpine.js */
@@ -198,11 +187,21 @@ html {
    Admin Dashboard Styles
 ================================ */
 .admin-bg {
-    background: linear-gradient(to bottom right, #f8fafc, #dbeafe, #eef2ff);
+    background: linear-gradient(
+        to bottom right,
+        #f8fafc,
+        #dbeafe,
+        #eef2ff
+    );
 }
 
 .sidebar-bg {
-    background: linear-gradient(to bottom, #0f172a, #1e293b, #0f172a);
+    background: linear-gradient(
+        to bottom,
+        #0f172a,
+        #1e293b,
+        #0f172a
+    );
 }
 
 .sidebar-border {
@@ -270,7 +269,7 @@ html {
     @apply absolute bottom-0 left-0 w-0 h-0.5 bg-[#1a307b] transition-all duration-300 w-full;
 }
 .nav-link::after {
-    content: "";
+    content: '';
     @apply absolute bottom-0 left-0 w-0 h-0.5 bg-[#1a307b] transition-all duration-300;
 }
 .nav-link:hover::after {

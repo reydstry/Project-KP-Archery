@@ -1,7 +1,7 @@
 <!-- Berita Section -->
-<div class="relative min-h-screen py-24 sm:py-32
+<div class="relative min-h-screen py-24 sm:py-32 
     bg-gradient-to-b from-[#1b2659] via-[#0f172a] to-[#16213a] overflow-hidden">
-
+    
     <!-- Background decorative blur -->
     <div class="absolute top-10 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute bottom-10 right-10 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -208,7 +208,7 @@
                 @foreach($newsItems as $item)
                 <div class="relative group">
                     <!-- Glow -->
-                    <div class="absolute inset-0 bg-blue-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="absolute inset-0 bg-red-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                     <!-- Card -->
                     <div class="relative h-full bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden
@@ -221,15 +221,6 @@
                                     -translate-x-full group-hover:translate-x-full 
                                     transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none z-10">
                         </span>
-
-                        <!-- Type Badge -->
-                        <div class="absolute top-4 right-4 z-20 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/>
-                                <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"/>
-                            </svg>
-                            <span>News</span>
-                        </div>
 
                         <!-- Image -->
                         <div class="relative h-52 overflow-hidden">

@@ -1,10 +1,5 @@
 <!-- Instructor Section -->
-<section class="relative py-24 sm:py-32 bg-gradient-to-b from-[#0f172a] to-[#1b2659] overflow-hidden">
-
-    <!-- Background decorative blur -->
-    <div class="absolute top-10 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-10 right-10 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
+<section class="relative py-24 sm:py-32 bg-gradient-to-b from-[#16213a] to-[#1b2659] overflow-hidden">
     <div class="container mx-auto px-6 relative z-10">
 
         <!-- Section Header -->
@@ -41,56 +36,49 @@
         @endphp
 
         <!-- Cards -->
-<div class="flex flex-col gap-6 max-w-3xl mx-auto">
-    @foreach($instructorPoints as $index => $point)
-    <div class="relative group">
-        <!-- Glow -->
-        <div class="absolute inset-0 bg-{{ $point['color'] }}-500/20 rounded-3xl blur-2xl scale-105 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div class="flex flex-col gap-6 max-w-3xl mx-auto">
+            @foreach($instructorPoints as $index => $point)
+            <div class="relative group">
+                <div class="liquid-glass wide relative p-6 transition-transform duration-300 hover:scale-105"
+                    style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);"
+                    onmouseenter="this.classList.add('is-hovered')"
+                    onmouseleave="this.classList.remove('is-hovered')">
 
-        <!-- Card -->
-        <div class="relative bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-6
-                    shadow-xl shadow-black/30 hover:shadow-2xl hover:shadow-black/60
-                    transition-all duration-300 hover:scale-105 overflow-hidden">
+                    <!-- Shine -->
+                    <span class="shine"></span>
 
-            <!-- Shine -->
-            <span class="absolute inset-0 w-full h-full 
-                        bg-gradient-to-r from-transparent via-white/10 to-transparent
-                        -translate-x-full group-hover:translate-x-full 
-                        transition-transform duration-700 ease-in-out skew-x-12 pointer-events-none z-10">
-            </span>
+                    <div class="flex items-center gap-5">
 
-            <div class="flex items-center gap-5">
+                        <!-- Left: Number + Icon -->
+                        <div class="flex flex-col items-center gap-2 flex-shrink-0">
+                            <div class="w-14 h-14 bg-{{ $point['color'] }}-500/20 backdrop-blur-sm border border-white/20 
+                                        rounded-2xl flex items-center justify-center
+                                        shadow-lg shadow-{{ $point['color'] }}-500/20">
+                                <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $point['icon'] }}"/>
+                                </svg>
+                            </div>
+                        </div>
 
-                <!-- Left: Number + Icon -->
-                <div class="flex flex-col items-center gap-2 flex-shrink-0">
-                    <div class="w-14 h-14 bg-{{ $point['color'] }}-500/20 backdrop-blur-sm border border-white/20 
-                                rounded-2xl flex items-center justify-center
-                                shadow-lg shadow-{{ $point['color'] }}-500/20">
-                        <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $point['icon'] }}"/>
-                        </svg>
+                        <!-- Vertical divider -->
+                        <div class="w-px h-16 bg-white/10 flex-shrink-0"></div>
+
+                        <!-- Right: Text -->
+                        <div class="flex-1">
+                            <h3 class="text-base sm:text-lg font-bold text-white mb-1.5 leading-tight">
+                                {{ $point['title'] }}
+                            </h3>
+                            <div class="w-8 h-0.5 bg-{{ $point['color'] }}-400/60 rounded-full mb-2"></div>
+                            <p class="text-white/60 text-sm leading-relaxed">
+                                {{ $point['description'] }}
+                            </p>
+                        </div>
+
                     </div>
                 </div>
-
-                <!-- Vertical divider -->
-                <div class="w-px h-16 bg-white/10 flex-shrink-0"></div>
-
-                <!-- Right: Text -->
-                <div class="flex-1">
-                    <h3 class="text-base sm:text-lg font-bold text-white mb-1.5 leading-tight">
-                        {{ $point['title'] }}
-                    </h3>
-                    <div class="w-8 h-0.5 bg-{{ $point['color'] }}-400/60 rounded-full mb-2"></div>
-                    <p class="text-white/60 text-sm leading-relaxed">
-                        {{ $point['description'] }}
-                    </p>
-                </div>
-
             </div>
+            @endforeach
         </div>
-    </div>
-    @endforeach
-</div>
 
     </div>
 </section>

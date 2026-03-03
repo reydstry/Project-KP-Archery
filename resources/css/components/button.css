@@ -1,0 +1,120 @@
+/* =========================
+   LIQUID GLASS BUTTON
+========================= */
+
+.liquid-btn {
+    position: relative;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    transition: 
+        transform 200ms cubic-bezier(.34,1.56,.64,1),
+        background 200ms ease,
+        box-shadow 200ms ease;
+
+    background: rgba(0, 0, 0, 0.05);
+
+    border-radius: 9999px;
+    overflow: hidden;
+    isolation: isolate;
+    z-index: 0;
+}
+
+.liquid-btn.btn-white {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.liquid-btn.btn-red {
+    background: rgba(255, 0, 0, 0.10);
+}
+
+.liquid-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+
+  background: conic-gradient(
+      from var(--angle-btn) at 50% 50%,
+      rgba(255,255,255,0.06) 0deg,
+      rgba(255,255,255,0.06) 60deg,
+      rgba(255,255,255,0.35) 85deg,
+      rgba(255,255,255,0.45) 95deg,
+      rgba(255,255,255,0.35) 105deg,
+      rgba(255,255,255,0.06) 140deg,
+      rgba(255,255,255,0.06) 230deg,
+      rgba(255,255,255,0.25) 260deg,
+      rgba(255,255,255,0.35) 270deg,
+      rgba(255,255,255,0.25) 280deg,
+      rgba(255,255,255,0.06) 320deg,
+      rgba(255,255,255,0.06) 360deg
+  );
+
+  -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  pointer-events: none;
+  z-index: 1;
+  animation: border-btn-to-normal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.liquid-btn.is-hovered::before {
+  animation: border-btn-to-hover 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* subtle hover */
+.liquid-btn:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    background-color: rgba(0, 0, 0, 0.55);
+}
+
+.liquid-btn.btn-white:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.liquid-btn.btn-red:hover {
+    cursor: pointer;
+    transform: scale(1.05);
+    background: rgba(255, 0, 0, 0.15);
+}
+
+/* subtle press */
+.liquid-btn:active {
+    transform: scale(0.95) !important;
+    transition: transform 80ms ease !important;
+    
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.3),
+        0 4px 12px rgba(0,0,0,0.12);
+}
+
+.shine {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: screen;
+  filter: blur(8px);
+
+  background: linear-gradient(
+      to right,
+      transparent,
+      rgba(255,255,255,0.1),
+      transparent
+  );
+
+  transform: translateX(-100%) skewX(12deg);
+  transition: transform 350ms ease-in-out;
+}
+
+.liquid-btn:hover .shine {
+  transform: translateX(100%) skewX(12deg);
+}

@@ -46,7 +46,7 @@
     </style>
     @stack('styles')
 </head>
-<body class="bg-gradient-to-b from-[#16213a] via-[#0f172a] to-[#1b2659] min-h-screen overflow-x-hidden" x-data="{ sidebarOpen: false, isMobile: window.innerWidth < 1024 }" @resize.window="isMobile = window.innerWidth < 1024">
+<body class="bg-gradient-to-b from-[#16213a]  to-[#1b2659] min-h-screen overflow-x-hidden" x-data="{ sidebarOpen: false, isMobile: window.innerWidth < 1024 }" @resize.window="isMobile = window.innerWidth < 1024">
 
     <!-- Mobile Overlay -->
     <div x-show="sidebarOpen && isMobile" 
