@@ -1,10 +1,5 @@
 <!-- Achievements Section -->
-<section class="relative py-24 sm:py-32 bg-gradient-to-b from-[#273576] to-[#0f172a] overflow-hidden">
-
-    <!-- Background decorative blur -->
-    <div class="absolute top-10 right-10 w-72 h-72 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-10 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
+<section class="relative py-24 sm:py-32 bg-gradient-to-b from-[#1b2659] to-[#0f172a] overflow-hidden">
     <div class="container mx-auto px-6 relative z-10">
 
         <!-- Section Header -->
@@ -61,9 +56,62 @@
                 ->take(10); // Limit to 10 members (show 3, scroll for more)
         ?>
 
+<<<<<<< HEAD
         <?php if($memberAchievements->isEmpty()): ?>
         <div class="text-center py-12">
             <p class="text-white/60 text-lg">Belum ada prestasi member yang tersedia saat ini.</p>
+=======
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-12">
+            <?php $__currentLoopData = $achievements; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $achievement): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            <div class="relative group">
+                <!-- Card -->
+                <div class="liquid-glass relative h-full transition-transform duration-500 hover:scale-105"
+                        style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);"
+                        onmouseenter="this.classList.add('is-hovered')"
+                        onmouseleave="this.classList.remove('is-hovered')">
+
+                    <!-- Shine -->
+                    <span class="shine"></span>
+
+                    <!-- Image -->
+                    <div class="h-48 overflow-hidden">
+                        <img src="<?php echo e(asset('asset/img/achievements/' . $achievement['photo'])); ?>" 
+                             alt="<?php echo e($achievement['name']); ?>" 
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h4 class="font-bold text-white text-base"><?php echo e($achievement['name']); ?></h4>
+                            <p class="text-white/50 text-xs mb-4">Atlet FocusOnex</p>
+                        </div>
+
+                        <div class="flex justify-center">
+                            <!-- Divider -->
+                            <div class="w-25 h-px bg-red-500/70 mb-4"></div>
+                        </div>
+         
+                        <!-- Awards -->
+                        <div class="space-y-3">
+                            <?php $__currentLoopData = $achievement['awards']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $award): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <div class="liquid-glass relative h-full transition-transform duration-500 px-4 py-2.5"
+                                style="box-shadow: 0 8px 32px rgba(0,0,0,0.25);" 
+
+                                <!-- Shine -->
+                                <span class="shine"></span>
+
+                                <span class="text-xl"><?php echo e($award['medal']); ?></span>
+                                <span class="text-white/80 text-xs sm:text-sm leading-snug"><?php echo e($award['title']); ?></span>
+                            </div>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+>>>>>>> e2398d387bee565a67bfc9447e3e48776e8d1d36
         </div>
         <?php else: ?>
         <!-- Carousel Container with Alpine.js -->
